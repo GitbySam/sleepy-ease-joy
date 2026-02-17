@@ -7,10 +7,12 @@ import Testimonials from "@/components/Testimonials";
 import BundleOffer from "@/components/BundleOffer";
 import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
+import SocialProofToasts from "@/components/SocialProofToasts";
 
 const Index = () => (
   <>
     <Header />
+    <SocialProofToasts />
     <main>
       <Hero />
       <Marquee />
