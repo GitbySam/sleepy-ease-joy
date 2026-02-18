@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
+import { Link } from "react-router-dom";
 import pillowHero from "@/assets/pillow-hero.png";
 
 const stagger = {
@@ -32,14 +33,15 @@ const Hero = () => (
           Fini les réveils en sursaut et les douleurs cervicales.
         </motion.p>
         <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 items-start">
-          <motion.a
-            href="#offer"
-            whileHover={{ scale: 1.06 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-gold text-primary-foreground px-8 py-4 rounded-full text-base font-bold shadow-gold-glow inline-flex items-center gap-2 uppercase tracking-wider"
-          >
-            Acheter maintenant — 50% OFF
-          </motion.a>
+          <Link to="/product">
+            <motion.span
+              whileHover={{ scale: 1.06 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-gold text-primary-foreground px-8 py-4 rounded-full text-base font-bold shadow-gold-glow inline-flex items-center gap-2 uppercase tracking-wider"
+            >
+              Acheter maintenant — 50% OFF
+            </motion.span>
+          </Link>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span className="flex">
               {[...Array(5)].map((_, i) => (

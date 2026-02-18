@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const bundles = [
   { qty: 1, label: "1 Sleepenzy", price: "34,95€", oldPrice: "69,90€", perUnit: "34,95€/unité", tag: null },
@@ -106,14 +107,15 @@ const BundleOffer = () => {
           </div>
         </motion.div>
 
-        <motion.a
-          href="#"
-          whileHover={{ scale: 1.04 }}
-          whileTap={{ scale: 0.96 }}
-          className="block w-full bg-gold text-primary-foreground text-center py-4 rounded-full text-lg font-bold shadow-gold-glow uppercase tracking-wider"
-        >
-          Commander maintenant
-        </motion.a>
+        <Link to="/product">
+          <motion.span
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
+            className="block w-full bg-gold text-primary-foreground text-center py-4 rounded-full text-lg font-bold shadow-gold-glow uppercase tracking-wider"
+          >
+            Commander maintenant
+          </motion.span>
+        </Link>
 
         <div className="flex justify-center gap-6 mt-6 text-xs text-muted-foreground">
           <span>🔒 Paiement sécurisé</span>
