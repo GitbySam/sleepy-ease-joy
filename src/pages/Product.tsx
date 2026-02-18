@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Check, Eye, ShieldCheck, Truck, RotateCcw, Star, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import pillowHero from "@/assets/pillow-hero.png";
-import CartDrawer from "@/components/CartDrawer";
+import CartDrawer, { type CartItem } from "@/components/CartDrawer";
 
 const bundles = [
   {
@@ -55,11 +55,25 @@ function useCountdown() {
 const Product = () => {
   const [selected, setSelected] = useState(0);
   const [cartOpen, setCartOpen] = useState(false);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const countdown = useCountdown();
   const bundle = bundles[selected];
   const viewers = 28;
 
   const handleAddToCart = () => {
+    setCartItems((prev) => {
+      const existing = prev.find((i) => i.id === bundle.id);
+      if (existing) {
+        return prev.map((i) => i.id === bundle.id ? { ...i, qty: i.qty + 1 } : i);
+      }
+      return [...prev, {
+        id: bundle.id,
+        label: bundle.label,
+        qty: 1,
+        unitPrice: bundle.price,
+        unitOldPrice: bundle.oldPrice,
+      }];
+    });
     setCartOpen(true);
   };
 
@@ -255,14 +269,12 @@ const Product = () => {
       <CartDrawer
         open={cartOpen}
         onClose={() => setCartOpen(false)}
-        item={{
-          label: bundle.label,
-          qty: bundle.id + 1,
-          price: bundle.price,
-          oldPrice: bundle.oldPrice,
+        items={cartItems}
+        onUpdateQty={(id, qty) => {
+          setCartItems((prev) => prev.map((i) => i.id === id ? { ...i, qty } : i));
         }}
-        onUpdateQty={(qty) => {
-          if (qty === 0) setCartOpen(false);
+        onRemove={(id) => {
+          setCartItems((prev) => prev.filter((i) => i.id !== id));
         }}
       />
     </div>
