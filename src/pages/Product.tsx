@@ -22,7 +22,7 @@ const bundles = [
     price: 54.90,
     oldPrice: 139.80,
     discount: "-61%",
-    tag: "POPULAIRE",
+    tag: "COUPLE PACK",
     tagColor: "bg-gold",
   },
   {
@@ -32,7 +32,7 @@ const bundles = [
     price: 69.90,
     oldPrice: 209.70,
     discount: "-67%",
-    tag: "MEILLEURE OFFRE",
+    tag: "FAMILY PACK",
     tagColor: "bg-destructive",
   },
 ];
