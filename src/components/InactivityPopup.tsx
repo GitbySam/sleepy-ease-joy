@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Gift, ShieldCheck, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const INACTIVITY_TIMEOUT = 30000; // 30 seconds
 
 const InactivityPopup = () => {
+  const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
@@ -40,8 +42,7 @@ const InactivityPopup = () => {
   const handleClaim = () => {
     setShow(false);
     setDismissed(true);
-    const offerSection = document.getElementById("offer");
-    offerSection?.scrollIntoView({ behavior: "smooth" });
+    navigate("/product");
   };
 
   return (
