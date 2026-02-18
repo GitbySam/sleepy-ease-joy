@@ -8,11 +8,13 @@ import BundleOffer from "@/components/BundleOffer";
 import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
 import SocialProofToasts from "@/components/SocialProofToasts";
+import InactivityPopup from "@/components/InactivityPopup";
 
 const Index = () => (
   <>
     <Header />
     <SocialProofToasts />
+    <InactivityPopup />
     <main>
       <Hero />
       <Marquee />
