@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShieldCheck, Truck, RotateCcw, Minus, Plus, Trash2 } from "lucide-react";
 import pillowHero from "@/assets/pillow-hero.png";
+import UpsellPopup from "./UpsellPopup";
 
 export interface CartItem {
   id: number;
@@ -19,6 +21,7 @@ interface CartDrawerProps {
 }
 
 const CartDrawer = ({ open, onClose, items, onUpdateQty, onRemove }: CartDrawerProps) => {
+  const [upsellOpen, setUpsellOpen] = useState(false);
   const totalPrice = items.reduce((sum, i) => sum + i.unitPrice * i.qty, 0);
   const totalOldPrice = items.reduce((sum, i) => sum + i.unitOldPrice * i.qty, 0);
   const savings = totalOldPrice - totalPrice;
@@ -107,10 +110,20 @@ const CartDrawer = ({ open, onClose, items, onUpdateQty, onRemove }: CartDrawerP
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.97 }}
+                onClick={() => setUpsellOpen(true)}
                 className="w-full bg-gold text-primary-foreground py-4 rounded-xl text-base font-bold shadow-gold-glow flex items-center justify-center gap-2 uppercase tracking-wider"
               >
                 🔒 Paiement Sécurisé
               </motion.button>
+
+              <UpsellPopup
+                open={upsellOpen}
+                onClose={() => setUpsellOpen(false)}
+                onAccept={() => {
+                  setUpsellOpen(false);
+                  // TODO: ajouter le bandeau au panier
+                }}
+              />
 
               <div className="flex items-center justify-center gap-3 opacity-60">
                 <span className="text-xs font-bold">VISA</span>
