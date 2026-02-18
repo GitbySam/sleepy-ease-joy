@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Check, Eye, ShieldCheck, Truck, RotateCcw, Star, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import pillowHero from "@/assets/pillow-hero.png";
+import CartDrawer from "@/components/CartDrawer";
 
 const bundles = [
   {
@@ -53,9 +54,14 @@ function useCountdown() {
 
 const Product = () => {
   const [selected, setSelected] = useState(0);
+  const [cartOpen, setCartOpen] = useState(false);
   const countdown = useCountdown();
   const bundle = bundles[selected];
   const viewers = 28;
+
+  const handleAddToCart = () => {
+    setCartOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -218,6 +224,7 @@ const Product = () => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
+              onClick={handleAddToCart}
               className="w-full bg-gold text-primary-foreground py-4 rounded-xl text-base font-bold shadow-gold-glow flex items-center justify-center gap-2 uppercase tracking-wider"
             >
               🛒 Ajouter au panier — {bundle.label}
@@ -245,6 +252,19 @@ const Product = () => {
           </motion.div>
         </div>
       </div>
+      <CartDrawer
+        open={cartOpen}
+        onClose={() => setCartOpen(false)}
+        item={{
+          label: bundle.label,
+          qty: bundle.id + 1,
+          price: bundle.price,
+          oldPrice: bundle.oldPrice,
+        }}
+        onUpdateQty={(qty) => {
+          if (qty === 0) setCartOpen(false);
+        }}
+      />
     </div>
   );
 };
