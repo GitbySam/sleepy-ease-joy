@@ -9,6 +9,7 @@ import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
 import SocialProofToasts from "@/components/SocialProofToasts";
 import InactivityPopup from "@/components/InactivityPopup";
+import ShopifyProducts from "@/components/ShopifyProducts";
 
 const Index = () => (
   <>
@@ -18,6 +19,7 @@ const Index = () => (
     <main>
       <Hero />
       <Marquee />
+      <ShopifyProducts />
       <Benefits />
       <ComparisonSlider />
       <Testimonials />
