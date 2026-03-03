@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
+import ShopifyCartDrawer from "./ShopifyCartDrawer";
 
 const AnnouncementBar = () => (
   <div className="bg-dark text-primary-foreground py-2 overflow-hidden">
@@ -46,16 +47,19 @@ const Header = () => {
             <a href="#testimonials" className="hover:text-foreground transition-colors">Avis</a>
             <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
           </div>
-          <Link to="/product">
-            <motion.span
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-gold text-primary-foreground px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 shadow-gold-glow"
-            >
-              <ShoppingBag size={16} />
-              <span className="hidden sm:inline">Commander</span>
-            </motion.span>
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link to="/product">
+              <motion.span
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-gold text-primary-foreground px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 shadow-gold-glow"
+              >
+                <ShoppingBag size={16} />
+                <span className="hidden sm:inline">Commander</span>
+              </motion.span>
+            </Link>
+            <ShopifyCartDrawer />
+          </div>
         </div>
       </nav>
     </header>
