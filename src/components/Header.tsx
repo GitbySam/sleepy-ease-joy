@@ -39,7 +39,7 @@ const Header = () => {
       >
         <div className="container mx-auto flex items-center justify-between py-4 px-6">
           <a href="#" className="font-serif text-2xl font-bold text-foreground tracking-tight">
-            Sleep<span className="text-gold">enzy</span>
+            Sleep<span className="text-gold">&zy</span>
           </a>
           <div className="hidden md:flex items-center gap-8 font-sans-body text-sm text-muted-foreground">
             <a href="#benefits" className="hover:text-foreground transition-colors">Bénéfices</a>
