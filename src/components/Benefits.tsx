@@ -1,26 +1,26 @@
 import { motion } from "framer-motion";
-import { Shield, Wind, Moon, Feather } from "lucide-react";
+import { ShieldOff, SmilePlus, Camera, Eye } from "lucide-react";
 
 const benefits = [
   {
-    icon: Shield,
-    title: "360° Neck Support",
-    desc: "Maintains natural alignment of your cervical spine for zero pain when you wake up.",
+    icon: ShieldOff,
+    title: "No More Head Drops",
+    desc: "Prevents the classic head-flop-onto-stranger moment. Your head stays locked in place.",
   },
   {
-    icon: Moon,
-    title: "Deep REM Sleep",
-    desc: "Eliminates the micro-wake reflex by preventing your head from tilting beyond 15°.",
+    icon: SmilePlus,
+    title: "Mouth Stays Closed",
+    desc: "Chin support keeps your jaw in place. No drool, no open mouth, no embarrassing faces.",
   },
   {
-    icon: Wind,
-    title: "Breathable Fabric",
-    desc: "Soft, airy material with no compression. No suffocating feeling or overheating.",
+    icon: Camera,
+    title: "No Embarrassing Photos",
+    desc: "You look composed even when fully asleep. No more viral office Slack moments.",
   },
   {
-    icon: Feather,
-    title: "Ultra-Light & Compact",
-    desc: "Wears like a scarf, fits in a handbag. Only 6.3 oz.",
+    icon: Eye,
+    title: "Discreet & Stylish",
+    desc: "Looks like a scarf, not a medical device. Nobody even knows it's a pillow.",
   },
 ];
 
@@ -47,7 +47,7 @@ const Benefits = () => (
           Designed by sleep specialists
         </p>
         <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
-          Why Sleep&zy is <span className="text-gold italic">different</span>
+          Why you'll never be <span className="text-gold italic">that person</span> again
         </h2>
       </motion.div>
 

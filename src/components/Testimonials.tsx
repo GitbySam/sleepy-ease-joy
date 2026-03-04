@@ -9,32 +9,32 @@ import "swiper/css/pagination";
 const testimonials = [
   {
     name: "Sarah L.",
-    role: "Frequent traveler",
-    text: "I've tried EVERY pillow on the market. Sleep&zy is the first one that actually keeps my head from falling. I slept 6 hours straight on my flight to Tokyo!",
+    role: "Marketing manager",
+    text: "My coworker took a photo of me drooling on a flight. It went VIRAL in the office Slack. Never again. Sleep&zy literally saved my professional reputation.",
     stars: 5,
   },
   {
     name: "James R.",
-    role: "Business consultant",
-    text: "After my cervical surgery, I thought I'd never travel comfortably again. This pillow changed everything. 12-hour flight, zero pain.",
+    role: "Daily commuter",
+    text: "I woke up on a stranger's shoulder on the subway. The look on their face... I ordered Sleep&zy that same day. Best $35 I've ever spent.",
     stars: 5,
   },
   {
     name: "Emily M.",
-    role: "Flight attendant",
-    text: "As cabin crew, I fly 80+ hours a month. This is the only one that actually works. I recommend it to all my passengers.",
+    role: "Mom of 3",
+    text: "My kids used to film me sleeping with my mouth wide open on road trips and post it on TikTok. Now I sleep like a normal human being. Thanks Sleep&zy!",
     stars: 5,
   },
   {
     name: "Mike D.",
-    role: "Digital nomad",
-    text: "Ultra-light and compact — fits right in my backpack. Plus it looks like a scarf so it's super discreet. Absolute game changer.",
+    role: "Sales executive",
+    text: "A client saw me passed out at the airport gate, mouth wide open, head back. I could've died of embarrassment. Got Sleep&zy the next day. Game changer.",
     stars: 5,
   },
   {
     name: "Jessica B.",
-    role: "Mom of 3",
-    text: "I could never sleep in the car. With Sleep&zy, I finally got some rest while my husband was driving on our road trip. What a relief!",
+    role: "Frequent flyer",
+    text: "A flight attendant had to wake me up because I was snoring with my head thrown back. My seatmate was filming. Sleep&zy fixed everything.",
     stars: 5,
   },
 ];
@@ -49,10 +49,10 @@ const Testimonials = () => (
         className="text-center mb-12"
       >
         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
-          12,000+ happy travelers
+          12,000+ dignified sleepers
         </p>
         <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
-          What they're <span className="text-gold italic">saying</span>
+          Real stories, real <span className="text-gold italic">saves</span>
         </h2>
       </motion.div>
 

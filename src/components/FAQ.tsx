@@ -8,16 +8,20 @@ import {
 
 const faqs = [
   {
-    q: "How does the Sleep&zy pillow work?",
-    a: "Sleep&zy uses an internal structural support that holds your jaw and chin in place, preventing your head from falling forward or to the side. This eliminates the vestibular wake reflex that jolts you awake.",
+    q: "Will it really stop me from drooling?",
+    a: "Yes! Sleep&zy's chin support keeps your jaw gently closed, which prevents your mouth from falling open — the #1 cause of drooling while sleeping upright. No more waking up to a wet shirt.",
   },
   {
-    q: "Is it different from a regular U-shaped pillow?",
-    a: "Yes, fundamentally. U-shaped pillows only cushion your head AFTER it falls. Sleep&zy prevents the movement BEFORE it happens thanks to its 360° structural support.",
+    q: "Does it prevent my mouth from opening?",
+    a: "Absolutely. The structural support cradles your chin and jaw, keeping them in a natural closed position. You'll look composed and dignified even in deep sleep.",
   },
   {
-    q: "Is it comfortable for long flights?",
-    a: "Absolutely. Its memory foam and breathable fabric make it comfortable even on 12+ hour flights. No compression feeling or excessive heat.",
+    q: "Will people notice I'm wearing it?",
+    a: "Nope. Sleep&zy looks like a stylish scarf or neck accessory. It's designed to be discreet — nobody will know it's a travel pillow until you tell them.",
+  },
+  {
+    q: "What if I'm a heavy sleeper who moves a lot?",
+    a: "That's exactly who this is for. The 360° structural support locks your head in place no matter how deeply you sleep. No more waking up on a stranger's shoulder.",
   },
   {
     q: "Can I wash it?",
@@ -25,11 +29,7 @@ const faqs = [
   },
   {
     q: "What is the return policy?",
-    a: "We offer a 90-day money-back guarantee. If you're not 100% satisfied, send it back and we'll give you a full refund, no questions asked.",
-  },
-  {
-    q: "How long does shipping take?",
-    a: "Free standard shipping takes 5-8 business days within the US. An express option (2-3 days) is available at checkout.",
+    a: "We offer a 90-day dignity-back guarantee. If you're not 100% satisfied, send it back for a full refund, no questions asked.",
   },
 ];
 

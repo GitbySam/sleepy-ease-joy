@@ -23,14 +23,14 @@ const Hero = () => (
         className="space-y-6"
       >
         <motion.p variants={fadeUp} className="text-sm font-sans-body uppercase tracking-[0.25em] text-muted-foreground">
-          Ergonomic cervical pillow
+          The anti-embarrassment travel pillow
         </motion.p>
         <motion.h1 variants={fadeUp} className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold leading-[1.1] text-foreground">
-          Sleep like <span className="text-gold italic">First Class.</span>
+          Stop waking up to <span className="text-gold italic">THAT photo.</span>
         </motion.h1>
         <motion.p variants={fadeUp} className="text-lg text-muted-foreground font-sans-body leading-relaxed max-w-lg">
-          The revolutionary travel pillow that keeps your head in place.
-          No more jerking awake or neck pain.
+          Mouth open. Head on a stranger's shoulder. Drool on your shirt.
+          We've all been there. Sleep&zy keeps your head locked in place so you sleep with dignity.
         </motion.p>
         <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 items-start">
           <Link to="/product">
@@ -39,7 +39,7 @@ const Hero = () => (
               whileTap={{ scale: 0.95 }}
               className="bg-gold text-primary-foreground px-8 py-4 rounded-full text-base font-bold shadow-gold-glow inline-flex items-center gap-2 uppercase tracking-wider"
             >
-              Shop now — 50% OFF
+              Save your reputation — 50% OFF
             </motion.span>
           </Link>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -53,7 +53,7 @@ const Hero = () => (
         </motion.div>
         <motion.div variants={fadeUp} className="flex items-center gap-2 text-xs text-muted-foreground pt-2">
           <ArrowDown size={14} className="animate-bounce" />
-          90-day money-back guarantee
+          90-day dignity-back guarantee
         </motion.div>
       </motion.div>
 
