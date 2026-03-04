@@ -25,7 +25,7 @@ const BundleOffer = () => {
             Limited offer — up to 67% off
           </p>
           <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-2">
-            Choose your <span className="text-gold italic">deal</span>
+            Protect your <span className="text-gold italic">reputation</span>
           </h2>
         </motion.div>
 
@@ -35,7 +35,7 @@ const BundleOffer = () => {
           viewport={{ once: true }}
           className="text-center text-sm text-muted-foreground mb-10 italic font-semibold"
         >
-          <span className="font-bold">7 out of 10 customers</span> gift a Sleep&zy to a loved one
+          <span className="font-bold">7 out of 10 customers</span> save a friend from embarrassment too
         </motion.p>
 
         <div className="space-y-4 mb-8">
@@ -113,7 +113,7 @@ const BundleOffer = () => {
             whileTap={{ scale: 0.96 }}
             className="block w-full bg-gold text-primary-foreground text-center py-4 rounded-full text-lg font-bold shadow-gold-glow uppercase tracking-wider"
           >
-            Order now
+            Save my dignity now
           </motion.span>
         </Link>
 

@@ -35,7 +35,7 @@ const UpsellPopup = ({ open, onClose, onAccept }: UpsellPopupProps) => {
                   <span className="text-xs font-bold uppercase tracking-wider">Limited offer</span>
                 </div>
                 <p className="text-sm font-bold">
-                  🎧 WAIT! Complete your sleep routine & save 50%
+                  🎧 Complete your anti-embarrassment kit & save 50%
                 </p>
               </div>
 
@@ -52,7 +52,7 @@ const UpsellPopup = ({ open, onClose, onAccept }: UpsellPopupProps) => {
                 <div className="bg-muted/50 border border-border rounded-lg p-3 flex items-start gap-2">
                   <span className="text-gold mt-0.5">💡</span>
                   <p className="text-xs text-muted-foreground">
-                    <strong className="text-foreground">Optimize your sleep!</strong> The Sleep&zy pillow + the sleep headband create the perfect environment for fast, deep sleep.
+                    <strong className="text-foreground">Full protection!</strong> The pillow prevents head drops. The headband blocks out light so you sleep deeper — without the zombie face.
                   </p>
                 </div>
 

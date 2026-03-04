@@ -1,23 +1,23 @@
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
-const buyers = [
-  { name: "Sarah L.", city: "New York", qty: 2 },
-  { name: "James D.", city: "Los Angeles", qty: 1 },
-  { name: "Emily M.", city: "Chicago", qty: 3 },
-  { name: "Mike B.", city: "Houston", qty: 1 },
-  { name: "Jessica R.", city: "Phoenix", qty: 2 },
-  { name: "Chris P.", city: "Philadelphia", qty: 1 },
-  { name: "Ashley F.", city: "San Antonio", qty: 2 },
-  { name: "David G.", city: "San Diego", qty: 1 },
-  { name: "Amanda V.", city: "Dallas", qty: 3 },
-  { name: "Ryan C.", city: "Austin", qty: 1 },
-  { name: "Lauren H.", city: "Denver", qty: 2 },
-  { name: "Brandon W.", city: "Seattle", qty: 1 },
+const messages = [
+  { emoji: "😴", name: "Sarah L.", city: "NYC", line: "just saved her dignity" },
+  { emoji: "🫣", name: "James D.", city: "LA", line: "no more drool photos" },
+  { emoji: "✈️", name: "Emily M.", city: "Chicago", line: "never embarrassed again" },
+  { emoji: "😮‍💨", name: "Mike B.", city: "Houston", line: "no more head-on-stranger moments" },
+  { emoji: "📸", name: "Jessica R.", city: "Phoenix", line: "deleted the evidence, got Sleep&zy" },
+  { emoji: "🙈", name: "Chris P.", city: "Philadelphia", line: "mouth officially stays closed" },
+  { emoji: "😤", name: "Ashley F.", city: "San Antonio", line: "saved a friend from embarrassment too" },
+  { emoji: "💤", name: "David G.", city: "San Diego", line: "sleeps with dignity now" },
+  { emoji: "🫡", name: "Amanda V.", city: "Dallas", line: "no more viral Slack photos" },
+  { emoji: "😎", name: "Ryan C.", city: "Austin", line: "reputation officially protected" },
+  { emoji: "🛡️", name: "Lauren H.", city: "Denver", line: "anti-embarrassment kit secured" },
+  { emoji: "✅", name: "Brandon W.", city: "Seattle", line: "no more drooling in public" },
 ];
 
-function getRandomBuyer() {
-  return buyers[Math.floor(Math.random() * buyers.length)];
+function getRandomMessage() {
+  return messages[Math.floor(Math.random() * messages.length)];
 }
 
 function getTimeAgo() {
@@ -30,10 +30,10 @@ const SocialProofToasts = () => {
 
   useEffect(() => {
     const showToast = () => {
-      const buyer = getRandomBuyer();
+      const msg = getRandomMessage();
       const time = getTimeAgo();
       toast(
-        `🛒 ${buyer.name} from ${buyer.city} bought ${buyer.qty > 1 ? `${buyer.qty} Sleep&zy` : "1 Sleep&zy"}`,
+        `${msg.emoji} ${msg.name} from ${msg.city} — ${msg.line}`,
         {
           description: time,
           duration: 4000,

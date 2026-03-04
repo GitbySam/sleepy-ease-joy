@@ -84,10 +84,10 @@ const InactivityPopup = () => {
                 <Gift className="text-white" size={28} />
               </div>
               <h2 className="text-2xl font-serif font-bold text-white mb-1">
-                WAIT!
+                WAIT! Your dignity is at stake
               </h2>
               <p className="text-white/90 text-sm font-sans-body">
-                Exclusive offer just for you
+                Next time you fall asleep in public, will you be ready?
               </p>
             </div>
 
@@ -114,14 +114,14 @@ const InactivityPopup = () => {
                 onClick={handleClaim}
                 className="w-full rounded-full bg-dark py-3.5 text-sm font-bold text-white tracking-wide shadow-lg hover:opacity-90 transition-opacity mb-3"
               >
-                CLAIM MY DISCOUNT NOW
+                PROTECT MY REPUTATION NOW
               </motion.button>
 
               <button
                 onClick={handleDismiss}
                 className="text-xs text-muted-foreground underline hover:text-foreground transition-colors font-sans-body"
               >
-                No thanks, I'd rather pay full price
+                No thanks, I enjoy being photographed drooling
               </button>
 
               <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">

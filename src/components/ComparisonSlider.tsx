@@ -35,10 +35,10 @@ const ComparisonSlider = () => {
           className="text-center mb-12"
         >
           <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
-            Clinically proven results
+            The proof speaks for itself
           </p>
           <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
-            Before <span className="text-gold">&</span> After
+            Embarrassing <span className="text-gold italic">vs.</span> Elegant
           </h2>
         </motion.div>
 
@@ -69,10 +69,10 @@ const ComparisonSlider = () => {
           </div>
 
           <div className="absolute top-4 left-4 bg-dark/70 text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm">
-            BEFORE
+            EMBARRASSING
           </div>
           <div className="absolute top-4 right-4 bg-gold/90 text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm">
-            AFTER
+            DIGNIFIED
           </div>
 
           {!hasInteracted && (
