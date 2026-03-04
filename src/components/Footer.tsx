@@ -4,7 +4,7 @@ const Footer = () => (
       <div className="grid md:grid-cols-4 gap-10">
         <div>
           <h3 className="font-serif text-2xl font-bold mb-4">
-            Sleep<span className="text-gold">enzy</span>
+            Sleep<span className="text-gold">&zy</span>
           </h3>
           <p className="text-sm text-primary-foreground/60 leading-relaxed">
             Le coussin cervical ergonomique qui révolutionne votre sommeil en voyage.
