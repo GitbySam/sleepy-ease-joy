@@ -35,10 +35,10 @@ const ComparisonSlider = () => {
           className="text-center mb-12"
         >
           <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
-            Résultat prouvé cliniquement
+            Clinically proven results
           </p>
           <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
-            Avant <span className="text-gold">&</span> Après
+            Before <span className="text-gold">&</span> After
           </h2>
         </motion.div>
 
@@ -56,37 +56,32 @@ const ComparisonSlider = () => {
           onTouchStart={() => setIsDragging(true)}
           onTouchEnd={() => setIsDragging(false)}
         >
-          {/* After (full background) */}
-          <img src={afterImg} alt="Après - Sommeil confortable" className="absolute inset-0 w-full h-full object-cover" />
+          <img src={afterImg} alt="After - Comfortable sleep" className="absolute inset-0 w-full h-full object-cover" />
           
-          {/* Before (clipped) */}
           <div className="absolute inset-0" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}>
-            <img src={beforeImg} alt="Avant - Sommeil inconfortable" className="w-full h-full object-cover" />
+            <img src={beforeImg} alt="Before - Uncomfortable sleep" className="w-full h-full object-cover" />
           </div>
 
-          {/* Slider line */}
           <div className="absolute top-0 bottom-0 w-0.5 bg-primary-foreground/80" style={{ left: `${position}%` }}>
             <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-card border-2 border-gold flex items-center justify-center shadow-lg">
               <span className="text-gold text-xs font-bold">⟷</span>
             </div>
           </div>
 
-          {/* Labels */}
           <div className="absolute top-4 left-4 bg-dark/70 text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm">
-            AVANT
+            BEFORE
           </div>
           <div className="absolute top-4 right-4 bg-gold/90 text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm">
-            APRÈS
+            AFTER
           </div>
 
-          {/* Hint */}
           {!hasInteracted && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-dark/70 text-primary-foreground px-4 py-2 rounded-full text-sm backdrop-blur-sm"
             >
-              ← Glissez pour voir →
+              ← Slide to compare →
             </motion.div>
           )}
         </motion.div>

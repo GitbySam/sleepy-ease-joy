@@ -46,7 +46,7 @@ const CartDrawer = ({ open, onClose, items, onUpdateQty, onRemove }: CartDrawerP
             className="fixed top-0 right-0 h-full w-full max-w-md bg-card z-50 shadow-2xl flex flex-col"
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-              <h2 className="text-lg font-bold text-foreground font-serif">🛒 Votre Panier</h2>
+              <h2 className="text-lg font-bold text-foreground font-serif">🛒 Your Cart</h2>
               <button onClick={onClose} className="p-1 hover:bg-muted rounded-lg transition-colors">
                 <X size={20} className="text-muted-foreground" />
               </button>
@@ -56,14 +56,14 @@ const CartDrawer = ({ open, onClose, items, onUpdateQty, onRemove }: CartDrawerP
               {items.map((item) => (
                 <div key={item.id} className="flex gap-4 bg-muted/30 rounded-xl p-4 border border-border">
                   <div className="w-20 h-20 bg-background rounded-lg flex items-center justify-center flex-shrink-0">
-                    <img src={pillowHero} alt="Sleepenzy" className="w-16 h-16 object-contain" />
+                    <img src={pillowHero} alt="Sleep&zy" className="w-16 h-16 object-contain" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-foreground text-sm">Sleepenzy™ — {item.label}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">Coussin Cervical Ergonomique</p>
+                    <p className="font-semibold text-foreground text-sm">Sleep&zy™ — {item.label}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Ergonomic Cervical Pillow</p>
                     <div className="flex items-center gap-2 mt-2">
-                      <span className="text-base font-bold text-foreground">{(item.unitPrice * item.qty).toFixed(2).replace(".", ",")}€</span>
-                      <span className="text-xs text-muted-foreground line-through">{(item.unitOldPrice * item.qty).toFixed(2).replace(".", ",")}€</span>
+                      <span className="text-base font-bold text-foreground">${(item.unitPrice * item.qty).toFixed(2)}</span>
+                      <span className="text-xs text-muted-foreground line-through">${(item.unitOldPrice * item.qty).toFixed(2)}</span>
                     </div>
                   </div>
                   <div className="flex flex-col items-end justify-between">
@@ -89,7 +89,7 @@ const CartDrawer = ({ open, onClose, items, onUpdateQty, onRemove }: CartDrawerP
                 </div>
               ))}
               {items.length === 0 && (
-                <p className="text-center text-muted-foreground text-sm py-8">Votre panier est vide</p>
+                <p className="text-center text-muted-foreground text-sm py-8">Your cart is empty</p>
               )}
             </div>
 
@@ -97,14 +97,14 @@ const CartDrawer = ({ open, onClose, items, onUpdateQty, onRemove }: CartDrawerP
               {savings > 0 && (
                 <div className="bg-gold/10 border border-gold/30 text-center py-2 rounded-lg">
                   <span className="text-sm font-bold text-foreground">
-                    ❄️ Économie Hiver : <span className="text-gold">{savings.toFixed(2).replace(".", ",")}€</span> !
+                    ❄️ Winter Savings: <span className="text-gold">${savings.toFixed(2)}</span>!
                   </span>
                 </div>
               )}
 
               <div className="flex items-center justify-between">
                 <span className="text-base font-bold text-foreground">Total</span>
-                <span className="text-xl font-bold text-foreground">{totalPrice.toFixed(2).replace(".", ",")}€</span>
+                <span className="text-xl font-bold text-foreground">${totalPrice.toFixed(2)}</span>
               </div>
 
               <motion.button
@@ -113,7 +113,7 @@ const CartDrawer = ({ open, onClose, items, onUpdateQty, onRemove }: CartDrawerP
                 onClick={() => setUpsellOpen(true)}
                 className="w-full bg-gold text-primary-foreground py-4 rounded-xl text-base font-bold shadow-gold-glow flex items-center justify-center gap-2 uppercase tracking-wider"
               >
-                🔒 Paiement Sécurisé
+                🔒 Secure Checkout
               </motion.button>
 
               <UpsellPopup
@@ -121,7 +121,7 @@ const CartDrawer = ({ open, onClose, items, onUpdateQty, onRemove }: CartDrawerP
                 onClose={() => setUpsellOpen(false)}
                 onAccept={() => {
                   setUpsellOpen(false);
-                  // TODO: ajouter le bandeau au panier
+                  // TODO: add headband to cart
                 }}
               />
 
@@ -136,15 +136,15 @@ const CartDrawer = ({ open, onClose, items, onUpdateQty, onRemove }: CartDrawerP
               <div className="flex items-center justify-center gap-5 text-xs text-muted-foreground">
                 <span className="flex flex-col items-center gap-1">
                   <ShieldCheck size={16} />
-                  Sécurisé
+                  Secure
                 </span>
                 <span className="flex flex-col items-center gap-1">
                   <Truck size={16} />
-                  Livraison gratuite
+                  Free shipping
                 </span>
                 <span className="flex flex-col items-center gap-1">
                   <RotateCcw size={16} />
-                  90 jours retour
+                  90-day returns
                 </span>
               </div>
             </div>

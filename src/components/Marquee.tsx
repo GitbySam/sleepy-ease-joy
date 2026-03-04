@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 
-const logos = ["VOGUE", "ELLE", "GQ", "Forbes", "TechCrunch", "Le Monde", "Cosmopolitan", "Marie Claire"];
+const logos = ["VOGUE", "ELLE", "GQ", "Forbes", "TechCrunch", "Cosmopolitan", "Marie Claire", "Travel + Leisure"];
 
 const Marquee = () => (
   <section className="bg-warm-gray py-8 overflow-hidden">
@@ -11,7 +11,7 @@ const Marquee = () => (
       className="relative"
     >
       <p className="text-center text-xs uppercase tracking-[0.3em] text-muted-foreground mb-6">
-        Vu dans la presse
+        As seen in
       </p>
       <div className="flex overflow-hidden">
         <div className="animate-marquee flex items-center gap-16 whitespace-nowrap">

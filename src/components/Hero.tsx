@@ -23,14 +23,14 @@ const Hero = () => (
         className="space-y-6"
       >
         <motion.p variants={fadeUp} className="text-sm font-sans-body uppercase tracking-[0.25em] text-muted-foreground">
-          Coussin cervical ergonomique
+          Ergonomic cervical pillow
         </motion.p>
         <motion.h1 variants={fadeUp} className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold leading-[1.1] text-foreground">
-          Dormez comme en <span className="text-gold italic">Première Classe.</span>
+          Sleep like <span className="text-gold italic">First Class.</span>
         </motion.h1>
         <motion.p variants={fadeUp} className="text-lg text-muted-foreground font-sans-body leading-relaxed max-w-lg">
-          Le coussin de voyage révolutionnaire qui maintient votre tête en place.
-          Fini les réveils en sursaut et les douleurs cervicales.
+          The revolutionary travel pillow that keeps your head in place.
+          No more jerking awake or neck pain.
         </motion.p>
         <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 items-start">
           <Link to="/product">
@@ -39,7 +39,7 @@ const Hero = () => (
               whileTap={{ scale: 0.95 }}
               className="bg-gold text-primary-foreground px-8 py-4 rounded-full text-base font-bold shadow-gold-glow inline-flex items-center gap-2 uppercase tracking-wider"
             >
-              Acheter maintenant — 50% OFF
+              Shop now — 50% OFF
             </motion.span>
           </Link>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -48,12 +48,12 @@ const Hero = () => (
                 <span key={i} className="text-gold">★</span>
               ))}
             </span>
-            <span>4.9/5 — 12 000+ avis</span>
+            <span>4.9/5 — 12,000+ reviews</span>
           </div>
         </motion.div>
         <motion.div variants={fadeUp} className="flex items-center gap-2 text-xs text-muted-foreground pt-2">
           <ArrowDown size={14} className="animate-bounce" />
-          Garantie 90 jours satisfait ou remboursé
+          90-day money-back guarantee
         </motion.div>
       </motion.div>
 
@@ -66,7 +66,7 @@ const Hero = () => (
         <div className="animate-float">
           <img
             src={pillowHero}
-            alt="Sleepenzy - Coussin cervical ergonomique"
+            alt="Sleep&zy - Ergonomic cervical pillow"
             className="w-full max-w-md drop-shadow-2xl"
           />
         </div>

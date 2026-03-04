@@ -3,16 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Gift, ShieldCheck, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const INACTIVITY_TIMEOUT = 30000; // 30 seconds
+const INACTIVITY_TIMEOUT = 30000;
 
 const InactivityPopup = () => {
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const [dismissed, setDismissed] = useState(false);
-
-  const resetTimer = useCallback(() => {
-    // handled via effect
-  }, []);
 
   useEffect(() => {
     if (dismissed) return;
@@ -71,7 +67,6 @@ const InactivityPopup = () => {
               >
                 <X size={16} />
               </button>
-              {/* Decorative dots */}
               <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 {[...Array(12)].map((_, i) => (
                   <div
@@ -89,10 +84,10 @@ const InactivityPopup = () => {
                 <Gift className="text-white" size={28} />
               </div>
               <h2 className="text-2xl font-serif font-bold text-white mb-1">
-                ATTENDEZ !
+                WAIT!
               </h2>
               <p className="text-white/90 text-sm font-sans-body">
-                Offre exclusive rien que pour vous
+                Exclusive offer just for you
               </p>
             </div>
 
@@ -100,17 +95,17 @@ const InactivityPopup = () => {
             <div className="bg-card px-6 py-6 text-center">
               <div className="mx-auto mb-4 rounded-full bg-gradient-to-r from-[hsl(var(--gold))] to-amber-500 px-6 py-2.5 inline-block">
                 <span className="text-white font-bold text-lg tracking-wide">
-                  -10% SUPPLÉMENTAIRES
+                  EXTRA 10% OFF
                 </span>
               </div>
               <p className="text-muted-foreground text-sm mb-1 font-sans-body">
-                Commandez maintenant et bénéficiez d'une
+                Order now and get an
               </p>
               <p className="text-foreground font-semibold text-sm mb-4 font-sans-body">
-                réduction supplémentaire de 10% sur votre commande !
+                additional 10% off your entire order!
               </p>
               <p className="text-xs text-muted-foreground mb-5 flex items-center justify-center gap-1.5">
-                ⏰ L'offre expire quand vous quittez cette page
+                ⏰ This offer expires when you leave this page
               </p>
 
               <motion.button
@@ -119,19 +114,19 @@ const InactivityPopup = () => {
                 onClick={handleClaim}
                 className="w-full rounded-full bg-dark py-3.5 text-sm font-bold text-white tracking-wide shadow-lg hover:opacity-90 transition-opacity mb-3"
               >
-                J'EN PROFITE MAINTENANT
+                CLAIM MY DISCOUNT NOW
               </motion.button>
 
               <button
                 onClick={handleDismiss}
                 className="text-xs text-muted-foreground underline hover:text-foreground transition-colors font-sans-body"
               >
-                Non merci, je préfère payer plein tarif
+                No thanks, I'd rather pay full price
               </button>
 
               <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
                 <ShieldCheck size={14} className="text-green-600" />
-                <span className="font-sans-body">Paiement sécurisé • Livraison gratuite • Garantie 30 jours</span>
+                <span className="font-sans-body">Secure payment • Free shipping • 90-day guarantee</span>
               </div>
             </div>
           </motion.div>

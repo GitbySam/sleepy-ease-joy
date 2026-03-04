@@ -4,23 +4,23 @@ import { Shield, Wind, Moon, Feather } from "lucide-react";
 const benefits = [
   {
     icon: Shield,
-    title: "Soutien cervical 360°",
-    desc: "Maintient l'alignement naturel de votre colonne cervicale pour zéro douleur au réveil.",
+    title: "360° Neck Support",
+    desc: "Maintains natural alignment of your cervical spine for zero pain when you wake up.",
   },
   {
     icon: Moon,
-    title: "Sommeil profond REM",
-    desc: "Élimine le réflexe de micro-réveil en empêchant la tête de basculer au-delà de 15°.",
+    title: "Deep REM Sleep",
+    desc: "Eliminates the micro-wake reflex by preventing your head from tilting beyond 15°.",
   },
   {
     icon: Wind,
-    title: "Tissu respirant",
-    desc: "Matière douce et aérée, sans compression. Aucune sensation d'étouffement ni de chaleur.",
+    title: "Breathable Fabric",
+    desc: "Soft, airy material with no compression. No suffocating feeling or overheating.",
   },
   {
     icon: Feather,
-    title: "Ultra-léger & compact",
-    desc: "Se porte comme un foulard, se range dans un sac à main. Seulement 180g.",
+    title: "Ultra-Light & Compact",
+    desc: "Wears like a scarf, fits in a handbag. Only 6.3 oz.",
   },
 ];
 
@@ -44,10 +44,10 @@ const Benefits = () => (
         className="text-center mb-16"
       >
         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
-          Conçu par des spécialistes du sommeil
+          Designed by sleep specialists
         </p>
         <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
-          Pourquoi Sleepenzy est <span className="text-gold italic">différent</span>
+          Why Sleep&zy is <span className="text-gold italic">different</span>
         </h2>
       </motion.div>
 
