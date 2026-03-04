@@ -4,9 +4,9 @@ import { Check } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const bundles = [
-  { qty: 1, label: "1 Sleepenzy", price: "34,95€", oldPrice: "69,90€", perUnit: "34,95€/unité", tag: null },
-  { qty: 2, label: "2 Sleepenzy", price: "54,90€", oldPrice: "139,80€", perUnit: "27,45€/unité", tag: "BEST SELLER" },
-  { qty: 3, label: "3 Sleepenzy", price: "69,90€", oldPrice: "209,70€", perUnit: "23,30€/unité", tag: "MEILLEURE OFFRE" },
+  { qty: 1, label: "1 Sleep&zy", price: "$34.95", oldPrice: "$69.90", perUnit: "$34.95/unit", tag: null },
+  { qty: 2, label: "2 Sleep&zy", price: "$54.90", oldPrice: "$139.80", perUnit: "$27.45/unit", tag: "BEST SELLER" },
+  { qty: 3, label: "3 Sleep&zy", price: "$69.90", oldPrice: "$209.70", perUnit: "$23.30/unit", tag: "BEST VALUE" },
 ];
 
 const BundleOffer = () => {
@@ -22,10 +22,10 @@ const BundleOffer = () => {
           className="text-center mb-4"
         >
           <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
-            Offre limitée — jusqu'à -67%
+            Limited offer — up to 67% off
           </p>
           <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-2">
-            Choisissez votre <span className="text-gold italic">offre</span>
+            Choose your <span className="text-gold italic">deal</span>
           </h2>
         </motion.div>
 
@@ -35,7 +35,7 @@ const BundleOffer = () => {
           viewport={{ once: true }}
           className="text-center text-sm text-muted-foreground mb-10 italic font-semibold"
         >
-          <span className="font-bold">7 clients sur 10</span> offrent un Sleepenzy à un proche
+          <span className="font-bold">7 out of 10 customers</span> gift a Sleep&zy to a loved one
         </motion.p>
 
         <div className="space-y-4 mb-8">
@@ -100,7 +100,7 @@ const BundleOffer = () => {
         >
           <div className="flex items-center gap-2 mb-2">
             <span className="w-2.5 h-2.5 rounded-full bg-destructive animate-pulse-dot" />
-            <span className="text-sm font-semibold text-destructive">Stock Faible — Plus que 3 en stock</span>
+            <span className="text-sm font-semibold text-destructive">Low Stock — Only 3 left</span>
           </div>
           <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
             <div className="bg-destructive h-full rounded-full animate-progress-pulse" style={{ width: "12%" }} />
@@ -113,14 +113,14 @@ const BundleOffer = () => {
             whileTap={{ scale: 0.96 }}
             className="block w-full bg-gold text-primary-foreground text-center py-4 rounded-full text-lg font-bold shadow-gold-glow uppercase tracking-wider"
           >
-            Commander maintenant
+            Order now
           </motion.span>
         </Link>
 
         <div className="flex justify-center gap-6 mt-6 text-xs text-muted-foreground">
-          <span>🔒 Paiement sécurisé</span>
-          <span>🚚 Livraison gratuite</span>
-          <span>↩️ 90 jours garantie</span>
+          <span>🔒 Secure payment</span>
+          <span>🚚 Free shipping</span>
+          <span>↩️ 90-day guarantee</span>
         </div>
       </div>
     </section>

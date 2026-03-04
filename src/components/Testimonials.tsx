@@ -8,33 +8,33 @@ import "swiper/css/pagination";
 
 const testimonials = [
   {
-    name: "Marie L.",
-    role: "Voyageuse fréquente",
-    text: "J'ai testé TOUS les coussins du marché. Sleepenzy est le premier qui empêche vraiment ma tête de basculer. J'ai dormi 6h d'affilée sur mon vol pour Tokyo !",
+    name: "Sarah L.",
+    role: "Frequent traveler",
+    text: "I've tried EVERY pillow on the market. Sleep&zy is the first one that actually keeps my head from falling. I slept 6 hours straight on my flight to Tokyo!",
     stars: 5,
   },
   {
-    name: "Thomas R.",
-    role: "Consultant",
-    text: "Après mon opération cervicale, je pensais ne plus jamais voyager confortablement. Ce coussin a tout changé. 12h de vol, zéro douleur.",
+    name: "James R.",
+    role: "Business consultant",
+    text: "After my cervical surgery, I thought I'd never travel comfortably again. This pillow changed everything. 12-hour flight, zero pain.",
     stars: 5,
   },
   {
-    name: "Sophie M.",
-    role: "Hôtesse de l'air",
-    text: "En tant que crew, je vole 80h par mois. C'est le seul qui fonctionne vraiment. Je le recommande à tous mes passagers.",
+    name: "Emily M.",
+    role: "Flight attendant",
+    text: "As cabin crew, I fly 80+ hours a month. This is the only one that actually works. I recommend it to all my passengers.",
     stars: 5,
   },
   {
-    name: "Lucas D.",
-    role: "Digital Nomad",
-    text: "Ultra-léger et compact, il se range dans mon sac à dos. En plus il ressemble à une écharpe donc c'est discret. Game changer.",
+    name: "Mike D.",
+    role: "Digital nomad",
+    text: "Ultra-light and compact — fits right in my backpack. Plus it looks like a scarf so it's super discreet. Absolute game changer.",
     stars: 5,
   },
   {
-    name: "Camille B.",
-    role: "Maman de 3 enfants",
-    text: "Je n'arrivais jamais à dormir en voiture. Avec Sleepenzy, j'ai enfin pu me reposer pendant que mon mari conduisait. Quel soulagement !",
+    name: "Jessica B.",
+    role: "Mom of 3",
+    text: "I could never sleep in the car. With Sleep&zy, I finally got some rest while my husband was driving on our road trip. What a relief!",
     stars: 5,
   },
 ];
@@ -49,10 +49,10 @@ const Testimonials = () => (
         className="text-center mb-12"
       >
         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
-          +12 000 voyageurs satisfaits
+          12,000+ happy travelers
         </p>
         <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
-          Ce qu'ils en <span className="text-gold italic">disent</span>
+          What they're <span className="text-gold italic">saying</span>
         </h2>
       </motion.div>
 

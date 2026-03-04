@@ -9,9 +9,9 @@ const AnnouncementBar = () => (
     <div className="animate-marquee whitespace-nowrap flex">
       {[...Array(2)].map((_, i) => (
         <span key={i} className="mx-8 text-sm font-sans-body tracking-wider">
-          Offre Limitée -50% &nbsp;•&nbsp; Livraison Gratuite &nbsp;•&nbsp; Paiement Sécurisé &nbsp;•&nbsp;
-          Offre Limitée -50% &nbsp;•&nbsp; Livraison Gratuite &nbsp;•&nbsp; Paiement Sécurisé &nbsp;•&nbsp;
-          Offre Limitée -50% &nbsp;•&nbsp; Livraison Gratuite &nbsp;•&nbsp; Paiement Sécurisé &nbsp;•&nbsp;
+          Limited Offer -50% &nbsp;•&nbsp; Free Shipping &nbsp;•&nbsp; Secure Payment &nbsp;•&nbsp;
+          Limited Offer -50% &nbsp;•&nbsp; Free Shipping &nbsp;•&nbsp; Secure Payment &nbsp;•&nbsp;
+          Limited Offer -50% &nbsp;•&nbsp; Free Shipping &nbsp;•&nbsp; Secure Payment &nbsp;•&nbsp;
         </span>
       ))}
     </div>
@@ -42,9 +42,9 @@ const Header = () => {
             Sleep<span className="text-gold">&zy</span>
           </a>
           <div className="hidden md:flex items-center gap-8 font-sans-body text-sm text-muted-foreground">
-            <a href="#benefits" className="hover:text-foreground transition-colors">Bénéfices</a>
-            <a href="#proof" className="hover:text-foreground transition-colors">Résultats</a>
-            <a href="#testimonials" className="hover:text-foreground transition-colors">Avis</a>
+            <a href="#benefits" className="hover:text-foreground transition-colors">Benefits</a>
+            <a href="#proof" className="hover:text-foreground transition-colors">Results</a>
+            <a href="#testimonials" className="hover:text-foreground transition-colors">Reviews</a>
             <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
           </div>
           <div className="flex items-center gap-3">
@@ -55,7 +55,7 @@ const Header = () => {
                 className="bg-gold text-primary-foreground px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 shadow-gold-glow"
               >
                 <ShoppingBag size={16} />
-                <span className="hidden sm:inline">Commander</span>
+                <span className="hidden sm:inline">Shop Now</span>
               </motion.span>
             </Link>
             <ShopifyCartDrawer />

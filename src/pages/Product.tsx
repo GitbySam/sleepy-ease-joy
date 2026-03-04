@@ -8,8 +8,8 @@ import CartDrawer, { type CartItem } from "@/components/CartDrawer";
 const bundles = [
   {
     id: 0,
-    label: "1 Sleepenzy",
-    desc: "1× Coussin Cervical Sleepenzy",
+    label: "1 Sleep&zy",
+    desc: "1× Sleep&zy Cervical Pillow",
     price: 34.95,
     oldPrice: 69.90,
     discount: "-50%",
@@ -18,8 +18,8 @@ const bundles = [
   },
   {
     id: 1,
-    label: "2 Sleepenzy",
-    desc: "2× Coussin Cervical Sleepenzy",
+    label: "2 Sleep&zy",
+    desc: "2× Sleep&zy Cervical Pillow",
     price: 54.90,
     oldPrice: 139.80,
     discount: "-61%",
@@ -28,8 +28,8 @@ const bundles = [
   },
   {
     id: 2,
-    label: "3 Sleepenzy",
-    desc: "3× Coussin Cervical Sleepenzy",
+    label: "3 Sleep&zy",
+    desc: "3× Sleep&zy Cervical Pillow",
     price: 69.90,
     oldPrice: 209.70,
     discount: "-67%",
@@ -38,10 +38,10 @@ const bundles = [
   },
 ];
 
-const badges = ["Soutien 360°", "Livraison Gratuite", "Promo Hiver"];
+const badges = ["360° Support", "Free Shipping", "Winter Sale"];
 
 function useCountdown() {
-  const [seconds, setSeconds] = useState(53934); // ~14h58
+  const [seconds, setSeconds] = useState(53934);
   useEffect(() => {
     const interval = setInterval(() => setSeconds((s) => (s > 0 ? s - 1 : 0)), 1000);
     return () => clearInterval(interval);
@@ -84,7 +84,7 @@ const Product = () => {
         <div className="container mx-auto px-4 py-3">
           <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors font-sans-body">
             <ArrowLeft size={16} />
-            Retour aux produits
+            Back to products
           </Link>
         </div>
       </div>
@@ -99,12 +99,12 @@ const Product = () => {
             className="relative"
           >
             <div className="absolute top-3 left-3 z-10 bg-gold text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1">
-              ❄️ PROMO HIVER
+              ❄️ WINTER SALE
             </div>
             <div className="bg-gradient-to-br from-muted/50 to-background rounded-2xl p-8 flex items-center justify-center min-h-[350px] md:min-h-[450px] border border-border">
               <img
                 src={pillowHero}
-                alt="Sleepenzy Coussin Cervical"
+                alt="Sleep&zy Cervical Pillow"
                 className="w-full max-w-sm drop-shadow-xl animate-float"
               />
             </div>
@@ -129,7 +129,7 @@ const Product = () => {
             {/* Title */}
             <div>
               <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground">
-                Sleepenzy™ — Coussin Cervical
+                Sleep&zy™ — Cervical Pillow
               </h1>
               <div className="flex items-center gap-2 mt-2">
                 <div className="flex">
@@ -137,26 +137,26 @@ const Product = () => {
                     <Star key={i} size={16} className="fill-gold text-gold" />
                   ))}
                 </div>
-                <span className="text-sm text-muted-foreground font-sans-body">(12 000+ avis)</span>
+                <span className="text-sm text-muted-foreground font-sans-body">(12,000+ reviews)</span>
               </div>
             </div>
 
             {/* Promo banner */}
             <div className="bg-gold text-primary-foreground text-center py-2.5 rounded-lg font-bold text-sm tracking-wide">
-              ❄️ SOLDES D'HIVER — JUSQU'À -67% !
+              ❄️ WINTER SALE — UP TO 67% OFF!
             </div>
 
             {/* Viewers */}
             <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-4 py-2 text-sm text-muted-foreground font-sans-body">
               <Eye size={15} />
-              <span><strong className="text-foreground">{viewers} personnes</strong> consultent ce produit en ce moment</span>
+              <span><strong className="text-foreground">{viewers} people</strong> are viewing this product right now</span>
             </div>
 
             {/* Stock */}
             <div className="border border-border rounded-lg px-4 py-3">
               <div className="flex items-center gap-2 mb-1.5">
                 <span className="w-2 h-2 rounded-full bg-destructive animate-pulse-dot" />
-                <span className="text-sm font-semibold text-destructive">Plus que 8 en stock</span>
+                <span className="text-sm font-semibold text-destructive">Only 8 left in stock</span>
               </div>
               <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
                 <div className="bg-destructive h-full rounded-full animate-progress-pulse" style={{ width: "25%" }} />
@@ -167,7 +167,7 @@ const Product = () => {
             <div className="bg-gold/10 border border-gold/30 text-center py-3 rounded-lg flex items-center justify-center gap-2">
               <Clock size={16} className="text-gold" />
               <span className="text-sm font-bold text-foreground font-sans-body">
-                L'offre expire dans <span className="text-gold">{countdown}</span>
+                Offer expires in <span className="text-gold">{countdown}</span>
               </span>
             </div>
 
@@ -183,10 +183,9 @@ const Product = () => {
                       : "border-border bg-card hover:border-gold/40"
                   }`}
                 >
-                  {/* Selected badge */}
                   {selected === b.id && (
                     <span className="absolute -top-2.5 left-4 bg-gold text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded">
-                      ✓ SÉLECTIONNÉ
+                      ✓ SELECTED
                     </span>
                   )}
                   {b.tag && (
@@ -218,8 +217,8 @@ const Product = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-lg font-bold text-foreground">{b.price.toFixed(2).replace(".", ",")}€</p>
-                      <p className="text-xs text-muted-foreground line-through">{b.oldPrice.toFixed(2).replace(".", ",")}€</p>
+                      <p className="text-lg font-bold text-foreground">${b.price.toFixed(2)}</p>
+                      <p className="text-xs text-muted-foreground line-through">${b.oldPrice.toFixed(2)}</p>
                     </div>
                   </div>
                 </button>
@@ -228,9 +227,9 @@ const Product = () => {
 
             {/* Price summary */}
             <div className="flex items-center gap-3 bg-muted/30 rounded-lg px-4 py-3">
-              <span className="text-sm text-muted-foreground font-sans-body">Votre prix :</span>
-              <span className="text-2xl font-bold text-foreground">{bundle.price.toFixed(2).replace(".", ",")}€</span>
-              <span className="text-sm text-muted-foreground line-through">{bundle.oldPrice.toFixed(2).replace(".", ",")}€</span>
+              <span className="text-sm text-muted-foreground font-sans-body">Your price:</span>
+              <span className="text-2xl font-bold text-foreground">${bundle.price.toFixed(2)}</span>
+              <span className="text-sm text-muted-foreground line-through">${bundle.oldPrice.toFixed(2)}</span>
               <span className="bg-gold text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">{bundle.discount}</span>
             </div>
 
@@ -241,15 +240,15 @@ const Product = () => {
               onClick={handleAddToCart}
               className="w-full bg-gold text-primary-foreground py-4 rounded-xl text-base font-bold shadow-gold-glow flex items-center justify-center gap-2 uppercase tracking-wider"
             >
-              🛒 Ajouter au panier — {bundle.label}
+              🛒 Add to cart — {bundle.label}
             </motion.button>
 
             {/* Trust */}
             <div className="flex flex-col items-center gap-3 pt-2">
               <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground font-sans-body">
-                <span className="flex items-center gap-1"><ShieldCheck size={14} /> Paiement sécurisé</span>
-                <span className="flex items-center gap-1"><Truck size={14} /> Livraison gratuite</span>
-                <span className="flex items-center gap-1"><RotateCcw size={14} /> 90 jours garantie</span>
+                <span className="flex items-center gap-1"><ShieldCheck size={14} /> Secure payment</span>
+                <span className="flex items-center gap-1"><Truck size={14} /> Free shipping</span>
+                <span className="flex items-center gap-1"><RotateCcw size={14} /> 90-day guarantee</span>
               </div>
               <div className="flex items-center gap-2 opacity-50">
                 <span className="text-xs font-bold">VISA</span>
@@ -260,7 +259,7 @@ const Product = () => {
               </div>
               <p className="text-[11px] text-muted-foreground flex items-center gap-1">
                 <ShieldCheck size={12} className="text-green-600" />
-                Paiement sécurisé avec chiffrement SSL
+                Secure checkout with SSL encryption
               </p>
             </div>
           </motion.div>

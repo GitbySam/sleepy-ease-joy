@@ -7,7 +7,7 @@ const Footer = () => (
             Sleep<span className="text-gold">&zy</span>
           </h3>
           <p className="text-sm text-primary-foreground/60 leading-relaxed">
-            Le coussin cervical ergonomique qui révolutionne votre sommeil en voyage.
+            The ergonomic cervical pillow that revolutionizes your travel sleep.
           </p>
         </div>
         <div>
@@ -15,21 +15,21 @@ const Footer = () => (
             Navigation
           </h4>
           <ul className="space-y-2 text-sm text-primary-foreground/50">
-            <li><a href="#benefits" className="hover:text-primary-foreground transition-colors">Bénéfices</a></li>
-            <li><a href="#proof" className="hover:text-primary-foreground transition-colors">Résultats</a></li>
-            <li><a href="#testimonials" className="hover:text-primary-foreground transition-colors">Avis clients</a></li>
+            <li><a href="#benefits" className="hover:text-primary-foreground transition-colors">Benefits</a></li>
+            <li><a href="#proof" className="hover:text-primary-foreground transition-colors">Results</a></li>
+            <li><a href="#testimonials" className="hover:text-primary-foreground transition-colors">Reviews</a></li>
             <li><a href="#faq" className="hover:text-primary-foreground transition-colors">FAQ</a></li>
           </ul>
         </div>
         <div>
           <h4 className="font-sans text-sm font-semibold uppercase tracking-wider mb-4 text-primary-foreground/80">
-            Légal
+            Legal
           </h4>
           <ul className="space-y-2 text-sm text-primary-foreground/50">
-            <li><a href="#" className="hover:text-primary-foreground transition-colors">Conditions générales</a></li>
-            <li><a href="#" className="hover:text-primary-foreground transition-colors">Politique de confidentialité</a></li>
-            <li><a href="#" className="hover:text-primary-foreground transition-colors">Retours & remboursements</a></li>
-            <li><a href="#" className="hover:text-primary-foreground transition-colors">Livraison</a></li>
+            <li><a href="#" className="hover:text-primary-foreground transition-colors">Terms & Conditions</a></li>
+            <li><a href="#" className="hover:text-primary-foreground transition-colors">Privacy Policy</a></li>
+            <li><a href="#" className="hover:text-primary-foreground transition-colors">Returns & Refunds</a></li>
+            <li><a href="#" className="hover:text-primary-foreground transition-colors">Shipping</a></li>
           </ul>
         </div>
         <div>
@@ -37,13 +37,13 @@ const Footer = () => (
             Contact
           </h4>
           <ul className="space-y-2 text-sm text-primary-foreground/50">
-            <li>contact@sleepenzy.com</li>
-            <li>Support 7j/7</li>
+            <li>support@sleepenzy.com</li>
+            <li>24/7 Support</li>
           </ul>
         </div>
       </div>
       <div className="border-t border-primary-foreground/10 mt-12 pt-8 text-center text-xs text-primary-foreground/40">
-        © 2026 Sleepenzy. Tous droits réservés.
+        © 2026 Sleep&zy. All rights reserved.
       </div>
     </div>
   </footer>

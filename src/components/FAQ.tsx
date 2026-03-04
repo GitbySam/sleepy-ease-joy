@@ -8,28 +8,28 @@ import {
 
 const faqs = [
   {
-    q: "Comment fonctionne le coussin Sleepenzy ?",
-    a: "Sleepenzy utilise un support structurel interne qui maintient votre mâchoire et votre menton, empêchant votre tête de basculer vers l'avant ou sur le côté. Cela élimine le réflexe vestibulaire de réveil qui vous réveille en sursaut.",
+    q: "How does the Sleep&zy pillow work?",
+    a: "Sleep&zy uses an internal structural support that holds your jaw and chin in place, preventing your head from falling forward or to the side. This eliminates the vestibular wake reflex that jolts you awake.",
   },
   {
-    q: "Est-ce différent d'un coussin en U classique ?",
-    a: "Oui, fondamentalement. Les coussins en U ne font qu'amortir votre tête APRÈS qu'elle tombe. Sleepenzy empêche le mouvement AVANT qu'il ne se produise grâce à son support structurel 360°.",
+    q: "Is it different from a regular U-shaped pillow?",
+    a: "Yes, fundamentally. U-shaped pillows only cushion your head AFTER it falls. Sleep&zy prevents the movement BEFORE it happens thanks to its 360° structural support.",
   },
   {
-    q: "Est-il confortable pour les longs vols ?",
-    a: "Absolument. Sa mousse à mémoire de forme et son tissu respirant le rendent confortable même sur des vols de 12h+. Pas de sensation de compression ni de chaleur excessive.",
+    q: "Is it comfortable for long flights?",
+    a: "Absolutely. Its memory foam and breathable fabric make it comfortable even on 12+ hour flights. No compression feeling or excessive heat.",
   },
   {
-    q: "Peut-on le laver ?",
-    a: "Oui, la housse est amovible et lavable en machine à 30°C. Le support interne se nettoie avec un chiffon humide.",
+    q: "Can I wash it?",
+    a: "Yes, the cover is removable and machine-washable at 85°F. The internal support can be wiped clean with a damp cloth.",
   },
   {
-    q: "Quelle est la politique de retour ?",
-    a: "Nous offrons une garantie satisfait ou remboursé de 90 jours. Si vous n'êtes pas 100% satisfait, renvoyez-le et nous vous remboursons intégralement, sans questions.",
+    q: "What is the return policy?",
+    a: "We offer a 90-day money-back guarantee. If you're not 100% satisfied, send it back and we'll give you a full refund, no questions asked.",
   },
   {
-    q: "Combien de temps dure la livraison ?",
-    a: "La livraison standard gratuite prend 7-12 jours ouvrés en France métropolitaine. Une option express (3-5 jours) est disponible au moment du paiement.",
+    q: "How long does shipping take?",
+    a: "Free standard shipping takes 5-8 business days within the US. An express option (2-3 days) is available at checkout.",
   },
 ];
 
@@ -43,10 +43,10 @@ const FAQ = () => (
         className="text-center mb-12"
       >
         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
-          Des questions ?
+          Got questions?
         </p>
         <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
-          Questions <span className="text-gold italic">fréquentes</span>
+          Frequently Asked <span className="text-gold italic">Questions</span>
         </h2>
       </motion.div>
 

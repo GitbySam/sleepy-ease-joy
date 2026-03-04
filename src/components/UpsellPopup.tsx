@@ -32,10 +32,10 @@ const UpsellPopup = ({ open, onClose, onAccept }: UpsellPopupProps) => {
               <div className="bg-gradient-to-r from-gold to-gold-dark text-primary-foreground text-center py-3 px-4">
                 <div className="flex items-center justify-center gap-2 mb-1">
                   <Clock size={14} />
-                  <span className="text-xs font-bold uppercase tracking-wider">Offre limitée</span>
+                  <span className="text-xs font-bold uppercase tracking-wider">Limited offer</span>
                 </div>
                 <p className="text-sm font-bold">
-                  🎧 WAIT! Complétez votre routine sommeil & économisez 50%
+                  🎧 WAIT! Complete your sleep routine & save 50%
                 </p>
               </div>
 
@@ -52,7 +52,7 @@ const UpsellPopup = ({ open, onClose, onAccept }: UpsellPopupProps) => {
                 <div className="bg-muted/50 border border-border rounded-lg p-3 flex items-start gap-2">
                   <span className="text-gold mt-0.5">💡</span>
                   <p className="text-xs text-muted-foreground">
-                    <strong className="text-foreground">Optimisez votre sommeil !</strong> Le coussin Sleepenzy + le bandeau musical créent l'environnement parfait pour un endormissement rapide et profond.
+                    <strong className="text-foreground">Optimize your sleep!</strong> The Sleep&zy pillow + the sleep headband create the perfect environment for fast, deep sleep.
                   </p>
                 </div>
 
@@ -60,23 +60,23 @@ const UpsellPopup = ({ open, onClose, onAccept }: UpsellPopupProps) => {
                 <div className="border border-border rounded-xl p-4 bg-background">
                   <div className="flex items-center gap-1 mb-3">
                     <span className="bg-destructive text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded">
-                      -50% AUJOURD'HUI
+                      -50% TODAY
                     </span>
                   </div>
 
                   <div className="flex gap-4 items-center">
                     <div className="w-24 h-24 bg-muted/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <img src={sleepMask} alt="Bandeau Sommeil MP3" className="w-20 h-20 object-contain" />
+                      <img src={sleepMask} alt="Sleep Headband MP3" className="w-20 h-20 object-contain" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-foreground text-sm">Bandeau Sommeil MP3 Sleepenzy™</h3>
+                      <h3 className="font-bold text-foreground text-sm">Sleep&zy™ MP3 Sleep Headband</h3>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-lg font-bold text-gold">19,90€</span>
-                        <span className="text-sm text-muted-foreground line-through">39,90€</span>
+                        <span className="text-lg font-bold text-gold">$19.90</span>
+                        <span className="text-sm text-muted-foreground line-through">$39.90</span>
                       </div>
                       <div className="flex items-center gap-1 mt-1">
                         <Flame size={12} className="text-destructive" />
-                        <span className="text-xs text-destructive font-semibold">Plus que 4 à ce prix !</span>
+                        <span className="text-xs text-destructive font-semibold">Only 4 left at this price!</span>
                       </div>
                     </div>
                   </div>
@@ -84,17 +84,17 @@ const UpsellPopup = ({ open, onClose, onAccept }: UpsellPopupProps) => {
                   {/* Features */}
                   <div className="flex items-center gap-3 mt-3 text-[10px] text-muted-foreground">
                     <span className="flex items-center gap-1">🎧 Bluetooth 5.0</span>
-                    <span className="flex items-center gap-1">🔋 10h autonomie</span>
+                    <span className="flex items-center gap-1">🔋 10h battery</span>
                   </div>
                 </div>
 
                 {/* Benefits */}
                 <div className="space-y-2">
                   {[
-                    "Écoutez musique, ASMR ou bruit blanc pour dormir",
-                    "Ultra-fin & confortable — ne gêne pas le sommeil",
-                    "Économisez 20,00€ vs achat séparé",
-                    "Livraison GRATUITE avec votre commande",
+                    "Listen to music, ASMR, or white noise to fall asleep",
+                    "Ultra-thin & comfortable — won't disrupt your sleep",
+                    "Save $20.00 vs buying separately",
+                    "FREE shipping with your order",
                   ].map((benefit, i) => (
                     <div key={i} className="flex items-start gap-2">
                       <Check size={14} className="text-gold mt-0.5 flex-shrink-0" />
@@ -110,7 +110,7 @@ const UpsellPopup = ({ open, onClose, onAccept }: UpsellPopupProps) => {
                   onClick={onAccept}
                   className="w-full bg-gold text-primary-foreground py-3.5 rounded-xl text-sm font-bold shadow-gold-glow uppercase tracking-wider"
                 >
-                  ✅ OUI ! Ajouter le bandeau — 19,90€
+                  ✅ YES! Add the headband — $19.90
                 </motion.button>
 
                 {/* Decline */}
@@ -118,11 +118,11 @@ const UpsellPopup = ({ open, onClose, onAccept }: UpsellPopupProps) => {
                   onClick={onClose}
                   className="w-full text-center text-xs text-muted-foreground underline hover:text-foreground transition-colors"
                 >
-                  Non merci, je paierai le prix fort plus tard (39,90€)
+                  No thanks, I'll pay full price later ($39.90)
                 </button>
 
                 <p className="text-[10px] text-muted-foreground text-center flex items-center justify-center gap-1">
-                  🔒 Cette offre exclusive expire à la fermeture de cette fenêtre
+                  🔒 This exclusive offer expires when you close this window
                 </p>
               </div>
             </div>
