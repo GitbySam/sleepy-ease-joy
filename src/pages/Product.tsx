@@ -97,15 +97,7 @@ const Product = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Top bar */}
-      <div className="bg-card border-b border-border">
-        <div className="container mx-auto px-4 py-3">
-          <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors font-sans-body">
-            <ArrowLeft size={16} />
-            Back to products
-          </Link>
-        </div>
-      </div>
+      <Header />
 
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="grid md:grid-cols-2 gap-8 lg:gap-14 items-start">
