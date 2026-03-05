@@ -48,10 +48,10 @@ const ShopifyProducts = () => {
       <section id="products" className="py-20 gradient-section-warm">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Nos Produits
+            Our Products
           </h2>
           <p className="text-muted-foreground text-lg">
-            Aucun produit disponible pour le moment. Revenez bientôt !
+            No products available at the moment. Check back soon!
           </p>
         </div>
       </section>
