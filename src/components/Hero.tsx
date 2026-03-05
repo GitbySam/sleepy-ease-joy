@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 import { Link } from "react-router-dom";
-import pillowHero from "@/assets/pillow-hero.png";
+import pillowHero from "@/assets/product-pillow-grey.png";
 
 const stagger = {
   hidden: {},

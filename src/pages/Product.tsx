@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Check, Eye, ShieldCheck, Truck, RotateCcw, Star, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
-import pillowHero from "@/assets/pillow-hero.png";
+import pillowHero from "@/assets/product-pillow-grey.png";
 import CartDrawer, { type CartItem } from "@/components/CartDrawer";
 
 const bundles = [
