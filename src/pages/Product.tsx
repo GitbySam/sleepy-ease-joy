@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Check, Eye, ShieldCheck, Truck, RotateCcw, Star, Clock, Loader2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Check, Eye, ShieldCheck, Truck, RotateCcw, Star, Clock, Loader2 } from "lucide-react";
 import pillowHero from "@/assets/product-pillow-grey.png";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
 import { toast } from "sonner";
+import Header from "@/components/Header";
 
 const badges = ["360° Support", "Free Shipping", "Winter Sale"];
 
@@ -69,8 +69,8 @@ const Product = () => {
       });
     }
 
-    toast.success(`${bundles.find(b => b.qty === selectedQty)?.label} ajouté au panier`, {
-      description: "Utilisez le panier en haut à droite pour finaliser votre commande.",
+    toast.success(`${bundles.find(b => b.qty === selectedQty)?.label} added to cart`, {
+      description: "Use the cart icon in the top right to complete your order.",
       position: "top-center",
     });
 
@@ -97,17 +97,9 @@ const Product = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Top bar */}
-      <div className="bg-card border-b border-border">
-        <div className="container mx-auto px-4 py-3">
-          <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors font-sans-body">
-            <ArrowLeft size={16} />
-            Back to products
-          </Link>
-        </div>
-      </div>
+      <Header />
 
-      <div className="container mx-auto px-4 py-8 md:py-12">
+      <div className="container mx-auto px-4 py-8 md:py-12 pt-28 md:pt-32">
         <div className="grid md:grid-cols-2 gap-8 lg:gap-14 items-start">
           {/* LEFT — Product Image */}
           <motion.div
@@ -273,12 +265,12 @@ const Product = () => {
                 <span className="flex items-center gap-1"><Truck size={14} /> Free shipping</span>
                 <span className="flex items-center gap-1"><RotateCcw size={14} /> 90-day guarantee</span>
               </div>
-              <div className="flex items-center gap-2 opacity-50">
-                <span className="text-xs font-bold">VISA</span>
-                <span className="text-xs font-bold">MC</span>
-                <span className="text-xs font-bold">AMEX</span>
-                <span className="text-xs font-bold">GPay</span>
-                <span className="text-xs font-bold">PayPal</span>
+              <div className="flex items-center gap-3 opacity-60">
+                <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#1A1F71"/><text x="24" y="20" textAnchor="middle" fill="#fff" fontSize="11" fontWeight="bold" fontFamily="sans-serif">VISA</text></svg>
+                <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#252525"/><circle cx="19" cy="16" r="9" fill="#EB001B"/><circle cx="29" cy="16" r="9" fill="#F79E1B"/><path d="M24 9.5a9 9 0 0 1 0 13" fill="#FF5F00"/></svg>
+                <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#2E77BC"/><text x="24" y="20" textAnchor="middle" fill="#fff" fontSize="8" fontWeight="bold" fontFamily="sans-serif">AMEX</text></svg>
+                <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#fff" stroke="#ddd"/><text x="24" y="14" textAnchor="middle" fill="#4285F4" fontSize="7" fontWeight="bold" fontFamily="sans-serif">G</text><text x="24" y="23" textAnchor="middle" fill="#5F6368" fontSize="7" fontFamily="sans-serif">Pay</text></svg>
+                <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#003087"/><text x="24" y="20" textAnchor="middle" fill="#fff" fontSize="8" fontWeight="bold" fontFamily="sans-serif">PayPal</text></svg>
               </div>
               <p className="text-[11px] text-muted-foreground flex items-center gap-1">
                 <ShieldCheck size={12} className="text-success" />

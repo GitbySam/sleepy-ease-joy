@@ -30,7 +30,7 @@ const ShopifyProducts = () => {
       quantity: 1,
       selectedOptions: variant.selectedOptions || [],
     });
-    toast.success(`${product.node.title} ajouté au panier`);
+    toast.success(`${product.node.title} added to cart`);
   };
 
   if (loading) {
@@ -48,10 +48,10 @@ const ShopifyProducts = () => {
       <section id="products" className="py-20 gradient-section-warm">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Nos Produits
+            Our Products
           </h2>
           <p className="text-muted-foreground text-lg">
-            Aucun produit disponible pour le moment. Revenez bientôt !
+            No products available at the moment. Check back soon!
           </p>
         </div>
       </section>
@@ -62,7 +62,7 @@ const ShopifyProducts = () => {
     <section id="products" className="py-20 gradient-section-warm">
       <div className="container mx-auto px-6">
         <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-12">
-          Nos Produits
+          Our Products
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.map((product) => {
@@ -85,7 +85,7 @@ const ShopifyProducts = () => {
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
-                      <span className="text-muted-foreground text-sm">Pas d'image</span>
+                      <span className="text-muted-foreground text-sm">No image</span>
                     )}
                   </div>
                 </Link>
@@ -114,7 +114,7 @@ const ShopifyProducts = () => {
                       ) : (
                         <ShoppingBag size={16} />
                       )}
-                      Ajouter
+                      Add
                     </motion.button>
                   </div>
                 </div>
