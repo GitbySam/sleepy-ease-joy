@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShieldCheck, Truck, RotateCcw, Minus, Plus, Trash2 } from "lucide-react";
-import pillowHero from "@/assets/pillow-hero.png";
+import pillowHero from "@/assets/product-pillow-grey.png";
 import UpsellPopup from "./UpsellPopup";
 
 export interface CartItem {
