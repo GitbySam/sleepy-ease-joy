@@ -18,15 +18,16 @@ const UpsellPopup = ({ open, onClose, onAccept }: UpsellPopupProps) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 z-[60]"
+            className="fixed inset-0 bg-black/60 z-[100]"
           />
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] z-[60] w-[92%] max-w-md"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
           >
+            <div className="w-full max-w-md">
             <div className="bg-card rounded-2xl shadow-2xl overflow-hidden border border-border">
               {/* Top banner */}
               <div className="bg-gradient-to-r from-gold to-gold-dark text-primary-foreground text-center py-3 px-4">
@@ -125,6 +126,7 @@ const UpsellPopup = ({ open, onClose, onAccept }: UpsellPopupProps) => {
                   🔒 This exclusive offer expires when you close this window
                 </p>
               </div>
+            </div>
             </div>
           </motion.div>
         </>
