@@ -114,7 +114,7 @@ const ShopifyProducts = () => {
                       ) : (
                         <ShoppingBag size={16} />
                       )}
-                      Ajouter
+                      Add
                     </motion.button>
                   </div>
                 </div>
