@@ -20,6 +20,7 @@ const Index = () => (
     <main>
       <Hero />
       <Marquee />
+      <InAction />
       <ShopifyProducts />
       <Benefits />
       <ComparisonSlider />
