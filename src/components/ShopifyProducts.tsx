@@ -85,7 +85,7 @@ const ShopifyProducts = () => {
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
-                      <span className="text-muted-foreground text-sm">Pas d'image</span>
+                      <span className="text-muted-foreground text-sm">No image</span>
                     )}
                   </div>
                 </Link>
