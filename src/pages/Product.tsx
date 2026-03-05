@@ -1,42 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Check, Eye, ShieldCheck, Truck, RotateCcw, Star, Clock } from "lucide-react";
+import { ArrowLeft, Check, Eye, ShieldCheck, Truck, RotateCcw, Star, Clock, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import pillowHero from "@/assets/product-pillow-grey.png";
-import CartDrawer, { type CartItem } from "@/components/CartDrawer";
-
-const bundles = [
-  {
-    id: 0,
-    label: "1 Sleep&zy",
-    desc: "1× Sleep&zy Cervical Pillow",
-    price: 34.95,
-    oldPrice: 69.90,
-    discount: "-50%",
-    tag: null,
-    tagColor: "",
-  },
-  {
-    id: 1,
-    label: "2 Sleep&zy",
-    desc: "2× Sleep&zy Cervical Pillow",
-    price: 54.90,
-    oldPrice: 139.80,
-    discount: "-61%",
-    tag: "COUPLE PACK",
-    tagColor: "bg-gold",
-  },
-  {
-    id: 2,
-    label: "3 Sleep&zy",
-    desc: "3× Sleep&zy Cervical Pillow",
-    price: 69.90,
-    oldPrice: 209.70,
-    discount: "-67%",
-    tag: "FAMILY PACK",
-    tagColor: "bg-destructive",
-  },
-];
+import { useCartStore } from "@/stores/cartStore";
+import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
+import { toast } from "sonner";
 
 const badges = ["360° Support", "Free Shipping", "Winter Sale"];
 
@@ -53,29 +22,78 @@ function useCountdown() {
 }
 
 const Product = () => {
-  const [selected, setSelected] = useState(0);
-  const [cartOpen, setCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [product, setProduct] = useState<ShopifyProduct | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedQty, setSelectedQty] = useState(1);
   const countdown = useCountdown();
-  const bundle = bundles[selected];
   const viewers = 28;
 
-  const handleAddToCart = () => {
-    setCartItems((prev) => {
-      const existing = prev.find((i) => i.id === bundle.id);
-      if (existing) {
-        return prev.map((i) => i.id === bundle.id ? { ...i, qty: i.qty + 1 } : i);
-      }
-      return [...prev, {
-        id: bundle.id,
-        label: bundle.label,
-        qty: 1,
-        unitPrice: bundle.price,
-        unitOldPrice: bundle.oldPrice,
-      }];
+  const addItem = useCartStore((s) => s.addItem);
+  const isLoading = useCartStore((s) => s.isLoading);
+  const getCheckoutUrl = useCartStore((s) => s.getCheckoutUrl);
+
+  useEffect(() => {
+    fetchProducts(1)
+      .then((products) => {
+        if (products.length > 0) setProduct(products[0]);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const variant = product?.node.variants.edges[0]?.node;
+  const price = variant ? parseFloat(variant.price.amount) : 34.95;
+  const currencySymbol = variant?.price.currencyCode === "EUR" ? "€" : "$";
+  const oldPrice = price * 2;
+
+  const bundles = [
+    { qty: 1, label: "1 Sleep&zy", desc: "1× Sleep&zy Anti-Embarrassment Pillow", discount: "-50%", tag: null, tagColor: "" },
+    { qty: 2, label: "2 Sleep&zy", desc: "2× Sleep&zy Anti-Embarrassment Pillow", discount: "-61%", tag: "COUPLE PACK", tagColor: "bg-gold" },
+    { qty: 3, label: "3 Sleep&zy", desc: "3× Sleep&zy Anti-Embarrassment Pillow", discount: "-67%", tag: "FAMILY PACK", tagColor: "bg-destructive" },
+  ];
+
+  const bundlePrices: Record<number, number> = { 1: price, 2: price * 1.57, 3: price * 2 };
+  const bundleOldPrices: Record<number, number> = { 1: oldPrice, 2: oldPrice * 2, 3: oldPrice * 3 };
+
+  const handleAddToCart = async () => {
+    if (!product || !variant) return;
+    
+    for (let i = 0; i < selectedQty; i++) {
+      await addItem({
+        product,
+        variantId: variant.id,
+        variantTitle: variant.title,
+        price: variant.price,
+        quantity: 1,
+        selectedOptions: variant.selectedOptions || [],
+      });
+    }
+
+    toast.success(`${bundles.find(b => b.qty === selectedQty)?.label} ajouté au panier`, {
+      description: "Utilisez le panier en haut à droite pour finaliser votre commande.",
+      position: "top-center",
     });
-    setCartOpen(true);
+
+    // Redirect to checkout directly
+    setTimeout(() => {
+      const checkoutUrl = getCheckoutUrl();
+      if (checkoutUrl) {
+        window.open(checkoutUrl, '_blank');
+      }
+    }, 500);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  const selectedBundle = bundles.find(b => b.qty === selectedQty)!;
+  const currentPrice = bundlePrices[selectedQty];
+  const currentOldPrice = bundleOldPrices[selectedQty];
 
   return (
     <div className="min-h-screen bg-background">
@@ -103,8 +121,8 @@ const Product = () => {
             </div>
             <div className="bg-gradient-to-br from-muted/50 to-background rounded-2xl p-8 flex items-center justify-center min-h-[350px] md:min-h-[450px] border border-border">
               <img
-                src={pillowHero}
-                alt="Sleep&zy Cervical Pillow"
+                src={product?.node.images?.edges?.[0]?.node?.url || pillowHero}
+                alt={product?.node.title || "Sleep&zy Cervical Pillow"}
                 className="w-full max-w-sm drop-shadow-xl animate-float"
               />
             </div>
@@ -129,7 +147,7 @@ const Product = () => {
             {/* Title */}
             <div>
               <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground">
-                Sleep&zy™ — Cervical Pillow
+                {product?.node.title || "Sleep&zy™ — Cervical Pillow"}
               </h1>
               <div className="flex items-center gap-2 mt-2">
                 <div className="flex">
@@ -175,15 +193,15 @@ const Product = () => {
             <div className="space-y-3">
               {bundles.map((b) => (
                 <button
-                  key={b.id}
-                  onClick={() => setSelected(b.id)}
+                  key={b.qty}
+                  onClick={() => setSelectedQty(b.qty)}
                   className={`w-full rounded-xl p-4 border-2 transition-all text-left relative ${
-                    selected === b.id
+                    selectedQty === b.qty
                       ? "border-gold bg-gold/5 shadow-md"
                       : "border-border bg-card hover:border-gold/40"
                   }`}
                 >
-                  {selected === b.id && (
+                  {selectedQty === b.qty && (
                     <span className="absolute -top-2.5 left-4 bg-gold text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded">
                       ✓ SELECTED
                     </span>
@@ -196,10 +214,10 @@ const Product = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                        selected === b.id ? "border-gold bg-gold" : "border-muted-foreground/30"
+                        selectedQty === b.qty ? "border-gold bg-gold" : "border-muted-foreground/30"
                       }`}>
                         <AnimatePresence>
-                          {selected === b.id && (
+                          {selectedQty === b.qty && (
                             <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
                               <Check size={12} className="text-primary-foreground" />
                             </motion.div>
@@ -217,8 +235,8 @@ const Product = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-lg font-bold text-foreground">${b.price.toFixed(2)}</p>
-                      <p className="text-xs text-muted-foreground line-through">${b.oldPrice.toFixed(2)}</p>
+                      <p className="text-lg font-bold text-foreground">{currencySymbol}{bundlePrices[b.qty].toFixed(2)}</p>
+                      <p className="text-xs text-muted-foreground line-through">{currencySymbol}{bundleOldPrices[b.qty].toFixed(2)}</p>
                     </div>
                   </div>
                 </button>
@@ -228,9 +246,9 @@ const Product = () => {
             {/* Price summary */}
             <div className="flex items-center gap-3 bg-muted/30 rounded-lg px-4 py-3">
               <span className="text-sm text-muted-foreground font-sans-body">Your price:</span>
-              <span className="text-2xl font-bold text-foreground">${bundle.price.toFixed(2)}</span>
-              <span className="text-sm text-muted-foreground line-through">${bundle.oldPrice.toFixed(2)}</span>
-              <span className="bg-gold text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">{bundle.discount}</span>
+              <span className="text-2xl font-bold text-foreground">{currencySymbol}{currentPrice.toFixed(2)}</span>
+              <span className="text-sm text-muted-foreground line-through">{currencySymbol}{currentOldPrice.toFixed(2)}</span>
+              <span className="bg-gold text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">{selectedBundle.discount}</span>
             </div>
 
             {/* CTA */}
@@ -238,9 +256,14 @@ const Product = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               onClick={handleAddToCart}
-              className="w-full bg-gold text-primary-foreground py-4 rounded-xl text-base font-bold shadow-gold-glow flex items-center justify-center gap-2 uppercase tracking-wider"
+              disabled={isLoading || !product}
+              className="w-full bg-gold text-primary-foreground py-4 rounded-xl text-base font-bold shadow-gold-glow flex items-center justify-center gap-2 uppercase tracking-wider disabled:opacity-50"
             >
-              🛒 Add to cart — {bundle.label}
+              {isLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>🛒 Add to cart — {selectedBundle.label}</>
+              )}
             </motion.button>
 
             {/* Trust */}
@@ -258,24 +281,13 @@ const Product = () => {
                 <span className="text-xs font-bold">PayPal</span>
               </div>
               <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-                <ShieldCheck size={12} className="text-green-600" />
+                <ShieldCheck size={12} className="text-success" />
                 Secure checkout with SSL encryption
               </p>
             </div>
           </motion.div>
         </div>
       </div>
-      <CartDrawer
-        open={cartOpen}
-        onClose={() => setCartOpen(false)}
-        items={cartItems}
-        onUpdateQty={(id, qty) => {
-          setCartItems((prev) => prev.map((i) => i.id === id ? { ...i, qty } : i));
-        }}
-        onRemove={(id) => {
-          setCartItems((prev) => prev.filter((i) => i.id !== id));
-        }}
-      />
     </div>
   );
 };
