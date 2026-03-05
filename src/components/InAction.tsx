@@ -26,7 +26,7 @@ const InAction = () => (
         </h2>
       </motion.div>
 
-      <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+      <div className="flex gap-4 max-w-5xl mx-auto">
         {scenes.map((scene, i) => (
           <motion.div
             key={scene.label}
