@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Marquee from "@/components/Marquee";
+import InAction from "@/components/InAction";
 import Benefits from "@/components/Benefits";
 import ComparisonSlider from "@/components/ComparisonSlider";
 import Testimonials from "@/components/Testimonials";
@@ -19,6 +20,7 @@ const Index = () => (
     <main>
       <Hero />
       <Marquee />
+      <InAction />
       <ShopifyProducts />
       <Benefits />
       <ComparisonSlider />
