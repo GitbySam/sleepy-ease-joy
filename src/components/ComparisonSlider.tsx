@@ -1,93 +1,72 @@
-import { useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import beforeImg from "@/assets/before-pillow.jpg";
-import afterImg from "@/assets/after-pillow.jpg";
+import headDrop from "@/assets/embarrassing-head-drop.jpg";
+import mouthOpen from "@/assets/embarrassing-mouth-open.jpg";
+import shoulder from "@/assets/embarrassing-shoulder.jpg";
+import drool from "@/assets/embarrassing-drool.jpg";
 
-const ComparisonSlider = () => {
-  const [position, setPosition] = useState(50);
-  const [isDragging, setIsDragging] = useState(false);
-  const [hasInteracted, setHasInteracted] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+const scenes = [
+  { img: headDrop, caption: "The head drop™", emoji: "😩" },
+  { img: mouthOpen, caption: "The fly catcher", emoji: "😮" },
+  { img: shoulder, caption: "The stranger cuddler", emoji: "😳" },
+  { img: drool, caption: "The drool trail", emoji: "🤤" },
+];
 
-  const handleMove = useCallback(
-    (clientX: number) => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
-      setPosition((x / rect.width) * 100);
-      if (!hasInteracted) setHasInteracted(true);
-    },
-    [hasInteracted]
-  );
+const ComparisonSlider = () => (
+  <section id="proof" className="py-24 gradient-section-reverse">
+    <div className="container mx-auto px-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="text-center mb-14"
+      >
+        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
+          The proof speaks for itself
+        </p>
+        <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
+          We've <span className="text-gold italic">all</span> been there.
+        </h2>
+      </motion.div>
 
-  const handleMouseDown = () => setIsDragging(true);
-  const handleMouseUp = () => setIsDragging(false);
-  const handleMouseMove = (e: React.MouseEvent) => { if (isDragging) handleMove(e.clientX); };
-  const handleTouchMove = (e: React.TouchEvent) => { handleMove(e.touches[0].clientX); setHasInteracted(true); };
-
-  return (
-    <section id="proof" className="py-24 gradient-section-reverse">
-      <div className="container mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
-          <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
-            The proof speaks for itself
-          </p>
-          <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
-            Embarrassing <span className="text-gold italic">vs.</span> Elegant
-          </h2>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          ref={containerRef}
-          className="relative max-w-2xl mx-auto aspect-[4/5] rounded-2xl overflow-hidden cursor-col-resize select-none shadow-xl"
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          onMouseMove={handleMouseMove}
-          onTouchMove={handleTouchMove}
-          onTouchStart={() => setIsDragging(true)}
-          onTouchEnd={() => setIsDragging(false)}
-        >
-          <img src={afterImg} alt="After - Comfortable sleep" className="absolute inset-0 w-full h-full object-cover" />
-          
-          <div className="absolute inset-0" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}>
-            <img src={beforeImg} alt="Before - Uncomfortable sleep" className="w-full h-full object-cover" />
-          </div>
-
-          <div className="absolute top-0 bottom-0 w-0.5 bg-primary-foreground/80" style={{ left: `${position}%` }}>
-            <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-card border-2 border-gold flex items-center justify-center shadow-lg">
-              <span className="text-gold text-xs font-bold">⟷</span>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
+        {scenes.map((scene, i) => (
+          <motion.div
+            key={scene.caption}
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.1, duration: 0.5 }}
+            className="group relative overflow-hidden rounded-2xl shadow-lg"
+          >
+            <div className="aspect-[3/4] overflow-hidden">
+              <img
+                src={scene.img}
+                alt={scene.caption}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
             </div>
-          </div>
-
-          <div className="absolute top-4 left-4 bg-dark/70 text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm">
-            EMBARRASSING
-          </div>
-          <div className="absolute top-4 right-4 bg-gold/90 text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm">
-            DIGNIFIED
-          </div>
-
-          {!hasInteracted && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-dark/70 text-primary-foreground px-4 py-2 rounded-full text-sm backdrop-blur-sm"
-            >
-              ← Slide to compare →
-            </motion.div>
-          )}
-        </motion.div>
+            <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-4 text-center">
+              <span className="text-2xl mb-1 block">{scene.emoji}</span>
+              <p className="text-sm font-serif font-semibold text-primary-foreground">
+                {scene.caption}
+              </p>
+            </div>
+          </motion.div>
+        ))}
       </div>
-    </section>
-  );
-};
+
+      <motion.p
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        className="text-center mt-8 text-lg text-muted-foreground font-sans-body"
+      >
+        Sleep&zy makes sure <span className="text-gold font-semibold">this never happens again.</span>
+      </motion.p>
+    </div>
+  </section>
+);
 
 export default ComparisonSlider;
