@@ -36,7 +36,7 @@ const InAction = () => (
             transition={{ delay: i * 0.15, duration: 0.6 }}
             className="group relative overflow-hidden rounded-2xl shadow-lg"
           >
-            <div className="aspect-square overflow-hidden">
+            <div className="aspect-[4/3] overflow-hidden">
               <img
                 src={scene.img}
                 alt={scene.caption}
