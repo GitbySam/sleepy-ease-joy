@@ -69,8 +69,8 @@ const Product = () => {
       });
     }
 
-    toast.success(`${bundles.find(b => b.qty === selectedQty)?.label} ajouté au panier`, {
-      description: "Utilisez le panier en haut à droite pour finaliser votre commande.",
+    toast.success(`${bundles.find(b => b.qty === selectedQty)?.label} added to cart`, {
+      description: "Use the cart icon in the top right to complete your order.",
       position: "top-center",
     });
 
