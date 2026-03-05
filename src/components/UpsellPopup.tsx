@@ -127,6 +127,7 @@ const UpsellPopup = ({ open, onClose, onAccept }: UpsellPopupProps) => {
                 </p>
               </div>
             </div>
+            </div>
           </motion.div>
         </>
       )}
