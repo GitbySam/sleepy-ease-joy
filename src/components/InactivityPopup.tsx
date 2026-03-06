@@ -130,6 +130,7 @@ const InactivityPopup = () => {
                 <span className="font-sans-body">Secure payment • Free shipping • 90-day guarantee</span>
               </div>
             </div>
+            </div>
           </motion.div>
         </>
       )}
