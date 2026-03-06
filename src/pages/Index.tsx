@@ -19,11 +19,11 @@ const Index = () => (
     <InactivityPopup />
     <main>
       <Hero />
-      <InAction />
-      <Marquee />
-      <ShopifyProducts />
-      <Benefits />
       <ComparisonSlider />
+      <Marquee />
+      <InAction />
+      <Benefits />
+      <ShopifyProducts />
       <Testimonials />
       <BundleOffer />
       <FAQ />
