@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,26 +6,24 @@ import { ShoppingCart, Minus, Plus, Trash2, ExternalLink, Loader2 } from "lucide
 import { useCartStore } from "@/stores/cartStore";
 
 export const ShopifyCartDrawer = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { items, isLoading, isSyncing, updateQuantity, removeItem, getCheckoutUrl, syncCart } = useCartStore();
+  const { items, isLoading, isSyncing, isDrawerOpen, setDrawerOpen, updateQuantity, removeItem, getCheckoutUrl, syncCart } = useCartStore();
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce((sum, item) => sum + (parseFloat(item.price.amount) * item.quantity), 0);
-  const currencyCode = items[0]?.price.currencyCode || "EUR";
 
   useEffect(() => {
-    if (isOpen) syncCart();
-  }, [isOpen, syncCart]);
+    if (isDrawerOpen) syncCart();
+  }, [isDrawerOpen, syncCart]);
 
   const handleCheckout = () => {
     const checkoutUrl = getCheckoutUrl();
     if (checkoutUrl) {
       window.open(checkoutUrl, '_blank');
-      setIsOpen(false);
+      setDrawerOpen(false);
     }
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet open={isDrawerOpen} onOpenChange={setDrawerOpen}>
       <SheetTrigger asChild>
         <button className="relative p-2 hover:bg-muted rounded-lg transition-colors">
           <ShoppingCart className="h-5 w-5 text-foreground" />
@@ -38,9 +36,9 @@ export const ShopifyCartDrawer = () => {
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-lg flex flex-col h-full">
         <SheetHeader className="flex-shrink-0">
-          <SheetTitle className="font-serif-display">🛒 Votre Panier</SheetTitle>
+          <SheetTitle className="font-serif-display">Cart</SheetTitle>
           <SheetDescription>
-            {totalItems === 0 ? "Votre panier est vide" : `${totalItems} article${totalItems !== 1 ? 's' : ''}`}
+            {totalItems === 0 ? "Your cart is empty" : `${totalItems} item${totalItems !== 1 ? 's' : ''} in your cart`}
           </SheetDescription>
         </SheetHeader>
         <div className="flex flex-col flex-1 pt-6 min-h-0">
@@ -48,7 +46,7 @@ export const ShopifyCartDrawer = () => {
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
                 <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">Votre panier est vide</p>
+                <p className="text-muted-foreground">Your cart is empty</p>
               </div>
             </div>
           ) : (
@@ -66,7 +64,7 @@ export const ShopifyCartDrawer = () => {
                         <h4 className="font-medium text-foreground truncate text-sm">{item.product.node.title}</h4>
                         <p className="text-xs text-muted-foreground">{item.selectedOptions.map(o => o.value).join(' • ')}</p>
                         <p className="font-semibold text-foreground mt-1">
-                          {parseFloat(item.price.amount).toFixed(2).replace(".", ",")} {currencyCode === "EUR" ? "€" : currencyCode}
+                          ${parseFloat(item.price.amount).toFixed(2)}
                         </p>
                       </div>
                       <div className="flex flex-col items-end gap-2 flex-shrink-0">
@@ -91,7 +89,7 @@ export const ShopifyCartDrawer = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold text-foreground">Total</span>
                   <span className="text-xl font-bold text-foreground">
-                    {totalPrice.toFixed(2).replace(".", ",")} {currencyCode === "EUR" ? "€" : currencyCode}
+                    ${totalPrice.toFixed(2)}
                   </span>
                 </div>
                 <Button onClick={handleCheckout} className="w-full bg-gold hover:bg-gold/90 text-primary-foreground shadow-gold-glow" size="lg" disabled={items.length === 0 || isLoading || isSyncing}>
@@ -100,7 +98,7 @@ export const ShopifyCartDrawer = () => {
                   ) : (
                     <>
                       <ExternalLink className="w-4 h-4 mr-2" />
-                      Paiement Sécurisé
+                      Secure Checkout
                     </>
                   )}
                 </Button>
