@@ -11,8 +11,11 @@ export const ShopifyCartDrawer = () => {
   const totalPrice = items.reduce((sum, item) => sum + (item.bundlePrice ? item.bundlePrice : parseFloat(item.price.amount) * item.quantity), 0);
 
   useEffect(() => {
-    if (isDrawerOpen) syncCart();
-  }, [isDrawerOpen, syncCart]);
+    if (isDrawerOpen && !isLoading) {
+      const timeout = setTimeout(() => syncCart(), 500);
+      return () => clearTimeout(timeout);
+    }
+  }, [isDrawerOpen, isLoading, syncCart]);
 
   const handleCheckout = () => {
     const checkoutUrl = getCheckoutUrl();
