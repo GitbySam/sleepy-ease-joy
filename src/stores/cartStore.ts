@@ -109,9 +109,10 @@ export const useCartStore = create<CartStore>()(
         }
       },
 
-      removeItem: async (variantId) => {
+      removeItem: async (variantId, bundleLabel) => {
         const { items, cartId, clearCart } = get();
-        const item = items.find(i => i.variantId === variantId);
+        const itemKey = `${variantId}__${bundleLabel || 'single'}`;
+        const item = items.find(i => `${i.variantId}__${i.bundleLabel || 'single'}` === itemKey);
         if (!item?.lineId || !cartId) return;
 
         set({ isLoading: true });
@@ -119,7 +120,7 @@ export const useCartStore = create<CartStore>()(
           const result = await removeLineFromShopifyCart(cartId, item.lineId);
           if (result.success) {
             const currentItems = get().items;
-            const newItems = currentItems.filter(i => i.variantId !== variantId);
+            const newItems = currentItems.filter(i => `${i.variantId}__${i.bundleLabel || 'single'}` !== itemKey);
             newItems.length === 0 ? clearCart() : set({ items: newItems });
           } else if (result.cartNotFound) {
             clearCart();
