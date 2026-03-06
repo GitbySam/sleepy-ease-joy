@@ -44,12 +44,12 @@ const InAction = () => (
                 loading="lazy"
               />
             </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-4 h-[72px] flex flex-col justify-end">
+            <div className="absolute inset-0 bg-gradient-to-t from-foreground/50 via-foreground/10 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 px-4 pb-4 pt-8">
               <span className="text-xs uppercase tracking-widest text-primary-foreground/80 font-sans-body leading-none">
                 {scene.label}
               </span>
-              <p className="text-sm sm:text-base font-serif font-semibold text-primary-foreground mt-1 leading-tight line-clamp-1">
+              <p className="text-sm sm:text-base font-serif font-semibold text-primary-foreground mt-1 leading-snug">
                 {scene.caption}
               </p>
             </div>
