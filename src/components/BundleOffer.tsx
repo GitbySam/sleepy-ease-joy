@@ -107,7 +107,7 @@ const BundleOffer = () => {
           </div>
         </motion.div>
 
-        <Link to="/product">
+        <Link to={`/product?bundle=${bundles[selected].qty}`}>
           <motion.span
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
