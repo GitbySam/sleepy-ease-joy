@@ -58,16 +58,14 @@ const Product = () => {
   const handleAddToCart = async () => {
     if (!product || !variant) return;
     
-    for (let i = 0; i < selectedQty; i++) {
-      await addItem({
-        product,
-        variantId: variant.id,
-        variantTitle: variant.title,
-        price: variant.price,
-        quantity: 1,
-        selectedOptions: variant.selectedOptions || [],
-      });
-    }
+    await addItem({
+      product,
+      variantId: variant.id,
+      variantTitle: variant.title,
+      price: variant.price,
+      quantity: selectedQty,
+      selectedOptions: variant.selectedOptions || [],
+    });
 
     toast.success(`${bundles.find(b => b.qty === selectedQty)?.label} added to cart`, {
       position: "top-center",
