@@ -5,6 +5,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Product from "./pages/Product";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import Returns from "./pages/Returns";
+import Shipping from "./pages/Shipping";
 import NotFound from "./pages/NotFound";
 import { useCartSync } from "./hooks/useCartSync";
 
