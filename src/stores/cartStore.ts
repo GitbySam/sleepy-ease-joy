@@ -22,8 +22,8 @@ interface CartStore {
   isDrawerOpen: boolean;
   setDrawerOpen: (open: boolean) => void;
   addItem: (item: Omit<CartItemData, 'lineId'>) => Promise<void>;
-  updateQuantity: (variantId: string, quantity: number) => Promise<void>;
-  removeItem: (variantId: string) => Promise<void>;
+  updateQuantity: (variantId: string, quantity: number, bundleLabel?: string) => Promise<void>;
+  removeItem: (variantId: string, bundleLabel?: string) => Promise<void>;
   clearCart: () => void;
   syncCart: () => Promise<void>;
   getCheckoutUrl: () => string | null;
@@ -42,7 +42,8 @@ export const useCartStore = create<CartStore>()(
 
       addItem: async (item) => {
         const { items, cartId, clearCart } = get();
-        const existingItem = items.find(i => i.variantId === item.variantId);
+        const itemKey = `${item.variantId}__${item.bundleLabel || 'single'}`;
+        const existingItem = items.find(i => `${i.variantId}__${i.bundleLabel || 'single'}` === itemKey);
 
         set({ isLoading: true });
         try {
@@ -61,7 +62,7 @@ export const useCartStore = create<CartStore>()(
             const result = await updateShopifyCartLine(cartId, existingItem.lineId, newQuantity);
             if (result.success) {
               const currentItems = get().items;
-              set({ items: currentItems.map(i => i.variantId === item.variantId ? { ...i, quantity: newQuantity } : i) });
+              set({ items: currentItems.map(i => `${i.variantId}__${i.bundleLabel || 'single'}` === itemKey ? { ...i, quantity: newQuantity } : i) });
             } else if (result.cartNotFound) {
               clearCart();
             }
@@ -81,14 +82,15 @@ export const useCartStore = create<CartStore>()(
         }
       },
 
-      updateQuantity: async (variantId, quantity) => {
+      updateQuantity: async (variantId, quantity, bundleLabel) => {
         if (quantity <= 0) {
-          await get().removeItem(variantId);
+          await get().removeItem(variantId, bundleLabel);
           return;
         }
 
         const { items, cartId, clearCart } = get();
-        const item = items.find(i => i.variantId === variantId);
+        const itemKey = `${variantId}__${bundleLabel || 'single'}`;
+        const item = items.find(i => `${i.variantId}__${i.bundleLabel || 'single'}` === itemKey);
         if (!item?.lineId || !cartId) return;
 
         set({ isLoading: true });
@@ -96,7 +98,7 @@ export const useCartStore = create<CartStore>()(
           const result = await updateShopifyCartLine(cartId, item.lineId, quantity);
           if (result.success) {
             const currentItems = get().items;
-            set({ items: currentItems.map(i => i.variantId === variantId ? { ...i, quantity } : i) });
+            set({ items: currentItems.map(i => `${i.variantId}__${i.bundleLabel || 'single'}` === itemKey ? { ...i, quantity } : i) });
           } else if (result.cartNotFound) {
             clearCart();
           }
@@ -107,9 +109,10 @@ export const useCartStore = create<CartStore>()(
         }
       },
 
-      removeItem: async (variantId) => {
+      removeItem: async (variantId, bundleLabel) => {
         const { items, cartId, clearCart } = get();
-        const item = items.find(i => i.variantId === variantId);
+        const itemKey = `${variantId}__${bundleLabel || 'single'}`;
+        const item = items.find(i => `${i.variantId}__${i.bundleLabel || 'single'}` === itemKey);
         if (!item?.lineId || !cartId) return;
 
         set({ isLoading: true });
@@ -117,7 +120,7 @@ export const useCartStore = create<CartStore>()(
           const result = await removeLineFromShopifyCart(cartId, item.lineId);
           if (result.success) {
             const currentItems = get().items;
-            const newItems = currentItems.filter(i => i.variantId !== variantId);
+            const newItems = currentItems.filter(i => `${i.variantId}__${i.bundleLabel || 'single'}` !== itemKey);
             newItems.length === 0 ? clearCart() : set({ items: newItems });
           } else if (result.cartNotFound) {
             clearCart();

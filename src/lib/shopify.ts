@@ -208,6 +208,8 @@ export interface CartItemData {
   price: { amount: string; currencyCode: string };
   quantity: number;
   selectedOptions: Array<{ name: string; value: string }>;
+  bundleLabel?: string;
+  bundlePrice?: number;
 }
 
 export async function createShopifyCart(item: CartItemData): Promise<{ cartId: string; checkoutUrl: string; lineId: string } | null> {
