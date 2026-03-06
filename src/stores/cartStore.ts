@@ -22,8 +22,8 @@ interface CartStore {
   isDrawerOpen: boolean;
   setDrawerOpen: (open: boolean) => void;
   addItem: (item: Omit<CartItemData, 'lineId'>) => Promise<void>;
-  updateQuantity: (variantId: string, quantity: number) => Promise<void>;
-  removeItem: (variantId: string) => Promise<void>;
+  updateQuantity: (variantId: string, quantity: number, bundleLabel?: string) => Promise<void>;
+  removeItem: (variantId: string, bundleLabel?: string) => Promise<void>;
   clearCart: () => void;
   syncCart: () => Promise<void>;
   getCheckoutUrl: () => string | null;
