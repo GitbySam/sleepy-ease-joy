@@ -48,11 +48,11 @@ const Product = () => {
 
   const bundles = [
     { qty: 1, label: "1 Sleep&zy", desc: "1× Sleep&zy Anti-Embarrassment Pillow", discount: "-50%", tag: null, tagColor: "" },
-    { qty: 2, label: "2 Sleep&zy", desc: "2× Sleep&zy Anti-Embarrassment Pillow", discount: "-61%", tag: "DUO PACK", tagColor: "bg-gold" },
-    { qty: 3, label: "3 Sleep&zy", desc: "3× Sleep&zy Anti-Embarrassment Pillow", discount: "-67%", tag: "FAMILY PACK", tagColor: "bg-destructive" },
+    { qty: 2, label: "2 Sleep&zy", desc: "2× Sleep&zy Anti-Embarrassment Pillow", discount: "-50%", tag: "DUO PACK", tagColor: "bg-gold" },
+    { qty: 3, label: "3 Sleep&zy", desc: "3× Sleep&zy Anti-Embarrassment Pillow", discount: "-50%", tag: "FAMILY PACK", tagColor: "bg-destructive" },
   ];
 
-  const bundlePrices: Record<number, number> = { 1: price, 2: price * 1.57, 3: price * 2 };
+  const bundlePrices: Record<number, number> = { 1: price, 2: price * 2, 3: price * 3 };
   const bundleOldPrices: Record<number, number> = { 1: oldPrice, 2: oldPrice * 2, 3: oldPrice * 3 };
 
   const handleAddToCart = async () => {
