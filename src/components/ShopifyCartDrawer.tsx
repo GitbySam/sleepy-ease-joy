@@ -54,7 +54,7 @@ export const ShopifyCartDrawer = () => {
               <div className="flex-1 overflow-y-auto pr-2 min-h-0">
                 <div className="space-y-4">
                   {items.map((item) => (
-                    <div key={item.variantId} className="flex gap-4 p-3 bg-muted/30 rounded-xl border border-border">
+                    <div key={`${item.variantId}__${item.bundleLabel || 'single'}`} className="flex gap-4 p-3 bg-muted/30 rounded-xl border border-border">
                       <div className="w-16 h-16 bg-background rounded-md overflow-hidden flex-shrink-0">
                         {item.product.node.images?.edges?.[0]?.node && (
                           <img src={item.product.node.images.edges[0].node.url} alt={item.product.node.title} className="w-full h-full object-cover" />
@@ -62,24 +62,20 @@ export const ShopifyCartDrawer = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-foreground truncate text-sm">{item.product.node.title}</h4>
+                        {item.bundleLabel && (
+                          <span className="inline-block text-[10px] font-bold bg-gold/20 text-gold px-1.5 py-0.5 rounded mt-0.5">
+                            {item.bundleLabel} — {item.quantity}×
+                          </span>
+                        )}
                         <p className="text-xs text-muted-foreground">{item.selectedOptions.map(o => o.value).join(' • ')}</p>
                         <p className="font-semibold text-foreground mt-1">
-                          ${parseFloat(item.price.amount).toFixed(2)}
+                          ${item.bundlePrice ? item.bundlePrice.toFixed(2) : (parseFloat(item.price.amount) * item.quantity).toFixed(2)}
                         </p>
                       </div>
                       <div className="flex flex-col items-end gap-2 flex-shrink-0">
                         <button onClick={() => removeItem(item.variantId)} className="text-muted-foreground hover:text-destructive transition-colors">
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
-                        <div className="flex items-center gap-1 border border-border rounded-lg">
-                          <button className="p-1.5 hover:bg-muted rounded-l-lg" onClick={() => updateQuantity(item.variantId, item.quantity - 1)}>
-                            <Minus className="h-3 w-3" />
-                          </button>
-                          <span className="w-6 text-center text-xs font-semibold">{item.quantity}</span>
-                          <button className="p-1.5 hover:bg-muted rounded-r-lg" onClick={() => updateQuantity(item.variantId, item.quantity + 1)}>
-                            <Plus className="h-3 w-3" />
-                          </button>
-                        </div>
                       </div>
                     </div>
                   ))}
