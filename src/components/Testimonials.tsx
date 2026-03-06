@@ -73,9 +73,9 @@ const Testimonials = () => (
           {testimonials.map((t, i) => (
             <SwiperSlide key={i}>
               <div className="bg-card rounded-2xl p-8 border border-border h-full flex flex-col">
-                <div className="flex gap-1 mb-4">
+                <div className="flex gap-0.5 mb-4">
                   {[...Array(t.stars)].map((_, j) => (
-                    <span key={j} className="text-success text-lg">★</span>
+                    <span key={j} className="inline-flex items-center justify-center w-5 h-5 bg-success rounded-sm text-white text-xs font-bold">★</span>
                   ))}
                 </div>
                 <p className="text-sm text-foreground leading-relaxed flex-1 mb-6">"{t.text}"</p>
