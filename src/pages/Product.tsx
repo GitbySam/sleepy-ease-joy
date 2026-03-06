@@ -48,7 +48,7 @@ const Product = () => {
 
   const bundles = [
     { qty: 1, label: "1 Sleep&zy", desc: "1× Sleep&zy Anti-Embarrassment Pillow", discount: "-50%", tag: null, tagColor: "" },
-    { qty: 2, label: "2 Sleep&zy", desc: "2× Sleep&zy Anti-Embarrassment Pillow", discount: "-61%", tag: "COUPLE PACK", tagColor: "bg-gold" },
+    { qty: 2, label: "2 Sleep&zy", desc: "2× Sleep&zy Anti-Embarrassment Pillow", discount: "-61%", tag: "DUO PACK", tagColor: "bg-gold" },
     { qty: 3, label: "3 Sleep&zy", desc: "3× Sleep&zy Anti-Embarrassment Pillow", discount: "-67%", tag: "FAMILY PACK", tagColor: "bg-destructive" },
   ];
 
