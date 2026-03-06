@@ -70,6 +70,7 @@ const Product = () => {
       selectedOptions: variant.selectedOptions || [],
       bundleLabel,
       bundlePrice: bundleTotal,
+      bundleUnitSize: selectedQty,
     });
 
     toast.success(`${selectedBundle.label} added to cart`, {

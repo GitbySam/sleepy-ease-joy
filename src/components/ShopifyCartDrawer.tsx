@@ -63,8 +63,16 @@ export const ShopifyCartDrawer = () => {
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-foreground truncate text-sm">{item.product.node.title}</h4>
                         {item.bundleLabel && (
-                          <span className="inline-block text-[10px] font-bold bg-gold/20 text-gold px-1.5 py-0.5 rounded mt-0.5">
-                            {item.bundleLabel} — {item.quantity}×
+                          <span className="inline-flex items-center gap-1.5 text-xs font-bold bg-gold/20 text-gold px-2 py-1 rounded-md mt-1">
+                            {item.bundleLabel}
+                            <span className="bg-gold text-primary-foreground px-1.5 py-0.5 rounded text-[11px] font-extrabold">
+                              ×{item.bundleUnitSize ? Math.round(item.quantity / item.bundleUnitSize) : item.quantity}
+                            </span>
+                          </span>
+                        )}
+                        {!item.bundleLabel && item.quantity > 1 && (
+                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground mt-1">
+                            Qty: <span className="font-bold text-foreground">{item.quantity}</span>
                           </span>
                         )}
                         <p className="text-xs text-muted-foreground">{item.selectedOptions.map(o => o.value).join(' • ')}</p>
