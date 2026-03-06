@@ -42,10 +42,10 @@ const Header = () => {
             Sleep<span className="text-gold">&zy</span>
           </a>
           <div className="hidden md:flex items-center gap-8 font-sans-body text-sm text-muted-foreground">
-            <a href="#benefits" className="hover:text-foreground transition-colors">Benefits</a>
-            <a href="#proof" className="hover:text-foreground transition-colors">Results</a>
-            <a href="#testimonials" className="hover:text-foreground transition-colors">Reviews</a>
-            <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
+            <a href="/#benefits" className="hover:text-foreground transition-colors">Benefits</a>
+            <a href="/#proof" className="hover:text-foreground transition-colors">Results</a>
+            <a href="/#testimonials" className="hover:text-foreground transition-colors">Reviews</a>
+            <a href="/#faq" className="hover:text-foreground transition-colors">FAQ</a>
           </div>
           <div className="flex items-center gap-3">
             <Link to="/product">
