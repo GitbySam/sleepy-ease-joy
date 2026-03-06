@@ -57,7 +57,10 @@ const Product = () => {
 
   const handleAddToCart = async () => {
     if (!product || !variant) return;
-    
+    const selectedBundle = bundles.find(b => b.qty === selectedQty)!;
+    const bundleLabel = selectedBundle.tag || selectedBundle.label;
+    const bundleTotal = bundlePrices[selectedQty];
+
     await addItem({
       product,
       variantId: variant.id,
@@ -65,9 +68,11 @@ const Product = () => {
       price: variant.price,
       quantity: selectedQty,
       selectedOptions: variant.selectedOptions || [],
+      bundleLabel,
+      bundlePrice: bundleTotal,
     });
 
-    toast.success(`${bundles.find(b => b.qty === selectedQty)?.label} added to cart`, {
+    toast.success(`${selectedBundle.label} added to cart`, {
       position: "top-center",
     });
 
