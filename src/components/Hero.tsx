@@ -43,9 +43,9 @@ const Hero = () => (
             </motion.span>
           </Link>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span className="flex">
+            <span className="flex gap-0.5">
               {[...Array(5)].map((_, i) => (
-                <span key={i} className="text-gold">★</span>
+                <span key={i} className="inline-flex items-center justify-center w-5 h-5 bg-success rounded-sm text-white text-xs font-bold">★</span>
               ))}
             </span>
             <span>4.9/5 — 12,000+ reviews</span>

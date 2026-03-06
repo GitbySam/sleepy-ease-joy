@@ -151,9 +151,9 @@ const Product = () => {
                 {product?.node.title || "Sleep&zy™ — Cervical Pillow"}
               </h1>
               <div className="flex items-center gap-2 mt-2">
-                <div className="flex">
+                <div className="flex gap-0.5">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={16} className="fill-gold text-gold" />
+                    <span key={i} className="inline-flex items-center justify-center w-5 h-5 bg-success rounded-sm text-white text-xs font-bold">★</span>
                   ))}
                 </div>
                 <span className="text-sm text-muted-foreground font-sans-body">(12,000+ reviews)</span>
