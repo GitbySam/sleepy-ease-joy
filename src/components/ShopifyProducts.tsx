@@ -74,7 +74,7 @@ const ShopifyProducts = () => {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm hover:shadow-md transition-shadow"
+                className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm hover:shadow-md transition-shadow w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] max-w-sm"
               >
                 <Link to={`/product/${product.node.handle}`}>
                   <div className="aspect-square bg-muted/30 flex items-center justify-center overflow-hidden">
