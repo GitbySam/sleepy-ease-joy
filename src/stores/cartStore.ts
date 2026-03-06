@@ -42,7 +42,8 @@ export const useCartStore = create<CartStore>()(
 
       addItem: async (item) => {
         const { items, cartId, clearCart } = get();
-        const existingItem = items.find(i => i.variantId === item.variantId);
+        const itemKey = `${item.variantId}__${item.bundleLabel || 'single'}`;
+        const existingItem = items.find(i => `${i.variantId}__${i.bundleLabel || 'single'}` === itemKey);
 
         set({ isLoading: true });
         try {
