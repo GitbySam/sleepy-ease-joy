@@ -41,36 +41,44 @@ const Product = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const variant = product?.node.variants.edges[0]?.node;
-  const price = variant ? parseFloat(variant.price.amount) : 34.95;
-  const currencySymbol = variant?.price.currencyCode === "EUR" ? "€" : "$";
-  const oldPrice = price * 2;
+  const variants = product?.node.variants.edges || [];
+  const singleVariant = variants.find(v => v.node.selectedOptions?.some(o => o.value === 'Single'))?.node || variants[0]?.node;
+  const duoVariant = variants.find(v => v.node.selectedOptions?.some(o => o.value === 'Duo Pack'))?.node;
+  const familyVariant = variants.find(v => v.node.selectedOptions?.some(o => o.value === 'Family Pack'))?.node;
+
+  const singlePrice = singleVariant ? parseFloat(singleVariant.price.amount) : 34.95;
+  const duoPrice = duoVariant ? parseFloat(duoVariant.price.amount) : 54.87;
+  const familyPrice = familyVariant ? parseFloat(familyVariant.price.amount) : 69.90;
+  const currencySymbol = singleVariant?.price.currencyCode === "EUR" ? "€" : "$";
+  const oldPricePerUnit = singlePrice * 2;
 
   const bundles = [
-    { qty: 1, label: "1 Sleep&zy", desc: "1× Sleep&zy Anti-Embarrassment Pillow", discount: "-50%", tag: null, tagColor: "" },
-    { qty: 2, label: "2 Sleep&zy", desc: "2× Sleep&zy Anti-Embarrassment Pillow", discount: "-50%", tag: "DUO PACK", tagColor: "bg-gold" },
-    { qty: 3, label: "3 Sleep&zy", desc: "3× Sleep&zy Anti-Embarrassment Pillow", discount: "-50%", tag: "FAMILY PACK", tagColor: "bg-destructive" },
+    { qty: 1, label: "1 Sleep&zy", desc: "1× Sleep&zy Anti-Embarrassment Pillow", discount: "-50%", tag: null, tagColor: "", variantNode: singleVariant },
+    { qty: 2, label: "2 Sleep&zy", desc: "2× Sleep&zy Anti-Embarrassment Pillow", discount: "-61%", tag: "DUO PACK", tagColor: "bg-gold", variantNode: duoVariant },
+    { qty: 3, label: "3 Sleep&zy", desc: "3× Sleep&zy Anti-Embarrassment Pillow", discount: "-67%", tag: "FAMILY PACK", tagColor: "bg-destructive", variantNode: familyVariant },
   ];
 
-  const bundlePrices: Record<number, number> = { 1: price, 2: price * 2, 3: price * 3 };
-  const bundleOldPrices: Record<number, number> = { 1: oldPrice, 2: oldPrice * 2, 3: oldPrice * 3 };
+  const bundlePrices: Record<number, number> = { 1: singlePrice, 2: duoPrice, 3: familyPrice };
+  const bundleOldPrices: Record<number, number> = { 1: oldPricePerUnit, 2: oldPricePerUnit * 2, 3: oldPricePerUnit * 3 };
 
   const handleAddToCart = async () => {
-    if (!product || !variant) return;
+    if (!product) return;
     const selectedBundle = bundles.find(b => b.qty === selectedQty)!;
+    const selectedVariant = selectedBundle.variantNode;
+    if (!selectedVariant) return;
     const bundleLabel = selectedBundle.tag || selectedBundle.label;
     const bundleTotal = bundlePrices[selectedQty];
 
     await addItem({
       product,
-      variantId: variant.id,
-      variantTitle: variant.title,
-      price: variant.price,
-      quantity: selectedQty,
-      selectedOptions: variant.selectedOptions || [],
+      variantId: selectedVariant.id,
+      variantTitle: selectedVariant.title,
+      price: selectedVariant.price,
+      quantity: 1,
+      selectedOptions: selectedVariant.selectedOptions || [],
       bundleLabel,
       bundlePrice: bundleTotal,
-      bundleUnitSize: selectedQty,
+      bundleUnitSize: 1,
     });
 
     toast.success(`${selectedBundle.label} added to cart`, {
