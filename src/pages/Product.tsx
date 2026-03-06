@@ -23,9 +23,12 @@ function useCountdown() {
 }
 
 const Product = () => {
+  const [searchParams] = useSearchParams();
+  const bundleParam = parseInt(searchParams.get("bundle") || "1", 10);
+  const initialQty = [1, 2, 3].includes(bundleParam) ? bundleParam : 1;
   const [product, setProduct] = useState<ShopifyProduct | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedQty, setSelectedQty] = useState(1);
+  const [selectedQty, setSelectedQty] = useState(initialQty);
   const countdown = useCountdown();
   const viewers = 28;
 
