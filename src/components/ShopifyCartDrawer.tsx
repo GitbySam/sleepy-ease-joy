@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Minus, Plus, Trash2, ExternalLink, Loader2 } from "lucide-react";
+import { ShoppingCart, Minus, Plus, Trash2, ExternalLink, Loader2, ShieldCheck, Truck, RotateCcw, Lock } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 
 export const ShopifyCartDrawer = () => {
@@ -106,6 +106,23 @@ export const ShopifyCartDrawer = () => {
                     </>
                   )}
                 </Button>
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-center justify-center gap-4 text-[11px] text-muted-foreground">
+                    <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5" /> Secure payment</span>
+                    <span className="flex items-center gap-1"><Truck className="w-3.5 h-3.5" /> Free shipping</span>
+                    <span className="flex items-center gap-1"><RotateCcw className="w-3.5 h-3.5" /> 90-day guarantee</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-3">
+                    <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#1A1F71"/><text x="24" y="20" textAnchor="middle" fill="#fff" fontSize="11" fontWeight="bold" fontFamily="Arial">VISA</text></svg>
+                    <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#EB001B" opacity="0.15"/><circle cx="18" cy="16" r="10" fill="#EB001B"/><circle cx="30" cy="16" r="10" fill="#F79E1B"/><path d="M24 8.5a10 10 0 010 15 10 10 0 010-15z" fill="#FF5F00"/></svg>
+                    <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#016FD0"/><text x="24" y="20" textAnchor="middle" fill="#fff" fontSize="8" fontWeight="bold" fontFamily="Arial">AMEX</text></svg>
+                    <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#F5F5F5" stroke="#ddd" strokeWidth="0.5"/><text x="24" y="18" textAnchor="middle" fill="#3C4043" fontSize="7" fontWeight="bold" fontFamily="Arial">G Pay</text></svg>
+                    <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#F5F5F5" stroke="#ddd" strokeWidth="0.5"/><text x="24" y="19" textAnchor="middle" fill="#003087" fontSize="7" fontWeight="bold" fontFamily="Arial">PayPal</text></svg>
+                  </div>
+                  <p className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground">
+                    <Lock className="w-3 h-3" /> Secure checkout with SSL encryption
+                  </p>
+                </div>
               </div>
             </>
           )}
