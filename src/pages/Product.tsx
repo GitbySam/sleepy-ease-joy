@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Eye, ShieldCheck, Truck, RotateCcw, Star, Clock, Loader2 } from "lucide-react";
 import pillowHero from "@/assets/product-pillow-grey.png";
