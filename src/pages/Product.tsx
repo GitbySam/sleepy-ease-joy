@@ -30,7 +30,7 @@ const Product = () => {
 
   const addItem = useCartStore((s) => s.addItem);
   const isLoading = useCartStore((s) => s.isLoading);
-  const getCheckoutUrl = useCartStore((s) => s.getCheckoutUrl);
+  const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
 
   useEffect(() => {
     fetchProducts(1)
