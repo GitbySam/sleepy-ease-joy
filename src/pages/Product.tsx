@@ -70,17 +70,10 @@ const Product = () => {
     }
 
     toast.success(`${bundles.find(b => b.qty === selectedQty)?.label} added to cart`, {
-      description: "Use the cart icon in the top right to complete your order.",
       position: "top-center",
     });
 
-    // Redirect to checkout directly
-    setTimeout(() => {
-      const checkoutUrl = getCheckoutUrl();
-      if (checkoutUrl) {
-        window.open(checkoutUrl, '_blank');
-      }
-    }, 500);
+    setDrawerOpen(true);
   };
 
   if (loading) {
