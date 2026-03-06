@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const Footer = () => (
   <footer className="bg-dark text-primary-foreground py-16">
     <div className="container mx-auto px-6">
