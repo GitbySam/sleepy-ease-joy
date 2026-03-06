@@ -73,7 +73,7 @@ export const ShopifyCartDrawer = () => {
                         </p>
                       </div>
                       <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                        <button onClick={() => removeItem(item.variantId)} className="text-muted-foreground hover:text-destructive transition-colors">
+                        <button onClick={() => removeItem(item.variantId, item.bundleLabel)} className="text-muted-foreground hover:text-destructive transition-colors">
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
                       </div>
