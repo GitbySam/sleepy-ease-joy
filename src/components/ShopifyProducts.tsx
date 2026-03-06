@@ -64,7 +64,7 @@ const ShopifyProducts = () => {
         <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-12">
           Our Products
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-md sm:max-w-none mx-auto" style={{ justifyItems: 'center' }}>
           {products.map((product) => {
             const image = product.node.images.edges[0]?.node;
             const price = product.node.priceRange.minVariantPrice;
