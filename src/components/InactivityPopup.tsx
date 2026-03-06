@@ -57,8 +57,9 @@ const InactivityPopup = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.85, y: 40 }}
             transition={{ type: "spring", damping: 25, stiffness: 350 }}
-            className="fixed left-1/2 top-1/2 z-[101] w-[90vw] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl overflow-hidden shadow-2xl"
+            className="fixed inset-0 z-[101] flex items-center justify-center p-4"
           >
+            <div className="w-[90vw] max-w-sm rounded-2xl overflow-hidden shadow-2xl">
             {/* Gradient header */}
             <div className="relative bg-gradient-to-br from-[hsl(var(--gold))] via-amber-500 to-amber-600 px-6 pt-8 pb-10 text-center">
               <button
@@ -128,6 +129,7 @@ const InactivityPopup = () => {
                 <ShieldCheck size={14} className="text-green-600" />
                 <span className="font-sans-body">Secure payment • Free shipping • 90-day guarantee</span>
               </div>
+            </div>
             </div>
           </motion.div>
         </>
