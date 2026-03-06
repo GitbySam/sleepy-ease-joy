@@ -28,10 +28,10 @@ const Footer = () => (
             Legal
           </h4>
           <ul className="space-y-2 text-sm text-primary-foreground/50">
-            <li><a href="#" className="hover:text-primary-foreground transition-colors">Terms & Conditions</a></li>
-            <li><a href="#" className="hover:text-primary-foreground transition-colors">Privacy Policy</a></li>
-            <li><a href="#" className="hover:text-primary-foreground transition-colors">Returns & Refunds</a></li>
-            <li><a href="#" className="hover:text-primary-foreground transition-colors">Shipping</a></li>
+            <li><Link to="/terms" className="hover:text-primary-foreground transition-colors">Terms & Conditions</Link></li>
+            <li><Link to="/privacy" className="hover:text-primary-foreground transition-colors">Privacy Policy</Link></li>
+            <li><Link to="/returns" className="hover:text-primary-foreground transition-colors">Returns & Refunds</Link></li>
+            <li><Link to="/shipping" className="hover:text-primary-foreground transition-colors">Shipping</Link></li>
           </ul>
         </div>
         <div>
