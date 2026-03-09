@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Eye, ShieldCheck, Truck, RotateCcw, Star, Clock, Loader2 } from "lucide-react";
+import { Check, ShieldCheck, Truck, RotateCcw, Star, Clock, Loader2 } from "lucide-react";
 import pillowHero from "@/assets/product-pillow-grey.png";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchProducts, type ShopifyProduct, applyDiscountToCart } from "@/lib/shopify";
