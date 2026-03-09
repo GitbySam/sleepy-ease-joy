@@ -266,8 +266,16 @@ const Product = () => {
             <div className="flex items-center gap-3 bg-muted/30 rounded-lg px-4 py-3">
               <span className="text-sm text-muted-foreground font-sans-body">Your price:</span>
               <span className="text-2xl font-bold text-foreground">{currencySymbol}{currentPrice.toFixed(2)}</span>
+              {hasPromo && (
+                <span className="text-sm text-muted-foreground line-through">
+                  {currencySymbol}{(currentPrice / promoMultiplier).toFixed(2)}
+                </span>
+              )}
               <span className="text-sm text-muted-foreground line-through">{currencySymbol}{currentOldPrice.toFixed(2)}</span>
               <span className="bg-gold text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">{selectedBundle.discount}</span>
+              {hasPromo && (
+                <span className="bg-destructive text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">-10% EXTRA</span>
+              )}
             </div>
 
             {/* CTA */}
