@@ -55,6 +55,10 @@ export default {
         cream: "hsl(var(--cream))",
         "warm-gray": "hsl(var(--warm-gray))",
         dark: "hsl(var(--dark))",
+        "dark-blue": {
+          DEFAULT: "hsl(var(--dark-blue))",
+          foreground: "hsl(var(--dark-blue-foreground))",
+        },
         success: "hsl(var(--success))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
