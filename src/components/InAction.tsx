@@ -34,17 +34,14 @@ const InAction = () => (
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.15, duration: 0.6 }}
-            className="group relative overflow-hidden rounded-2xl shadow-lg"
+            className="group relative overflow-hidden rounded-2xl shadow-lg aspect-[3/4] sm:aspect-[4/3]"
           >
-            <div className="aspect-[3/4] sm:aspect-[4/3] overflow-hidden">
-              <img
-                src={scene.img}
-                alt={scene.caption}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
-            </div>
-            
+            <img
+              src={scene.img}
+              alt={scene.caption}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              loading="lazy"
+            />
             <div className="absolute bottom-0 left-0 right-0 px-4 pb-4 pt-8">
               <span className="text-xs uppercase tracking-widest text-white/90 font-sans-body leading-none block drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
                 {scene.label}
