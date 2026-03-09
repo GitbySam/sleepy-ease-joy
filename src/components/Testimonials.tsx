@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import testimonialMike from "@/assets/testimonial-mike.png";
+import testimonialJames from "@/assets/testimonial-james.png";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 // @ts-ignore
