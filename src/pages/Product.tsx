@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check, Eye, ShieldCheck, Truck, RotateCcw, Star, Clock, Loader2 } from "lucide-react";
 import pillowHero from "@/assets/product-pillow-grey.png";
 import { useCartStore } from "@/stores/cartStore";
-import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
+import { fetchProducts, type ShopifyProduct, applyDiscountToCart } from "@/lib/shopify";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 
