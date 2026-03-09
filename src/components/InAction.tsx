@@ -44,7 +44,7 @@ const InAction = () => (
                 loading="lazy"
               />
             </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+            
             <div className="absolute bottom-0 left-0 right-0 px-4 pb-4 pt-8 min-h-[72px] flex flex-col justify-end">
               <span className="text-xs uppercase tracking-widest text-primary-foreground/80 font-sans-body leading-none block">
                 {scene.label}
