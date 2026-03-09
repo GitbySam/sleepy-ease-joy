@@ -184,6 +184,33 @@ const CART_LINES_REMOVE_MUTATION = `
   }
 `;
 
+const CART_DISCOUNT_CODES_UPDATE = `
+  mutation cartDiscountCodesUpdate($cartId: ID!, $discountCodes: [String!]!) {
+    cartDiscountCodesUpdate(cartId: $cartId, discountCodes: $discountCodes) {
+      cart { id }
+      userErrors { field message }
+    }
+  }
+`;
+
+export async function applyDiscountToCart(cartId: string, discountCode: string): Promise<boolean> {
+  try {
+    const data = await storefrontApiRequest(CART_DISCOUNT_CODES_UPDATE, {
+      cartId,
+      discountCodes: [discountCode],
+    });
+    const userErrors = data?.data?.cartDiscountCodesUpdate?.userErrors || [];
+    if (userErrors.length > 0) {
+      console.error('Discount code failed:', userErrors);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error('Failed to apply discount:', error);
+    return false;
+  }
+}
+
 function formatCheckoutUrl(checkoutUrl: string): string {
   try {
     const url = new URL(checkoutUrl);

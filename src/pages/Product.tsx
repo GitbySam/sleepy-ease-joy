@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check, Eye, ShieldCheck, Truck, RotateCcw, Star, Clock, Loader2 } from "lucide-react";
 import pillowHero from "@/assets/product-pillow-grey.png";
 import { useCartStore } from "@/stores/cartStore";
-import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
+import { fetchProducts, type ShopifyProduct, applyDiscountToCart } from "@/lib/shopify";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 
@@ -25,6 +25,9 @@ function useCountdown() {
 const Product = () => {
   const [searchParams] = useSearchParams();
   const bundleParam = parseInt(searchParams.get("bundle") || "1", 10);
+  const promoCode = searchParams.get("promo") || null;
+  const hasPromo = promoCode === "SLEEPZY10";
+  const promoMultiplier = hasPromo ? 0.9 : 1;
   const initialQty = [1, 2, 3].includes(bundleParam) ? bundleParam : 1;
   const [product, setProduct] = useState<ShopifyProduct | null>(null);
   const [loading, setLoading] = useState(true);
@@ -62,7 +65,7 @@ const Product = () => {
     { qty: 3, label: "3 Sleep&zy", desc: "3× Sleep&zy Anti-Embarrassment Pillow", discount: "-67%", tag: "FAMILY PACK", tagColor: "bg-destructive", variantNode: familyVariant },
   ];
 
-  const bundlePrices: Record<number, number> = { 1: singlePrice, 2: duoPrice, 3: familyPrice };
+  const bundlePrices: Record<number, number> = { 1: singlePrice * promoMultiplier, 2: duoPrice * promoMultiplier, 3: familyPrice * promoMultiplier };
   const bundleOldPrices: Record<number, number> = { 1: oldPricePerUnit, 2: oldPricePerUnit * 2, 3: oldPricePerUnit * 3 };
 
   const handleAddToCart = async () => {
@@ -88,6 +91,14 @@ const Product = () => {
     toast.success(`${selectedBundle.label} added to cart`, {
       position: "top-center",
     });
+
+    // Apply promo discount code to cart if coming from popup
+    if (hasPromo) {
+      const cartId = useCartStore.getState().cartId;
+      if (cartId) {
+        await applyDiscountToCart(cartId, promoCode!);
+      }
+    }
 
     setDrawerOpen(true);
   };
@@ -159,6 +170,13 @@ const Product = () => {
                 <span className="text-sm text-muted-foreground font-sans-body">(12,000+ reviews)</span>
               </div>
             </div>
+
+            {/* Promo banner */}
+            {hasPromo && (
+              <div className="bg-gradient-to-r from-[hsl(var(--gold))] to-amber-500 text-primary-foreground text-center py-3 rounded-lg font-bold text-sm tracking-wide animate-pulse">
+                🎁 EXTRA 10% OFF APPLIED — Code SLEEPZY10
+              </div>
+            )}
 
             {/* Promo banner */}
             <div className="bg-gold text-primary-foreground text-center py-2.5 rounded-lg font-bold text-sm tracking-wide">
@@ -248,8 +266,16 @@ const Product = () => {
             <div className="flex items-center gap-3 bg-muted/30 rounded-lg px-4 py-3">
               <span className="text-sm text-muted-foreground font-sans-body">Your price:</span>
               <span className="text-2xl font-bold text-foreground">{currencySymbol}{currentPrice.toFixed(2)}</span>
+              {hasPromo && (
+                <span className="text-sm text-muted-foreground line-through">
+                  {currencySymbol}{(currentPrice / promoMultiplier).toFixed(2)}
+                </span>
+              )}
               <span className="text-sm text-muted-foreground line-through">{currencySymbol}{currentOldPrice.toFixed(2)}</span>
               <span className="bg-gold text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">{selectedBundle.discount}</span>
+              {hasPromo && (
+                <span className="bg-destructive text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">-10% EXTRA</span>
+              )}
             </div>
 
             {/* CTA */}
