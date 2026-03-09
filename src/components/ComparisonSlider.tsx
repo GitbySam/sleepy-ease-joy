@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import headDrop from "@/assets/embarrassing-head-drop.jpg";
+import headDrop from "@/assets/embarrassing-head-drop.gif";
 import mouthOpen from "@/assets/embarrassing-mouth-open.jpg";
 import shoulder from "@/assets/embarrassing-shoulder.jpg";
 import drool from "@/assets/embarrassing-drool.jpg";
