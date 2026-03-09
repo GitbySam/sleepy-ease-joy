@@ -172,6 +172,13 @@ const Product = () => {
             </div>
 
             {/* Promo banner */}
+            {hasPromo && (
+              <div className="bg-gradient-to-r from-[hsl(var(--gold))] to-amber-500 text-primary-foreground text-center py-3 rounded-lg font-bold text-sm tracking-wide animate-pulse">
+                🎁 EXTRA 10% OFF APPLIED — Code SLEEPZY10
+              </div>
+            )}
+
+            {/* Promo banner */}
             <div className="bg-gold text-primary-foreground text-center py-2.5 rounded-lg font-bold text-sm tracking-wide">
               ❄️ WINTER SALE — UP TO 67% OFF!
             </div>
