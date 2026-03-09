@@ -75,7 +75,11 @@ const Testimonials = () => (
               <div className="bg-card rounded-2xl p-8 border border-border h-full flex flex-col">
                 <div className="flex gap-0.5 mb-4">
                   {[...Array(t.stars)].map((_, j) => (
-                    <span key={j} className="inline-flex items-center justify-center w-5 h-5 bg-success rounded-sm text-white text-xs font-bold">★</span>
+                    <span key={j} className="inline-flex items-center justify-center w-8 h-8 bg-success rounded-[4px]">
+                      <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
+                        <path d="M12 2l2.9 6.3L22 9.2l-5 4.6 1.3 6.9L12 17.3 5.7 20.7 7 13.8 2 9.2l7.1-.9L12 2z" />
+                      </svg>
+                    </span>
                   ))}
                 </div>
                 <p className="text-sm text-foreground leading-relaxed flex-1 mb-6">"{t.text}"</p>
