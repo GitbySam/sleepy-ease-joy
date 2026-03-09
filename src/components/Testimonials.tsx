@@ -20,6 +20,7 @@ const testimonials = [
     role: "Daily commuter",
     text: "I woke up on a stranger's shoulder on the subway. The look on their face... I ordered Sleep&zy that same day. Best $35 I've ever spent.",
     stars: 5,
+    image: testimonialJames,
   },
   {
     name: "Emily M.",
