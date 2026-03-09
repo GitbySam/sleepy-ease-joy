@@ -34,7 +34,7 @@ const InAction = () => (
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.15, duration: 0.6 }}
-            className="group relative overflow-hidden rounded-2xl shadow-lg"
+            className="group overflow-hidden rounded-2xl shadow-lg"
           >
             <div className="aspect-[3/4] sm:aspect-[4/3] overflow-hidden">
               <img
@@ -44,7 +44,7 @@ const InAction = () => (
                 loading="lazy"
               />
             </div>
-            <div className="absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-sm px-4 py-3">
+            <div className="px-4 py-3">
               <span className="text-xs uppercase tracking-widest text-muted-foreground font-sans-body leading-none">
                 {scene.label}
               </span>
