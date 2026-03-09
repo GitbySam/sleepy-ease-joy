@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import testimonialMike from "@/assets/testimonial-mike.png";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 // @ts-ignore
@@ -30,6 +31,7 @@ const testimonials = [
     role: "Sales executive",
     text: "A client saw me passed out at the airport gate, mouth wide open, head back. I could've died of embarrassment. Got Sleep&zy the next day. Game changer.",
     stars: 5,
+    image: testimonialMike,
   },
   {
     name: "Jessica B.",
@@ -84,9 +86,13 @@ const Testimonials = () => (
                 </div>
                 <p className="text-sm text-foreground leading-relaxed flex-1 mb-6">"{t.text}"</p>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center text-gold font-bold text-sm">
-                    {t.name[0]}
-                  </div>
+                  {t.image ? (
+                    <img src={t.image} alt={t.name} className="w-10 h-10 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center text-gold font-bold text-sm">
+                      {t.name[0]}
+                    </div>
+                  )}
                   <div>
                     <p className="text-sm font-semibold text-foreground">{t.name}</p>
                     <p className="text-xs text-muted-foreground">{t.role}</p>
