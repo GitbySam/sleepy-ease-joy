@@ -33,7 +33,6 @@ const Product = () => {
   const [loading, setLoading] = useState(true);
   const [selectedQty, setSelectedQty] = useState(initialQty);
   const countdown = useCountdown();
-  const viewers = 28;
 
   const addItem = useCartStore((s) => s.addItem);
   const isLoading = useCartStore((s) => s.isLoading);
