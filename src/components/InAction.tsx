@@ -34,9 +34,9 @@ const InAction = () => (
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.15, duration: 0.6 }}
-            className="group relative overflow-hidden rounded-2xl shadow-lg"
+            className="group overflow-hidden rounded-2xl shadow-lg bg-card"
           >
-            <div className="aspect-[3/4] sm:aspect-[4/3] overflow-hidden">
+            <div className="aspect-[3/4] sm:aspect-[4/3] overflow-hidden rounded-t-2xl">
               <img
                 src={scene.img}
                 alt={scene.caption}
@@ -44,12 +44,11 @@ const InAction = () => (
                 loading="lazy"
               />
             </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-foreground/50 via-foreground/10 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 px-4 pb-4 pt-8">
-              <span className="text-xs uppercase tracking-widest text-primary-foreground/80 font-sans-body leading-none">
+            <div className="px-4 py-3">
+              <span className="text-xs uppercase tracking-widest text-muted-foreground font-sans-body leading-none">
                 {scene.label}
               </span>
-              <p className="text-sm sm:text-base font-serif font-semibold text-primary-foreground mt-1 leading-snug">
+              <p className="text-sm sm:text-base font-serif font-semibold text-foreground mt-1 leading-snug">
                 {scene.caption}
               </p>
             </div>
