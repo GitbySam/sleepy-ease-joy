@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import testimonialMike from "@/assets/testimonial-mike.png";
+import testimonialJames from "@/assets/testimonial-james.png";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 // @ts-ignore
@@ -19,6 +20,7 @@ const testimonials = [
     role: "Daily commuter",
     text: "I woke up on a stranger's shoulder on the subway. The look on their face... I ordered Sleep&zy that same day. Best $35 I've ever spent.",
     stars: 5,
+    image: testimonialJames,
   },
   {
     name: "Emily M.",
