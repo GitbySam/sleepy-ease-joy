@@ -31,6 +31,7 @@ const testimonials = [
     role: "Sales executive",
     text: "A client saw me passed out at the airport gate, mouth wide open, head back. I could've died of embarrassment. Got Sleep&zy the next day. Game changer.",
     stars: 5,
+    image: testimonialMike,
   },
   {
     name: "Jessica B.",
