@@ -38,7 +38,7 @@ const InactivityPopup = () => {
   const handleClaim = () => {
     setShow(false);
     setDismissed(true);
-    navigate("/product");
+    navigate("/product?promo=SLEEPZY10");
   };
 
   return (
