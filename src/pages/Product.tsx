@@ -92,6 +92,14 @@ const Product = () => {
       position: "top-center",
     });
 
+    // Apply promo discount code to cart if coming from popup
+    if (hasPromo) {
+      const cartId = useCartStore.getState().cartId;
+      if (cartId) {
+        await applyDiscountToCart(cartId, promoCode!);
+      }
+    }
+
     setDrawerOpen(true);
   };
 
