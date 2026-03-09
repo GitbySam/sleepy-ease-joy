@@ -65,7 +65,7 @@ const Product = () => {
     { qty: 3, label: "3 Sleep&zy", desc: "3× Sleep&zy Anti-Embarrassment Pillow", discount: "-67%", tag: "FAMILY PACK", tagColor: "bg-destructive", variantNode: familyVariant },
   ];
 
-  const bundlePrices: Record<number, number> = { 1: singlePrice, 2: duoPrice, 3: familyPrice };
+  const bundlePrices: Record<number, number> = { 1: singlePrice * promoMultiplier, 2: duoPrice * promoMultiplier, 3: familyPrice * promoMultiplier };
   const bundleOldPrices: Record<number, number> = { 1: oldPricePerUnit, 2: oldPricePerUnit * 2, 3: oldPricePerUnit * 3 };
 
   const handleAddToCart = async () => {
