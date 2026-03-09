@@ -45,8 +45,12 @@ const Hero = () => (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span className="flex gap-0.5">
               {[...Array(5)].map((_, i) => (
-                <span key={i} className="inline-flex items-center justify-center w-5 h-5 bg-success rounded-sm text-white text-xs font-bold">★</span>
-              ))}
+                 <span key={i} className="inline-flex items-center justify-center w-7 h-7 bg-success rounded-[3px]">
+                   <svg viewBox="0 0 24 24" className="w-4 h-4 fill-white">
+                     <path d="M12 2l2.9 6.3L22 9.2l-5 4.6 1.3 6.9L12 17.3 5.7 20.7 7 13.8 2 9.2l7.1-.9L12 2z" />
+                   </svg>
+                 </span>
+               ))}
             </span>
             <span>4.9/5 — 12,000+ reviews</span>
           </div>
