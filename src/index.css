@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -42,6 +42,8 @@
     --cream: 40 33% 97%;
     --warm-gray: 30 10% 94%;
     --dark: 230 25% 10%;
+    --dark-blue: 220 40% 13%;
+    --dark-blue-foreground: 220 20% 90%;
     --success: 152 69% 36%;
 
     --sidebar-background: 0 0% 98%;
@@ -53,7 +55,7 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    font-family: 'Inter', sans-serif;
+    font-family: 'DM Sans', sans-serif;
   }
 }
 
@@ -74,7 +76,7 @@
     font-family: 'Playfair Display', serif;
   }
   .font-sans-body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'DM Sans', sans-serif;
   }
   .text-gold {
     color: hsl(var(--gold));
@@ -90,6 +92,12 @@
   }
   .bg-dark {
     background-color: hsl(var(--dark));
+  }
+  .bg-dark-blue {
+    background-color: hsl(var(--dark-blue));
+  }
+  .text-dark-blue-foreground {
+    color: hsl(var(--dark-blue-foreground));
   }
   .border-gold {
     border-color: hsl(var(--gold));
