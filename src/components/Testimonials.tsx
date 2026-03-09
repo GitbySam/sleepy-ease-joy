@@ -42,7 +42,7 @@ const testimonials = [
 ];
 
 const Testimonials = () => (
-  <section id="testimonials" className="py-24 gradient-section-warm">
+  <section id="testimonials" className="py-24 bg-dark-blue">
     <div className="container mx-auto px-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -50,10 +50,10 @@ const Testimonials = () => (
         viewport={{ once: true }}
         className="text-center mb-12"
       >
-        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
+        <p className="text-xs uppercase tracking-[0.3em] text-dark-blue-foreground/50 mb-3">
           12,000+ dignified sleepers
         </p>
-        <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
+        <h2 className="text-4xl md:text-5xl font-serif font-bold text-dark-blue-foreground">
           Real stories, real <span className="text-gold italic">saves</span>
         </h2>
       </motion.div>
@@ -74,7 +74,7 @@ const Testimonials = () => (
         >
           {testimonials.map((t, i) => (
             <SwiperSlide key={i}>
-              <div className="bg-card rounded-2xl p-8 border border-border h-full flex flex-col">
+              <div className="bg-dark-blue-foreground/5 backdrop-blur-sm rounded-2xl p-8 border border-dark-blue-foreground/10 h-full flex flex-col">
                 <div className="flex gap-0.5 mb-4">
                   {[...Array(t.stars)].map((_, j) => (
                     <span key={j} className="inline-flex items-center justify-center w-7 h-7 bg-success rounded-[3px]">
@@ -84,7 +84,7 @@ const Testimonials = () => (
                     </span>
                   ))}
                 </div>
-                <p className="text-sm text-foreground leading-relaxed flex-1 mb-6">"{t.text}"</p>
+                <p className="text-sm text-dark-blue-foreground/90 leading-relaxed flex-1 mb-6">"{t.text}"</p>
                 <div className="flex items-center gap-3">
                   {t.image ? (
                     <img src={t.image} alt={t.name} className="w-10 h-10 rounded-full object-cover" />
@@ -94,8 +94,8 @@ const Testimonials = () => (
                     </div>
                   )}
                   <div>
-                    <p className="text-sm font-semibold text-foreground">{t.name}</p>
-                    <p className="text-xs text-muted-foreground">{t.role}</p>
+                    <p className="text-sm font-semibold text-dark-blue-foreground">{t.name}</p>
+                    <p className="text-xs text-dark-blue-foreground/50">{t.role}</p>
                   </div>
                 </div>
               </div>

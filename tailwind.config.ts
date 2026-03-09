@@ -55,6 +55,10 @@ export default {
         cream: "hsl(var(--cream))",
         "warm-gray": "hsl(var(--warm-gray))",
         dark: "hsl(var(--dark))",
+        "dark-blue": {
+          DEFAULT: "hsl(var(--dark-blue))",
+          foreground: "hsl(var(--dark-blue-foreground))",
+        },
         success: "hsl(var(--success))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
@@ -69,7 +73,7 @@ export default {
       },
       fontFamily: {
         serif: ["'Playfair Display'", "serif"],
-        sans: ["'Inter'", "sans-serif"],
+        sans: ["'DM Sans'", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",

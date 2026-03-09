@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Eye, ShieldCheck, Truck, RotateCcw, Star, Clock, Loader2 } from "lucide-react";
+import { Check, ShieldCheck, Truck, RotateCcw, Star, Clock, Loader2 } from "lucide-react";
 import pillowHero from "@/assets/product-pillow-grey.png";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchProducts, type ShopifyProduct, applyDiscountToCart } from "@/lib/shopify";
@@ -33,7 +33,6 @@ const Product = () => {
   const [loading, setLoading] = useState(true);
   const [selectedQty, setSelectedQty] = useState(initialQty);
   const countdown = useCountdown();
-  const viewers = 28;
 
   const addItem = useCartStore((s) => s.addItem);
   const isLoading = useCartStore((s) => s.isLoading);
@@ -187,29 +186,21 @@ const Product = () => {
               ❄️ WINTER SALE — UP TO 67% OFF!
             </div>
 
-            {/* Viewers */}
-            <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-4 py-2 text-sm text-muted-foreground font-sans-body">
-              <Eye size={15} />
-              <span><strong className="text-foreground">{viewers} people</strong> are viewing this product right now</span>
-            </div>
-
-            {/* Stock */}
-            <div className="border border-border rounded-lg px-4 py-3">
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="w-2 h-2 rounded-full bg-destructive animate-pulse-dot" />
-                <span className="text-sm font-semibold text-destructive">Only 8 left in stock</span>
+            {/* Stock + Countdown combined */}
+            <div className="border border-border rounded-lg px-4 py-3 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-destructive animate-pulse-dot" />
+                  <span className="text-sm font-semibold text-destructive">Only 8 left in stock</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Clock size={14} className="text-gold" />
+                  <span className="text-xs font-bold text-gold font-sans-body">{countdown}</span>
+                </div>
               </div>
-              <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
                 <div className="bg-destructive h-full rounded-full animate-progress-pulse" style={{ width: "25%" }} />
               </div>
-            </div>
-
-            {/* Countdown */}
-            <div className="bg-gold/10 border border-gold/30 text-center py-3 rounded-lg flex items-center justify-center gap-2">
-              <Clock size={16} className="text-gold" />
-              <span className="text-sm font-bold text-foreground font-sans-body">
-                Offer expires in <span className="text-gold">{countdown}</span>
-              </span>
             </div>
 
             {/* Bundle selection */}
