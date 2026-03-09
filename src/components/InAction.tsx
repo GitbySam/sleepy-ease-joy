@@ -34,7 +34,7 @@ const InAction = () => (
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.15, duration: 0.6 }}
-            className="group relative overflow-hidden rounded-2xl shadow-lg aspect-[3/4] sm:aspect-[4/3]"
+            className="group relative overflow-hidden rounded-2xl shadow-lg aspect-[3/4] sm:aspect-[4/3] flex-1"
           >
             <img
               src={scene.img}
