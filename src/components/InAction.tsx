@@ -42,11 +42,11 @@ const InAction = () => (
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
             />
-            <div className="absolute bottom-0 left-0 right-0 px-3 pb-3 pt-6 sm:px-4 sm:pb-4 sm:pt-8 bg-gradient-to-t from-black/60 via-black/20 to-transparent">
-              <span className="text-[10px] sm:text-xs uppercase tracking-widest text-white/90 font-sans-body leading-none block drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+            <div className="absolute bottom-0 left-0 right-0 px-2 pb-2 pt-4 sm:px-4 sm:pb-4 sm:pt-8 bg-gradient-to-t from-black/60 via-black/20 to-transparent">
+              <span className="text-[9px] sm:text-xs uppercase tracking-widest text-white/90 font-sans-body leading-none block drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                 {scene.label}
               </span>
-              <p className="text-xs sm:text-base font-serif font-semibold text-white mt-0.5 sm:mt-1 leading-tight sm:leading-snug drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+              <p className="text-[11px] sm:text-base font-serif font-semibold text-white mt-0.5 sm:mt-1 leading-tight sm:leading-snug drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                 {scene.caption}
               </p>
             </div>
