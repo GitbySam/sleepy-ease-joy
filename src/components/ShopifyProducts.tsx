@@ -5,8 +5,10 @@ import { Link } from "react-router-dom";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const ShopifyProducts = () => {
+  const { t } = useLanguage();
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const addItem = useCartStore((s) => s.addItem);
@@ -30,7 +32,7 @@ const ShopifyProducts = () => {
       quantity: 1,
       selectedOptions: variant.selectedOptions || [],
     });
-    toast.success(`${product.node.title} added to cart`);
+    toast.success(`${product.node.title} ${t("products.addedToCart")}`);
   };
 
   if (loading) {
@@ -48,10 +50,10 @@ const ShopifyProducts = () => {
       <section id="products" className="py-20 gradient-section-warm">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Our Products
+            {t("products.title")}
           </h2>
           <p className="text-muted-foreground text-lg">
-            No products available at the moment. Check back soon!
+            {t("products.empty")}
           </p>
         </div>
       </section>
@@ -62,7 +64,7 @@ const ShopifyProducts = () => {
     <section id="products" className="py-20 gradient-section-warm">
       <div className="container mx-auto px-6">
         <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-12">
-          Our Products
+          {t("products.title")}
         </h2>
         <div className="flex flex-wrap justify-center gap-8">
           {products.map((product) => {
@@ -85,7 +87,7 @@ const ShopifyProducts = () => {
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
-                      <span className="text-muted-foreground text-sm">No image</span>
+                      <span className="text-muted-foreground text-sm">{t("products.noImage")}</span>
                     )}
                   </div>
                 </Link>
@@ -114,7 +116,7 @@ const ShopifyProducts = () => {
                       ) : (
                         <ShoppingBag size={16} />
                       )}
-                      Add
+                      {t("products.add")}
                     </motion.button>
                   </div>
                 </div>

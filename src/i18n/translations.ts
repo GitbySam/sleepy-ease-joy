@@ -450,6 +450,13 @@ export const translations = {
   "cart.items": { en: "item(s) in your cart", fr: "article(s) dans votre panier", es: "artículo(s) en tu carrito" },
   "cart.total": { en: "Total", fr: "Total", es: "Total" },
   "cart.checkout": { en: "Secure Checkout", fr: "Paiement sécurisé", es: "Pago seguro" },
+
+  // Shopify Products
+  "products.title": { en: "Our Products", fr: "Nos Produits", es: "Nuestros Productos" },
+  "products.empty": { en: "No products available at the moment. Check back soon!", fr: "Aucun produit disponible pour le moment. Revenez bientôt !", es: "No hay productos disponibles por el momento. ¡Vuelve pronto!" },
+  "products.add": { en: "Add", fr: "Ajouter", es: "Añadir" },
+  "products.addedToCart": { en: "added to cart", fr: "ajouté au panier", es: "añadido al carrito" },
+  "products.noImage": { en: "No image", fr: "Pas d'image", es: "Sin imagen" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;
