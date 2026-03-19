@@ -32,7 +32,7 @@ const ShopifyProducts = () => {
       quantity: 1,
       selectedOptions: variant.selectedOptions || [],
     });
-    toast.success(`${product.node.title} added to cart`);
+    toast.success(`${product.node.title} ${t("products.addedToCart")}`);
   };
 
   if (loading) {
