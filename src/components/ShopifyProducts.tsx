@@ -66,7 +66,6 @@ const ShopifyProducts = () => {
         <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-12">
           {t("products.title")}
         </h2>
-        </h2>
         <div className="flex flex-wrap justify-center gap-8">
           {products.map((product) => {
             const image = product.node.images.edges[0]?.node;
