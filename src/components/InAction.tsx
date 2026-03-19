@@ -53,6 +53,32 @@ const InAction = () => (
             </div>
           </motion.div>
         ))}
+
+          {/* Demo video card */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 3 * 0.15, duration: 0.6 }}
+            className="group relative overflow-hidden rounded-2xl shadow-lg aspect-[3/4] sm:aspect-[4/3] flex-1"
+          >
+            <video
+              src={demoVideo}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute bottom-0 left-0 right-0 px-2 pb-2 pt-4 sm:px-4 sm:pb-4 sm:pt-8 bg-gradient-to-t from-black/60 via-black/20 to-transparent">
+              <span className="text-[9px] sm:text-xs uppercase tracking-widest text-white/90 font-sans-body leading-none block drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                🎬 Demo
+              </span>
+              <p className="text-[11px] sm:text-base font-serif font-semibold text-white mt-0.5 sm:mt-1 leading-tight sm:leading-snug drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                See it in action.
+              </p>
+            </div>
+          </motion.div>
       </div>
     </div>
   </section>
