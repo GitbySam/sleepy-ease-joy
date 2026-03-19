@@ -64,7 +64,8 @@ const ShopifyProducts = () => {
     <section id="products" className="py-20 gradient-section-warm">
       <div className="container mx-auto px-6">
         <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-12">
-          Our Products
+          {t("products.title")}
+        </h2>
         </h2>
         <div className="flex flex-wrap justify-center gap-8">
           {products.map((product) => {
