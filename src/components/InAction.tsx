@@ -27,7 +27,7 @@ const InAction = () => (
         </h2>
       </motion.div>
 
-      <div className="flex gap-4 max-w-5xl mx-auto">
+      <div className="flex gap-4 max-w-6xl mx-auto">
         {scenes.map((scene, i) => (
           <motion.div
             key={scene.label}
