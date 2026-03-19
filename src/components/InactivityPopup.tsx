@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Gift, ShieldCheck, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const INACTIVITY_TIMEOUT = 30000;
 
@@ -9,6 +10,7 @@ const InactivityPopup = () => {
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (dismissed) return;
@@ -60,7 +62,6 @@ const InactivityPopup = () => {
             className="fixed inset-0 z-[101] flex items-center justify-center p-4"
           >
             <div className="w-[90vw] max-w-sm rounded-2xl overflow-hidden shadow-2xl">
-            {/* Gradient header */}
             <div className="relative bg-gradient-to-br from-[hsl(var(--gold))] via-amber-500 to-amber-600 px-6 pt-8 pb-10 text-center">
               <button
                 onClick={handleDismiss}
@@ -85,28 +86,27 @@ const InactivityPopup = () => {
                 <Gift className="text-white" size={28} />
               </div>
               <h2 className="text-2xl font-serif font-bold text-white mb-1">
-                WAIT! Your dignity is at stake
+                {t("inactivity.title")}
               </h2>
               <p className="text-white/90 text-sm font-sans-body">
-                Next time you fall asleep in public, will you be ready?
+                {t("inactivity.subtitle")}
               </p>
             </div>
 
-            {/* Body */}
             <div className="bg-card px-6 py-6 text-center">
               <div className="mx-auto mb-4 rounded-full bg-gradient-to-r from-[hsl(var(--gold))] to-amber-500 px-6 py-2.5 inline-block">
                 <span className="text-white font-bold text-lg tracking-wide">
-                  EXTRA 10% OFF
+                  {t("inactivity.extra10")}
                 </span>
               </div>
               <p className="text-muted-foreground text-sm mb-1 font-sans-body">
-                Order now and get an
+                {t("inactivity.orderNow")}
               </p>
               <p className="text-foreground font-semibold text-sm mb-4 font-sans-body">
-                additional 10% off your entire order!
+                {t("inactivity.additional10")}
               </p>
               <p className="text-xs text-muted-foreground mb-5 flex items-center justify-center gap-1.5">
-                ⏰ This offer expires when you leave this page
+                {t("inactivity.expires")}
               </p>
 
               <motion.button
@@ -115,19 +115,19 @@ const InactivityPopup = () => {
                 onClick={handleClaim}
                 className="w-full rounded-full bg-dark py-3.5 text-sm font-bold text-white tracking-wide shadow-lg hover:opacity-90 transition-opacity mb-3"
               >
-                PROTECT MY REPUTATION NOW
+                {t("inactivity.cta")}
               </motion.button>
 
               <button
                 onClick={handleDismiss}
                 className="text-xs text-muted-foreground underline hover:text-foreground transition-colors font-sans-body"
               >
-                No thanks, I enjoy being photographed drooling
+                {t("inactivity.decline")}
               </button>
 
               <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
                 <ShieldCheck size={14} className="text-green-600" />
-                <span className="font-sans-body">Secure payment • Free shipping • 90-day guarantee</span>
+                <span className="font-sans-body">{t("inactivity.trust")}</span>
               </div>
             </div>
             </div>

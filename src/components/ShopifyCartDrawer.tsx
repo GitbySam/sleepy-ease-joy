@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Minus, Plus, Trash2, ExternalLink, Loader2, ShieldCheck, Truck, RotateCcw, Lock } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 export const ShopifyCartDrawer = () => {
   const { items, isLoading, isSyncing, isDrawerOpen, setDrawerOpen, updateQuantity, removeItem, getCheckoutUrl, syncCart } = useCartStore();
+  const { t } = useLanguage();
   const totalItems = items.length;
   const totalPrice = items.reduce((sum, item) => sum + (item.bundlePrice ? item.bundlePrice : parseFloat(item.price.amount) * item.quantity), 0);
 
@@ -39,9 +41,9 @@ export const ShopifyCartDrawer = () => {
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-lg flex flex-col h-full">
         <SheetHeader className="flex-shrink-0">
-          <SheetTitle className="font-serif-display">Cart</SheetTitle>
+          <SheetTitle className="font-serif-display">{t("cart.title")}</SheetTitle>
           <SheetDescription>
-            {totalItems === 0 ? "Your cart is empty" : `${totalItems} item${totalItems !== 1 ? 's' : ''} in your cart`}
+            {totalItems === 0 ? t("cart.empty") : `${totalItems} ${t("cart.items")}`}
           </SheetDescription>
         </SheetHeader>
         <div className="flex flex-col flex-1 pt-6 min-h-0">
@@ -49,7 +51,7 @@ export const ShopifyCartDrawer = () => {
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
                 <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">Your cart is empty</p>
+                <p className="text-muted-foreground">{t("cart.empty")}</p>
               </div>
             </div>
           ) : (
@@ -94,7 +96,7 @@ export const ShopifyCartDrawer = () => {
               </div>
               <div className="flex-shrink-0 space-y-4 pt-4 border-t border-border bg-background">
                 <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold text-foreground">Total</span>
+                  <span className="text-lg font-semibold text-foreground">{t("cart.total")}</span>
                   <span className="text-xl font-bold text-foreground">
                     ${totalPrice.toFixed(2)}
                   </span>
@@ -105,15 +107,15 @@ export const ShopifyCartDrawer = () => {
                   ) : (
                     <>
                       <ExternalLink className="w-4 h-4 mr-2" />
-                      Secure Checkout
+                      {t("cart.checkout")}
                     </>
                   )}
                 </Button>
                 <div className="space-y-3 pt-2">
                   <div className="flex items-center justify-center gap-4 text-[11px] text-muted-foreground">
-                    <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5" /> Secure payment</span>
-                    <span className="flex items-center gap-1"><Truck className="w-3.5 h-3.5" /> Free shipping</span>
-                    <span className="flex items-center gap-1"><RotateCcw className="w-3.5 h-3.5" /> 90-day guarantee</span>
+                    <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5" /> {t("product.securePayment")}</span>
+                    <span className="flex items-center gap-1"><Truck className="w-3.5 h-3.5" /> {t("product.freeShipping")}</span>
+                    <span className="flex items-center gap-1"><RotateCcw className="w-3.5 h-3.5" /> {t("product.guarantee90")}</span>
                   </div>
                   <div className="flex items-center justify-center gap-3">
                     <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#1A1F71"/><text x="24" y="20" textAnchor="middle" fill="#fff" fontSize="11" fontWeight="bold" fontFamily="Arial">VISA</text></svg>
@@ -123,7 +125,7 @@ export const ShopifyCartDrawer = () => {
                     <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#F5F5F5" stroke="#ddd" strokeWidth="0.5"/><text x="24" y="19" textAnchor="middle" fill="#003087" fontSize="7" fontWeight="bold" fontFamily="Arial">PayPal</text></svg>
                   </div>
                   <p className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground">
-                    <Lock className="w-3 h-3" /> Secure checkout with SSL encryption
+                    <Lock className="w-3 h-3" /> {t("product.sslEncryption")}
                   </p>
                 </div>
               </div>

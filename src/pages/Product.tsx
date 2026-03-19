@@ -7,8 +7,7 @@ import { useCartStore } from "@/stores/cartStore";
 import { fetchProducts, type ShopifyProduct, applyDiscountToCart } from "@/lib/shopify";
 import { toast } from "sonner";
 import Header from "@/components/Header";
-
-const badges = ["360° Support", "Free Shipping", "Winter Sale"];
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const COLOR_MAP: Record<string, string> = {
   Grey: "#9CA3AF",
@@ -40,6 +39,7 @@ const Product = () => {
   const [selectedQty, setSelectedQty] = useState(initialQty);
   const [selectedColor, setSelectedColor] = useState("Grey");
   const countdown = useCountdown();
+  const { t, lang } = useLanguage();
 
   const addItem = useCartStore((s) => s.addItem);
   const isLoading = useCartStore((s) => s.isLoading);
@@ -54,11 +54,9 @@ const Product = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  // Extract available colors from product options
   const colorOption = product?.node.options?.find(o => o.name === "Color");
   const availableColors = colorOption?.values || ["Grey"];
 
-  // Filter variants by selected color
   const variants = product?.node.variants.edges || [];
   const coloredVariants = variants.filter(v =>
     v.node.selectedOptions?.some(o => o.name === "Color" && o.value === selectedColor)
@@ -71,13 +69,19 @@ const Product = () => {
   const singlePrice = singleVariant ? parseFloat(singleVariant.price.amount) : 34.95;
   const duoPrice = duoVariant ? parseFloat(duoVariant.price.amount) : 54.87;
   const familyPrice = familyVariant ? parseFloat(familyVariant.price.amount) : 69.90;
-  const currencySymbol = singleVariant?.price.currencyCode === "EUR" ? "€" : "$";
+  const currencySymbol = lang === "en" ? "$" : "€";
   const oldPricePerUnit = singlePrice * 2;
 
+  const badges = [
+    t("product.badge360"),
+    t("product.badgeFreeShipping"),
+    t("product.badgeWinterSale"),
+  ];
+
   const bundles = [
-    { qty: 1, label: "1 Sleep&zy", desc: "1× Sleep&zy Anti-Embarrassment Pillow", discount: "-50%", tag: null, tagColor: "", variantNode: singleVariant },
-    { qty: 2, label: "2 Sleep&zy", desc: "2× Sleep&zy Anti-Embarrassment Pillow", discount: "-61%", tag: "DUO PACK", tagColor: "bg-gold", variantNode: duoVariant },
-    { qty: 3, label: "3 Sleep&zy", desc: "3× Sleep&zy Anti-Embarrassment Pillow", discount: "-67%", tag: "FAMILY PACK", tagColor: "bg-destructive", variantNode: familyVariant },
+    { qty: 1, label: "1 Sleep&zy", desc: t("product.desc1"), discount: "-50%", tag: null, tagColor: "", variantNode: singleVariant },
+    { qty: 2, label: "2 Sleep&zy", desc: t("product.desc2"), discount: "-61%", tag: "DUO PACK", tagColor: "bg-gold", variantNode: duoVariant },
+    { qty: 3, label: "3 Sleep&zy", desc: t("product.desc3"), discount: "-67%", tag: "FAMILY PACK", tagColor: "bg-destructive", variantNode: familyVariant },
   ];
 
   const bundlePrices: Record<number, number> = { 1: singlePrice * promoMultiplier, 2: duoPrice * promoMultiplier, 3: familyPrice * promoMultiplier };
@@ -103,7 +107,7 @@ const Product = () => {
       bundleUnitSize: 1,
     });
 
-    toast.success(`${selectedBundle.label} (${selectedColor}) added to cart`, {
+    toast.success(`${selectedBundle.label} (${selectedColor}) ${t("product.addedToCart")}`, {
       position: "top-center",
     });
 
@@ -143,7 +147,7 @@ const Product = () => {
             className="relative"
           >
             <div className="absolute top-3 left-3 z-10 bg-gold text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1">
-              ❄️ WINTER SALE
+              {t("product.winterSaleTag")}
             </div>
             <div className="bg-gradient-to-br from-muted/50 to-background rounded-2xl p-8 flex items-center justify-center min-h-[350px] md:min-h-[450px] border border-border">
               <AnimatePresence mode="wait">
@@ -192,20 +196,20 @@ const Product = () => {
                     </span>
                   ))}
                 </div>
-                <span className="text-sm text-muted-foreground font-sans-body">(12,000+ reviews)</span>
+                <span className="text-sm text-muted-foreground font-sans-body">{t("product.reviews")}</span>
               </div>
             </div>
 
             {/* Promo banner */}
             {hasPromo && (
               <div className="bg-gradient-to-r from-[hsl(var(--gold))] to-amber-500 text-primary-foreground text-center py-3 rounded-lg font-bold text-sm tracking-wide animate-pulse">
-                🎁 EXTRA 10% OFF APPLIED — Code SLEEPZY10
+                {t("product.promoApplied")}
               </div>
             )}
 
             {/* Sale banner */}
             <div className="bg-gold text-primary-foreground text-center py-2.5 rounded-lg font-bold text-sm tracking-wide">
-              ❄️ WINTER SALE — UP TO 67% OFF!
+              {t("product.winterSaleBanner")}
             </div>
 
             {/* Stock + Countdown combined */}
@@ -213,7 +217,7 @@ const Product = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-destructive animate-pulse-dot" />
-                  <span className="text-sm font-semibold text-destructive">Only 8 left in stock</span>
+                  <span className="text-sm font-semibold text-destructive">{t("product.stockLeft")}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Clock size={14} className="text-gold" />
@@ -229,7 +233,7 @@ const Product = () => {
             {availableColors.length > 1 && (
               <div className="space-y-2">
                 <p className="text-sm font-semibold text-foreground">
-                  Color: <span className="text-muted-foreground font-normal">{selectedColor}</span>
+                  {t("product.color")}: <span className="text-muted-foreground font-normal">{selectedColor}</span>
                 </p>
                 <div className="flex items-center gap-3">
                   {availableColors.map((color) => (
@@ -276,7 +280,7 @@ const Product = () => {
                 >
                   {selectedQty === b.qty && (
                     <span className="absolute -top-2.5 left-4 bg-gold text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded">
-                      ✓ SELECTED
+                      ✓ {t("product.selected")}
                     </span>
                   )}
                   {b.tag && (
@@ -318,7 +322,7 @@ const Product = () => {
 
             {/* Price summary */}
             <div className="flex items-center gap-3 bg-muted/30 rounded-lg px-4 py-3">
-              <span className="text-sm text-muted-foreground font-sans-body">Your price:</span>
+              <span className="text-sm text-muted-foreground font-sans-body">{t("product.yourPrice")}</span>
               <span className="text-2xl font-bold text-foreground">{currencySymbol}{currentPrice.toFixed(2)}</span>
               {hasPromo && (
                 <span className="text-sm text-muted-foreground line-through">
@@ -343,16 +347,16 @@ const Product = () => {
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                <>🛒 Add to cart — {selectedBundle.label}</>
+                <>🛒 {t("product.addToCart")} — {selectedBundle.label}</>
               )}
             </motion.button>
 
             {/* Trust */}
             <div className="flex flex-col items-center gap-3 pt-2">
               <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground font-sans-body">
-                <span className="flex items-center gap-1"><ShieldCheck size={14} /> Secure payment</span>
-                <span className="flex items-center gap-1"><Truck size={14} /> Free shipping</span>
-                <span className="flex items-center gap-1"><RotateCcw size={14} /> 90-day guarantee</span>
+                <span className="flex items-center gap-1"><ShieldCheck size={14} /> {t("product.securePayment")}</span>
+                <span className="flex items-center gap-1"><Truck size={14} /> {t("product.freeShipping")}</span>
+                <span className="flex items-center gap-1"><RotateCcw size={14} /> {t("product.guarantee90")}</span>
               </div>
               <div className="flex items-center gap-3 opacity-60">
                 <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#1A1F71"/><text x="24" y="20" textAnchor="middle" fill="#fff" fontSize="11" fontWeight="bold" fontFamily="sans-serif">VISA</text></svg>
@@ -363,7 +367,7 @@ const Product = () => {
               </div>
               <p className="text-[11px] text-muted-foreground flex items-center gap-1">
                 <ShieldCheck size={12} className="text-success" />
-                Secure checkout with SSL encryption
+                {t("product.sslEncryption")}
               </p>
             </div>
           </motion.div>
