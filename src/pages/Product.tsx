@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ShieldCheck, Truck, RotateCcw, Star, Clock, Loader2 } from "lucide-react";
+import { Check, ShieldCheck, Truck, RotateCcw, Clock, Loader2 } from "lucide-react";
 import pillowHero from "@/assets/product-pillow-grey.png";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchProducts, type ShopifyProduct, applyDiscountToCart } from "@/lib/shopify";
@@ -9,6 +9,12 @@ import { toast } from "sonner";
 import Header from "@/components/Header";
 
 const badges = ["360° Support", "Free Shipping", "Winter Sale"];
+
+const COLOR_MAP: Record<string, string> = {
+  Grey: "#9CA3AF",
+  Black: "#1F2937",
+  Red: "#DC2626",
+};
 
 function useCountdown() {
   const [seconds, setSeconds] = useState(53934);
@@ -32,6 +38,7 @@ const Product = () => {
   const [product, setProduct] = useState<ShopifyProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedQty, setSelectedQty] = useState(initialQty);
+  const [selectedColor, setSelectedColor] = useState("Grey");
   const countdown = useCountdown();
 
   const addItem = useCartStore((s) => s.addItem);
@@ -47,10 +54,19 @@ const Product = () => {
       .finally(() => setLoading(false));
   }, []);
 
+  // Extract available colors from product options
+  const colorOption = product?.node.options?.find(o => o.name === "Color");
+  const availableColors = colorOption?.values || ["Grey"];
+
+  // Filter variants by selected color
   const variants = product?.node.variants.edges || [];
-  const singleVariant = variants.find(v => v.node.selectedOptions?.some(o => o.value === 'Single'))?.node || variants[0]?.node;
-  const duoVariant = variants.find(v => v.node.selectedOptions?.some(o => o.value === 'Duo Pack'))?.node;
-  const familyVariant = variants.find(v => v.node.selectedOptions?.some(o => o.value === 'Family Pack'))?.node;
+  const coloredVariants = variants.filter(v =>
+    v.node.selectedOptions?.some(o => o.name === "Color" && o.value === selectedColor)
+  );
+
+  const singleVariant = coloredVariants.find(v => v.node.selectedOptions?.some(o => o.value === 'Single'))?.node || coloredVariants[0]?.node;
+  const duoVariant = coloredVariants.find(v => v.node.selectedOptions?.some(o => o.value === 'Duo Pack'))?.node;
+  const familyVariant = coloredVariants.find(v => v.node.selectedOptions?.some(o => o.value === 'Family Pack'))?.node;
 
   const singlePrice = singleVariant ? parseFloat(singleVariant.price.amount) : 34.95;
   const duoPrice = duoVariant ? parseFloat(duoVariant.price.amount) : 54.87;
@@ -87,11 +103,10 @@ const Product = () => {
       bundleUnitSize: 1,
     });
 
-    toast.success(`${selectedBundle.label} added to cart`, {
+    toast.success(`${selectedBundle.label} (${selectedColor}) added to cart`, {
       position: "top-center",
     });
 
-    // Apply promo discount code to cart if coming from popup
     if (hasPromo) {
       const cartId = useCartStore.getState().cartId;
       if (cartId) {
@@ -131,11 +146,18 @@ const Product = () => {
               ❄️ WINTER SALE
             </div>
             <div className="bg-gradient-to-br from-muted/50 to-background rounded-2xl p-8 flex items-center justify-center min-h-[350px] md:min-h-[450px] border border-border">
-              <img
-                src={product?.node.images?.edges?.[0]?.node?.url || pillowHero}
-                alt={product?.node.title || "Sleep&zy Cervical Pillow"}
-                className="w-full max-w-sm drop-shadow-xl animate-float"
-              />
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={selectedColor}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.3 }}
+                  src={product?.node.images?.edges?.[0]?.node?.url || pillowHero}
+                  alt={`Sleep&zy Cervical Pillow - ${selectedColor}`}
+                  className="w-full max-w-sm drop-shadow-xl animate-float"
+                />
+              </AnimatePresence>
             </div>
           </motion.div>
 
@@ -181,7 +203,7 @@ const Product = () => {
               </div>
             )}
 
-            {/* Promo banner */}
+            {/* Sale banner */}
             <div className="bg-gold text-primary-foreground text-center py-2.5 rounded-lg font-bold text-sm tracking-wide">
               ❄️ WINTER SALE — UP TO 67% OFF!
             </div>
@@ -202,6 +224,43 @@ const Product = () => {
                 <div className="bg-destructive h-full rounded-full animate-progress-pulse" style={{ width: "25%" }} />
               </div>
             </div>
+
+            {/* Color selector */}
+            {availableColors.length > 1 && (
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-foreground">
+                  Color: <span className="text-muted-foreground font-normal">{selectedColor}</span>
+                </p>
+                <div className="flex items-center gap-3">
+                  {availableColors.map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => setSelectedColor(color)}
+                      className={`relative w-9 h-9 rounded-full transition-all duration-200 ${
+                        selectedColor === color
+                          ? "ring-2 ring-gold ring-offset-2 ring-offset-background scale-110"
+                          : "hover:scale-105 ring-1 ring-border"
+                      }`}
+                      style={{ backgroundColor: COLOR_MAP[color] || "#9CA3AF" }}
+                      aria-label={`Select ${color}`}
+                    >
+                      <AnimatePresence>
+                        {selectedColor === color && (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0 }}
+                            className="absolute inset-0 flex items-center justify-center"
+                          >
+                            <Check size={16} className="text-white drop-shadow-md" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Bundle selection */}
             <div className="space-y-3">
