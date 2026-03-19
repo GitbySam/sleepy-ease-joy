@@ -3,70 +3,78 @@ import headDrop from "@/assets/embarrassing-head-drop.gif";
 import mouthOpen from "@/assets/embarrassing-mouth-open.jpg";
 import shoulder from "@/assets/embarrassing-shoulder.jpg";
 import drool from "@/assets/embarrassing-drool.jpg";
+import { useLanguage } from "@/i18n/LanguageContext";
 
-const scenes = [
-  { img: headDrop, caption: "The head drop™", emoji: "😩" },
-  { img: mouthOpen, caption: "The fly catcher", emoji: "😮" },
-  { img: shoulder, caption: "The stranger cuddler", emoji: "😳" },
-  { img: drool, caption: "The drool trail", emoji: "🤤" },
-];
+const ComparisonSlider = () => {
+  const { t } = useLanguage();
 
-const ComparisonSlider = () => (
-  <section id="proof" className="py-24 gradient-section-reverse">
-    <div className="container mx-auto px-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="text-center mb-14"
-      >
-        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
-          The proof speaks for itself
-        </p>
-        <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
-          We've <span className="text-gold italic">all</span> been there.
-        </h2>
-      </motion.div>
+  const scenes = [
+    { img: headDrop, caption: t("comparison.headDrop"), emoji: "😩" },
+    { img: mouthOpen, caption: t("comparison.flyCatcher"), emoji: "😮" },
+    { img: shoulder, caption: t("comparison.strangerCuddler"), emoji: "😳" },
+    { img: drool, caption: t("comparison.droolTrail"), emoji: "🤤" },
+  ];
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
-        {scenes.map((scene, i) => (
-          <motion.div
-            key={scene.caption}
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.1, duration: 0.5 }}
-            className="group relative overflow-hidden rounded-2xl shadow-lg"
-          >
-            <div className="aspect-[3/4] overflow-hidden">
-              <img
-                src={scene.img}
-                alt={scene.caption}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-4 text-center">
-              <span className="text-2xl mb-1 block">{scene.emoji}</span>
-              <p className="text-sm font-serif font-semibold text-primary-foreground">
-                {scene.caption}
-              </p>
-            </div>
-          </motion.div>
-        ))}
+  const titleParts = t("comparison.title").split(/<gold>|<\/gold>/);
+  const bottomParts = t("comparison.bottom").split(/<gold>|<\/gold>/);
+
+  return (
+    <section id="proof" className="py-24 gradient-section-reverse">
+      <div className="container mx-auto px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-14"
+        >
+          <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
+            {t("comparison.subtitle")}
+          </p>
+          <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
+            {titleParts[0]}<span className="text-gold italic">{titleParts[1]}</span>{titleParts[2]}
+          </h2>
+        </motion.div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
+          {scenes.map((scene, i) => (
+            <motion.div
+              key={scene.caption}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1, duration: 0.5 }}
+              className="group relative overflow-hidden rounded-2xl shadow-lg"
+            >
+              <div className="aspect-[3/4] overflow-hidden">
+                <img
+                  src={scene.img}
+                  alt={scene.caption}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-4 text-center">
+                <span className="text-2xl mb-1 block">{scene.emoji}</span>
+                <p className="text-sm font-serif font-semibold text-primary-foreground">
+                  {scene.caption}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="text-center mt-8 text-lg text-muted-foreground font-sans-body"
+        >
+          {bottomParts[0]}<span className="text-gold font-semibold">{bottomParts[1]}</span>{bottomParts[2]}
+        </motion.p>
       </div>
-
-      <motion.p
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        className="text-center mt-8 text-lg text-muted-foreground font-sans-body"
-      >
-        Sleep&zy makes sure <span className="text-gold font-semibold">this never happens again.</span>
-      </motion.p>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 export default ComparisonSlider;

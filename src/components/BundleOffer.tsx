@@ -2,15 +2,22 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check } from "lucide-react";
 import { Link } from "react-router-dom";
-
-const bundles = [
-  { qty: 1, label: "1 Sleep&zy", price: "$34.95", oldPrice: "$69.90", perUnit: "$34.95/unit", tag: null },
-  { qty: 2, label: "2 Sleep&zy", price: "$54.90", oldPrice: "$139.80", perUnit: "$27.45/unit", tag: "BEST SELLER" },
-  { qty: 3, label: "3 Sleep&zy", price: "$69.90", oldPrice: "$209.70", perUnit: "$23.30/unit", tag: "BEST VALUE" },
-];
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const BundleOffer = () => {
   const [selected, setSelected] = useState(1);
+  const { t, lang } = useLanguage();
+
+  const currencySymbol = lang === "en" ? "$" : "€";
+
+  const bundles = [
+    { qty: 1, label: "1 Sleep&zy", price: `${currencySymbol}34.95`, oldPrice: `${currencySymbol}69.90`, perUnit: `${currencySymbol}34.95${t("bundle.perUnit")}`, tag: null },
+    { qty: 2, label: "2 Sleep&zy", price: `${currencySymbol}54.90`, oldPrice: `${currencySymbol}139.80`, perUnit: `${currencySymbol}27.45${t("bundle.perUnit")}`, tag: "BEST SELLER" },
+    { qty: 3, label: "3 Sleep&zy", price: `${currencySymbol}69.90`, oldPrice: `${currencySymbol}209.70`, perUnit: `${currencySymbol}23.30${t("bundle.perUnit")}`, tag: "BEST VALUE" },
+  ];
+
+  const titleParts = t("bundle.title").split(/<gold>|<\/gold>/);
+  const socialParts = t("bundle.socialProof").split(/<bold>|<\/bold>/);
 
   return (
     <section id="offer" className="py-24 bg-card">
@@ -22,10 +29,10 @@ const BundleOffer = () => {
           className="text-center mb-4"
         >
           <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
-            Limited offer — up to 67% off
+            {t("bundle.subtitle")}
           </p>
           <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-2">
-            Protect your <span className="text-gold italic">reputation</span>
+            {titleParts[0]}<span className="text-gold italic">{titleParts[1]}</span>{titleParts[2]}
           </h2>
         </motion.div>
 
@@ -35,7 +42,7 @@ const BundleOffer = () => {
           viewport={{ once: true }}
           className="text-center text-sm text-muted-foreground mb-10 italic font-semibold"
         >
-          <span className="font-bold">7 out of 10 customers</span> save a friend from embarrassment too
+          <span className="font-bold">{socialParts[1]}</span>{socialParts[2]}
         </motion.p>
 
         <div className="space-y-4 mb-8">
@@ -91,7 +98,6 @@ const BundleOffer = () => {
           ))}
         </div>
 
-        {/* Stock counter */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -100,7 +106,7 @@ const BundleOffer = () => {
         >
           <div className="flex items-center gap-2 mb-2">
             <span className="w-2.5 h-2.5 rounded-full bg-destructive animate-pulse-dot" />
-            <span className="text-sm font-semibold text-destructive">Low Stock — Only 3 left</span>
+            <span className="text-sm font-semibold text-destructive">{t("bundle.lowStock")}</span>
           </div>
           <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
             <div className="bg-destructive h-full rounded-full animate-progress-pulse" style={{ width: "12%" }} />
@@ -113,14 +119,14 @@ const BundleOffer = () => {
             whileTap={{ scale: 0.96 }}
             className="block w-full bg-gold text-primary-foreground text-center py-4 rounded-full text-lg font-bold shadow-gold-glow uppercase tracking-wider"
           >
-            Save my dignity now
+            {t("bundle.cta")}
           </motion.span>
         </Link>
 
         <div className="flex justify-center gap-6 mt-6 text-xs text-muted-foreground">
-          <span>🔒 Secure payment</span>
-          <span>🚚 Free shipping</span>
-          <span>↩️ 90-day guarantee</span>
+          <span>{t("bundle.securePayment")}</span>
+          <span>{t("bundle.freeShipping")}</span>
+          <span>{t("bundle.guarantee")}</span>
         </div>
       </div>
     </section>
