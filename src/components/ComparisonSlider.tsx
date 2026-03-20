@@ -9,10 +9,10 @@ const ComparisonSlider = () => {
   const { t } = useLanguage();
 
   const scenes = [
-    { img: headDrop, caption: t("comparison.headDrop"), emoji: "😩" },
-    { img: mouthOpen, caption: t("comparison.flyCatcher"), emoji: "😮" },
-    { img: shoulder, caption: t("comparison.strangerCuddler"), emoji: "😳" },
-    { img: drool, caption: t("comparison.droolTrail"), emoji: "🤤" },
+    { img: null, video: headDropVideo, caption: t("comparison.headDrop"), emoji: "😩" },
+    { img: mouthOpen, video: null, caption: t("comparison.flyCatcher"), emoji: "😮" },
+    { img: shoulder, video: null, caption: t("comparison.strangerCuddler"), emoji: "😳" },
+    { img: drool, video: null, caption: t("comparison.droolTrail"), emoji: "🤤" },
   ];
 
   const titleParts = t("comparison.title").split(/<gold>|<\/gold>/);
