@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
-import headDrop from "@/assets/embarrassing-head-drop.gif";
-import mouthOpen from "@/assets/embarrassing-mouth-open.jpg";
-import shoulder from "@/assets/embarrassing-shoulder.jpg";
-import drool from "@/assets/embarrassing-drool.jpg";
+import headDropVideo from "@/assets/embarrassing-head-drop.mp4";
+import mouthOpen from "@/assets/embarrassing-mouth-open.webp";
+import shoulder from "@/assets/embarrassing-shoulder.webp";
+import drool from "@/assets/embarrassing-drool.webp";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 const ComparisonSlider = () => {
