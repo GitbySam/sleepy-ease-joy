@@ -1,18 +1,18 @@
 import { motion } from "framer-motion";
-import headDrop from "@/assets/embarrassing-head-drop.gif";
-import mouthOpen from "@/assets/embarrassing-mouth-open.jpg";
-import shoulder from "@/assets/embarrassing-shoulder.jpg";
-import drool from "@/assets/embarrassing-drool.jpg";
+import headDropVideo from "@/assets/embarrassing-head-drop.mp4";
+import mouthOpen from "@/assets/embarrassing-mouth-open.webp";
+import shoulder from "@/assets/embarrassing-shoulder.webp";
+import drool from "@/assets/embarrassing-drool.webp";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 const ComparisonSlider = () => {
   const { t } = useLanguage();
 
   const scenes = [
-    { img: headDrop, caption: t("comparison.headDrop"), emoji: "😩" },
-    { img: mouthOpen, caption: t("comparison.flyCatcher"), emoji: "😮" },
-    { img: shoulder, caption: t("comparison.strangerCuddler"), emoji: "😳" },
-    { img: drool, caption: t("comparison.droolTrail"), emoji: "🤤" },
+    { img: null, video: headDropVideo, caption: t("comparison.headDrop"), emoji: "😩" },
+    { img: mouthOpen, video: null, caption: t("comparison.flyCatcher"), emoji: "😮" },
+    { img: shoulder, video: null, caption: t("comparison.strangerCuddler"), emoji: "😳" },
+    { img: drool, video: null, caption: t("comparison.droolTrail"), emoji: "🤤" },
   ];
 
   const titleParts = t("comparison.title").split(/<gold>|<\/gold>/);
@@ -46,12 +46,23 @@ const ComparisonSlider = () => {
               className="group relative overflow-hidden rounded-2xl shadow-lg"
             >
               <div className="aspect-[3/4] overflow-hidden">
-                <img
-                  src={scene.img}
-                  alt={scene.caption}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
-                />
+                {scene.video ? (
+                  <video
+                    src={scene.video}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                ) : (
+                  <img
+                    src={scene.img!}
+                    alt={scene.caption}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                )}
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-4 text-center">
