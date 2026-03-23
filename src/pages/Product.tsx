@@ -49,7 +49,18 @@ const Product = () => {
   useEffect(() => {
     fetchProducts(1)
       .then((products) => {
-        if (products.length > 0) setProduct(products[0]);
+        if (products.length > 0) {
+          setProduct(products[0]);
+          // Track ViewContent
+          const p = products[0];
+          const price = p.node.priceRange.minVariantPrice;
+          trackViewContent({
+            contentName: p.node.title,
+            contentId: p.node.id,
+            value: parseFloat(price.amount),
+            currency: price.currencyCode,
+          });
+        }
       })
       .catch(console.error)
       .finally(() => setLoading(false));
