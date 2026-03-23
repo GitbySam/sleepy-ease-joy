@@ -119,6 +119,15 @@ const Product = () => {
       bundleUnitSize: 1,
     });
 
+    // Track AddToCart with Meta Pixel
+    trackAddToCart({
+      contentName: `${selectedBundle.label} (${selectedColor})`,
+      contentId: selectedVariant.id,
+      value: bundleTotal,
+      currency: lang === 'en' ? 'USD' : 'EUR',
+      quantity: selectedQty,
+    });
+
     toast.success(`${selectedBundle.label} (${selectedColor}) ${t("product.addedToCart")}`, {
       position: "top-center",
     });

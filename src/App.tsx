@@ -16,7 +16,15 @@ import { useCartSync } from "./hooks/useCartSync";
 
 const queryClient = new QueryClient();
 
-const App = () => {
+const RouteTracker = () => {
+  const location = useLocation();
+  useEffect(() => {
+    trackPageView();
+  }, [location.pathname]);
+  return null;
+};
+
+const AppRoutes = () => {
   useCartSync();
 
   return (
@@ -26,6 +34,7 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <RouteTracker />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/product" element={<Product />} />
@@ -44,4 +53,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default AppRoutes;
