@@ -8,6 +8,7 @@ import { fetchProducts, type ShopifyProduct, applyDiscountToCart } from "@/lib/s
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { trackViewContent, trackAddToCart } from "@/lib/metaPixel";
 
 const COLOR_MAP: Record<string, string> = {
   Grey: "#9CA3AF",
