@@ -23,6 +23,11 @@ export const ShopifyCartDrawer = () => {
   const handleCheckout = () => {
     const checkoutUrl = getCheckoutUrl();
     if (checkoutUrl) {
+      // Track InitiateCheckout
+      trackInitiateCheckout({
+        value: totalPrice,
+        numItems: totalItems,
+      });
       window.open(checkoutUrl, '_blank');
       setDrawerOpen(false);
     }
