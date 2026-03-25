@@ -97,7 +97,7 @@ const CartDrawer = ({ open, onClose, items, onUpdateQty, onRemove }: CartDrawerP
               {savings > 0 && (
                 <div className="bg-gold/10 border border-gold/30 text-center py-2 rounded-lg">
                   <span className="text-sm font-bold text-foreground">
-                    ❄️ Winter Savings: <span className="text-gold">${savings.toFixed(2)}</span>!
+                    🌸 Spring Savings: <span className="text-gold">${savings.toFixed(2)}</span>!
                   </span>
                 </div>
               )}

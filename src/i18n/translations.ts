@@ -287,13 +287,13 @@ export const translations = {
   // Product page
   "product.badge360": { en: "360° Support", fr: "Support 360°", es: "Soporte 360°" },
   "product.badgeFreeShipping": { en: "Free Shipping", fr: "Livraison gratuite", es: "Envío gratis" },
-  "product.badgeWinterSale": { en: "Winter Sale", fr: "Soldes d'hiver", es: "Rebajas de invierno" },
+  "product.badgeWinterSale": { en: "Spring Sale", fr: "Soldes de printemps", es: "Rebajas de primavera" },
   "product.winterSaleBanner": {
-    en: "❄️ WINTER SALE — UP TO 67% OFF!",
-    fr: "❄️ SOLDES D'HIVER — JUSQU'À -67% !",
-    es: "❄️ REBAJAS DE INVIERNO — ¡HASTA -67%!",
+    en: "🌸 SPRING SALE — UP TO 67% OFF!",
+    fr: "🌸 SOLDES DE PRINTEMPS — JUSQU'À -67% !",
+    es: "🌸 REBAJAS DE PRIMAVERA — ¡HASTA -67%!",
   },
-  "product.winterSaleTag": { en: "❄️ WINTER SALE", fr: "❄️ SOLDES D'HIVER", es: "❄️ REBAJAS" },
+  "product.winterSaleTag": { en: "🌸 SPRING SALE", fr: "🌸 SOLDES DE PRINTEMPS", es: "🌸 REBAJAS DE PRIMAVERA" },
   "product.stockLeft": {
     en: "Only 8 left in stock",
     fr: "Plus que 8 en stock",
