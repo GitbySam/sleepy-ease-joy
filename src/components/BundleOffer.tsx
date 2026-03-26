@@ -12,7 +12,7 @@ const BundleOffer = () => {
 
   const bundles = [
     { qty: 1, label: "1 Sleep&zy", price: `${currencySymbol}34.95`, oldPrice: `${currencySymbol}69.90`, perUnit: `${currencySymbol}34.95${t("bundle.perUnit")}`, tag: null },
-    { qty: 2, label: "2 Sleep&zy", price: `${currencySymbol}54.90`, oldPrice: `${currencySymbol}139.80`, perUnit: `${currencySymbol}27.45${t("bundle.perUnit")}`, tag: "BEST SELLER" },
+    { qty: 2, label: "2 Sleep&zy", price: `${currencySymbol}60.90`, oldPrice: `${currencySymbol}139.80`, perUnit: `${currencySymbol}30.45${t("bundle.perUnit")}`, tag: "BEST SELLER" },
     { qty: 3, label: "3 Sleep&zy", price: `${currencySymbol}69.90`, oldPrice: `${currencySymbol}209.70`, perUnit: `${currencySymbol}23.30${t("bundle.perUnit")}`, tag: "BEST VALUE" },
   ];
 
