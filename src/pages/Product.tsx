@@ -79,7 +79,7 @@ const Product = () => {
   const familyVariant = coloredVariants.find(v => v.node.selectedOptions?.some(o => o.value === 'Family Pack'))?.node;
 
   const singlePrice = singleVariant ? parseFloat(singleVariant.price.amount) : 34.95;
-  const duoPrice = duoVariant ? parseFloat(duoVariant.price.amount) : 60.90;
+  const duoPrice = duoVariant ? parseFloat(duoVariant.price.amount) : 64.90;
   const familyPrice = familyVariant ? parseFloat(familyVariant.price.amount) : 69.90;
   const currencySymbol = lang === "en" ? "$" : "€";
   const oldPricePerUnit = singlePrice * 2;
@@ -92,7 +92,7 @@ const Product = () => {
 
   const bundles = [
     { qty: 1, label: "1 Sleep&zy", desc: t("product.desc1"), discount: "-50%", tag: null, tagColor: "", variantNode: singleVariant },
-    { qty: 2, label: "2 Sleep&zy", desc: t("product.desc2"), discount: "-56%", tag: "DUO PACK", tagColor: "bg-gold", variantNode: duoVariant },
+    { qty: 2, label: "2 Sleep&zy", desc: t("product.desc2"), discount: "-54%", tag: "DUO PACK", tagColor: "bg-gold", variantNode: duoVariant },
     { qty: 3, label: "3 Sleep&zy", desc: t("product.desc3"), discount: "-67%", tag: "FAMILY PACK", tagColor: "bg-destructive", variantNode: familyVariant },
   ];
 
