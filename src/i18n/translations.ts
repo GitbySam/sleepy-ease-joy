@@ -319,19 +319,19 @@ export const translations = {
     es: "🎁 -10% EXTRA APLICADO — Código SLEEPZY10",
   },
   "product.desc1": {
-    en: "1× Sleep&zy Anti-Embarrassment Pillow",
-    fr: "1× Sleep&zy Anti-Embarrassment Pillow",
-    es: "1× Sleep&zy Anti-Embarrassment Pillow",
+    en: "1× Sleep&zy Anti-Embarrassment Pillow + 1× Transport Bag",
+    fr: "1× Oreiller Sleep&zy Anti-Gêne + 1× Sac de transport",
+    es: "1× Almohada Sleep&zy Anti-Vergüenza + 1× Bolsa de transporte",
   },
   "product.desc2": {
-    en: "2× Sleep&zy Anti-Embarrassment Pillow",
-    fr: "2× Sleep&zy Anti-Embarrassment Pillow",
-    es: "2× Sleep&zy Anti-Embarrassment Pillow",
+    en: "2× Sleep&zy Anti-Embarrassment Pillow + 2× Transport Bag",
+    fr: "2× Oreiller Sleep&zy Anti-Gêne + 2× Sac de transport",
+    es: "2× Almohada Sleep&zy Anti-Vergüenza + 2× Bolsa de transporte",
   },
   "product.desc3": {
-    en: "3× Sleep&zy Anti-Embarrassment Pillow",
-    fr: "3× Sleep&zy Anti-Embarrassment Pillow",
-    es: "3× Sleep&zy Anti-Embarrassment Pillow",
+    en: "3× Sleep&zy Anti-Embarrassment Pillow + 3× Transport Bag",
+    fr: "3× Oreiller Sleep&zy Anti-Gêne + 3× Sac de transport",
+    es: "3× Almohada Sleep&zy Anti-Vergüenza + 3× Bolsa de transporte",
   },
 
   // SocialProofToasts
