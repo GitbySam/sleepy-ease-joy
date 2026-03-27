@@ -448,6 +448,7 @@ export const translations = {
   "cart.title": { en: "Cart", fr: "Panier", es: "Carrito" },
   "cart.empty": { en: "Your cart is empty", fr: "Votre panier est vide", es: "Tu carrito está vacío" },
   "cart.items": { en: "item(s) in your cart", fr: "article(s) dans votre panier", es: "artículo(s) en tu carrito" },
+  "cart.transportBag": { en: "Transport Bag included", fr: "Sac de transport inclus", es: "Bolsa de transporte incluida" },
   "cart.total": { en: "Total", fr: "Total", es: "Total" },
   "cart.checkout": { en: "Secure Checkout", fr: "Paiement sécurisé", es: "Pago seguro" },
 
