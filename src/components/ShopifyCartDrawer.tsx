@@ -87,6 +87,9 @@ export const ShopifyCartDrawer = () => {
                           </span>
                         )}
                         <p className="text-xs text-muted-foreground">{item.selectedOptions.map(o => o.value).join(' • ')}</p>
+                        <p className="text-xs text-muted-foreground">
+                          + {item.quantity}× {t("cart.transportBag")}
+                        </p>
                         <p className="font-semibold text-foreground mt-1">
                           ${item.bundlePrice ? item.bundlePrice.toFixed(2) : (parseFloat(item.price.amount) * item.quantity).toFixed(2)}
                         </p>
