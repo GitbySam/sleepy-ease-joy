@@ -48,7 +48,9 @@ const Header = () => {
             <a href="/#faq" className="hover:text-foreground transition-colors">{t("nav.faq")}</a>
           </div>
           <div className="flex items-center gap-3">
-            <LanguageSwitcher />
+            <div className="hidden md:block">
+              <LanguageSwitcher />
+            </div>
             <Link to="/product">
               <motion.span
                 whileHover={{ scale: 1.05 }}

@@ -18,6 +18,7 @@ const Index = () => (
     <Header />
     <SocialProofToasts />
     <InactivityPopup />
+    <StickyMobileCTA />
     <main>
       <Hero />
       <ComparisonSlider />

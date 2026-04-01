@@ -20,7 +20,7 @@ const BundleOffer = () => {
   const socialParts = t("bundle.socialProof").split(/<bold>|<\/bold>/);
 
   return (
-    <section id="offer" className="py-24 bg-card">
+    <section id="offer" className="py-14 md:py-24 bg-card">
       <div className="container mx-auto px-6 max-w-3xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

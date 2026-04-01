@@ -22,7 +22,7 @@ const FAQ = () => {
   const titleParts = t("faq.title").split(/<gold>|<\/gold>/);
 
   return (
-    <section id="faq" className="py-24 gradient-section-warm">
+    <section id="faq" className="py-14 md:py-24 gradient-section-warm">
       <div className="container mx-auto px-6 max-w-3xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

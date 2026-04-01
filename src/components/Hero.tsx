@@ -74,7 +74,7 @@ const Hero = () => {
             <img
               src={pillowHero}
               alt="Sleep&zy - Ergonomic cervical pillow"
-              className="w-full max-w-md drop-shadow-2xl"
+              className="w-full max-w-xs md:max-w-md drop-shadow-2xl"
             />
           </div>
         </motion.div>
