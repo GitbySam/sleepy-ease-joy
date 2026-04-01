@@ -12,6 +12,7 @@ import SocialProofToasts from "@/components/SocialProofToasts";
 import InactivityPopup from "@/components/InactivityPopup";
 import ShopifyProducts from "@/components/ShopifyProducts";
 import StickyMobileCTA from "@/components/StickyMobileCTA";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const Index = () => (
   <>
@@ -19,6 +20,7 @@ const Index = () => (
     <SocialProofToasts />
     <InactivityPopup />
     <StickyMobileCTA />
+    <ScrollToTop />
     <main>
       <Hero />
       <ComparisonSlider />
