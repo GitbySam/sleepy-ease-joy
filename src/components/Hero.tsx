@@ -18,7 +18,7 @@ const Hero = () => {
   const { t } = useLanguage();
 
   return (
-    <section className="gradient-hero min-h-[80vh] flex items-center pt-32 pb-16">
+    <section className="gradient-hero min-h-[60vh] md:min-h-[80vh] flex items-center pt-28 md:pt-32 pb-10 md:pb-16">
       <div className="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
         <motion.div
           variants={stagger}
