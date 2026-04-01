@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 const BundleOffer = () => {
-  const [selected, setSelected] = useState(1);
+  const [selected, setSelected] = useState(2);
   const { t, lang } = useLanguage();
 
   const currencySymbol = lang === "en" ? "$" : "€";
