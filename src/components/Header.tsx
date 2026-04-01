@@ -28,7 +28,7 @@ const Header = () => {
   const navLinks = [
     { to: "/product", label: t("nav.products"), isLink: true },
     { to: "/#benefits", label: t("nav.benefits"), isLink: false },
-    { to: "/#proof", label: t("nav.results"), isLink: false },
+    { to: "/#results", label: t("nav.results"), isLink: false },
     { to: "/#testimonials", label: t("nav.reviews"), isLink: false },
     { to: "/#faq", label: t("nav.faq"), isLink: false },
   ];
