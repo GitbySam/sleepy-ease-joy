@@ -11,12 +11,14 @@ import Footer from "@/components/Footer";
 import SocialProofToasts from "@/components/SocialProofToasts";
 import InactivityPopup from "@/components/InactivityPopup";
 import ShopifyProducts from "@/components/ShopifyProducts";
+import StickyMobileCTA from "@/components/StickyMobileCTA";
 
 const Index = () => (
   <>
     <Header />
     <SocialProofToasts />
     <InactivityPopup />
+    <StickyMobileCTA />
     <main>
       <Hero />
       <ComparisonSlider />

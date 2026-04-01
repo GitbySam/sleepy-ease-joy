@@ -458,6 +458,14 @@ export const translations = {
   "products.add": { en: "Add", fr: "Ajouter", es: "Añadir" },
   "products.addedToCart": { en: "added to cart", fr: "ajouté au panier", es: "añadido al carrito" },
   "products.noImage": { en: "No image", fr: "Pas d'image", es: "Sin imagen" },
+
+  // Sticky Mobile CTA
+  "sticky.cta": { en: "Shop Now — 50% OFF", fr: "Acheter — -50%", es: "Comprar — -50%" },
+  "sticky.viewing": {
+    en: "{count} people are viewing this product",
+    fr: "{count} personnes consultent ce produit",
+    es: "{count} personas están viendo este producto",
+  },
 } as const;
 
 export type TranslationKey = keyof typeof translations;
