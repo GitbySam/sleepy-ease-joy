@@ -41,7 +41,7 @@ const StickyMobileCTA = () => {
         >
           <div className="bg-card/95 backdrop-blur-md border-t border-border px-4 pt-2 pb-4 shadow-[0_-4px_20px_rgba(0,0,0,0.15)]">
             <p className="text-[11px] text-center text-muted-foreground mb-2">
-              🔥 {t("sticky.viewing", { count: viewerCount })}
+              🔥 {t("sticky.viewing").replace("{count}", String(viewerCount))}
             </p>
             <Link to="/product" className="block">
               <motion.div
