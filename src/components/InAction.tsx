@@ -17,7 +17,7 @@ const InAction = () => {
   const titleParts = t("inAction.title").split(/<gold>|<\/gold>/);
 
   return (
-    <section className="py-14 md:py-20 gradient-section-warm">
+    <section id="results" className="py-14 md:py-20 gradient-section-warm">
       <div className="container mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
