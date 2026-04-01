@@ -29,7 +29,7 @@ const Hero = () => {
           <motion.p variants={fadeUp} className="text-sm font-sans-body uppercase tracking-[0.25em] text-muted-foreground">
             {t("hero.subtitle")}
           </motion.p>
-          <motion.h1 variants={fadeUp} className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold leading-[1.1] text-foreground">
+          <motion.h1 variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold leading-[1.1] text-foreground">
             {t("hero.title1")} <span className="text-gold italic">{t("hero.title2")}</span>
           </motion.h1>
           <motion.p variants={fadeUp} className="text-lg text-muted-foreground font-sans-body leading-relaxed max-w-lg">
