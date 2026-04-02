@@ -21,14 +21,14 @@ export const translations = {
     es: "La almohada de viaje anti-vergüenza",
   },
   "hero.title1": {
-    en: "Stop waking up to",
-    fr: "Arrêtez de vous réveiller avec",
-    es: "Deja de despertarte con",
+    en: "Drool-free. Lean-free.",
+    fr: "Drool-free. Lean-free.",
+    es: "Drool-free. Lean-free.",
   },
   "hero.title2": {
-    en: "THAT photo.",
-    fr: "CETTE photo.",
-    es: "ESA foto.",
+    en: "Shame-free.",
+    fr: "Shame-free.",
+    es: "Shame-free.",
   },
   "hero.desc": {
     en: "Mouth open. Head on a stranger's shoulder. Drool on your shirt. We've all been there. Sleep&zy keeps your head locked in place so you sleep with dignity.",
