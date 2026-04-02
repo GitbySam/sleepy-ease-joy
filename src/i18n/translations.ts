@@ -22,13 +22,13 @@ export const translations = {
   },
   "hero.title1": {
     en: "Drool-free. Lean-free.",
-    fr: "Drool-free. Lean-free.",
-    es: "Drool-free. Lean-free.",
+    fr: "Sans bave. Sans appui.",
+    es: "Sin babas. Sin apoyarse.",
   },
   "hero.title2": {
     en: "Shame-free.",
-    fr: "Shame-free.",
-    es: "Shame-free.",
+    fr: "Sans honte.",
+    es: "Sin vergüenza.",
   },
   "hero.desc": {
     en: "Mouth open. Head on a stranger's shoulder. Drool on your shirt. We've all been there. Sleep&zy keeps your head locked in place so you sleep with dignity.",
