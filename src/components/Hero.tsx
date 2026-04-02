@@ -93,7 +93,7 @@ const Hero = () => {
             alt="Sleep&zy pillow in use on airplane"
             className="w-full h-full object-cover object-[15%_center]"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-background/20" />
         </motion.div>
 
         <div className="container mx-auto px-6 relative z-10 pt-32 pb-16">
@@ -101,7 +101,7 @@ const Hero = () => {
             variants={stagger}
             initial="hidden"
             animate="visible"
-            className="space-y-6 max-w-xl"
+            className="space-y-6 max-w-xl [&_h1]:drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] [&_p]:drop-shadow-[0_1px_2px_rgba(0,0,0,0.1)]"
           >
             <motion.p variants={fadeUp} className="text-sm font-sans-body uppercase tracking-[0.25em] text-muted-foreground">
               {t("hero.subtitle")}
