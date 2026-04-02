@@ -20,7 +20,7 @@ const Hero = () => {
   return (
     <>
       {/* MOBILE Hero: image on top, content below */}
-      <section className="md:hidden flex flex-col">
+      <section className="md:hidden flex flex-col pt-[56px]">
         <motion.div
           initial={{ scale: 1.1, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -30,7 +30,7 @@ const Hero = () => {
           <img
             src={heroBanner}
             alt="Sleep&zy pillow in use on airplane"
-            className="w-full h-full object-cover object-top"
+            className="w-full h-full object-cover object-center"
           />
         </motion.div>
 
