@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 import { Link } from "react-router-dom";
-import pillowHero from "@/assets/product-pillow-grey.png";
+import heroBanner from "@/assets/hero-banner.jpg";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 const stagger = {
@@ -18,29 +18,30 @@ const Hero = () => {
   const { t } = useLanguage();
 
   return (
-    <section className="gradient-hero min-h-[auto] md:min-h-[80vh] flex items-center pt-28 md:pt-32 pb-8 md:pb-16">
-      <div className="container mx-auto px-6 grid md:grid-cols-2 gap-6 md:gap-12 items-center">
-        {/* Image first on mobile for compact layout */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="flex justify-center order-first md:order-last"
-        >
-          <div className="animate-float">
-            <img
-              src={pillowHero}
-              alt="Sleep&zy - Ergonomic cervical pillow"
-              className="w-48 md:w-full max-w-md drop-shadow-2xl"
-            />
-          </div>
-        </motion.div>
+    <section className="relative min-h-[50vh] md:min-h-[85vh] flex items-end md:items-center overflow-hidden">
+      {/* Banner background image */}
+      <motion.div
+        initial={{ scale: 1.1, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 1.2, ease: "easeOut" }}
+        className="absolute inset-0"
+      >
+        <img
+          src={heroBanner}
+          alt="Sleep&zy pillow in use on airplane"
+          className="w-full h-full object-cover object-top"
+        />
+        {/* Dark overlay gradient for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/20 md:bg-gradient-to-r md:from-background md:via-background/80 md:to-transparent" />
+      </motion.div>
 
+      {/* Content overlay */}
+      <div className="container mx-auto px-6 relative z-10 pb-8 pt-28 md:pt-32 md:pb-16">
         <motion.div
           variants={stagger}
           initial="hidden"
           animate="visible"
-          className="space-y-4 md:space-y-6"
+          className="space-y-4 md:space-y-6 max-w-xl"
         >
           <motion.p variants={fadeUp} className="text-xs md:text-sm font-sans-body uppercase tracking-[0.25em] text-muted-foreground">
             {t("hero.subtitle")}
