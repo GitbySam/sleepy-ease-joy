@@ -23,11 +23,11 @@ const Index = () => (
     <ScrollToTop />
     <main>
       <Hero />
-      <ComparisonSlider />
       <Marquee />
       <InAction />
-      <Benefits />
+      <ComparisonSlider />
       <ShopifyProducts />
+      <Benefits />
       <Testimonials />
       <BundleOffer />
       <FAQ />
