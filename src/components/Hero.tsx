@@ -93,7 +93,7 @@ const Hero = () => {
             alt="Sleep&zy pillow in use on airplane"
             className="w-full h-full object-cover object-[15%_center]"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-transparent" />
         </motion.div>
 
         <div className="container mx-auto px-6 relative z-10 pt-32 pb-16">
