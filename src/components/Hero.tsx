@@ -91,7 +91,7 @@ const Hero = () => {
           <img
             src={heroBanner}
             alt="Sleep&zy pillow in use on airplane"
-            className="w-full h-full object-cover object-[85%_center]"
+            className="w-full h-full object-cover object-[65%_center]"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
         </motion.div>
