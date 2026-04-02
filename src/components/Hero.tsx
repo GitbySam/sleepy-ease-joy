@@ -101,7 +101,7 @@ const Hero = () => {
             variants={stagger}
             initial="hidden"
             animate="visible"
-            className="space-y-6 max-w-xl"
+            className="space-y-6 max-w-xl [&_h1]:drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] [&_p]:drop-shadow-[0_1px_2px_rgba(0,0,0,0.1)]"
           >
             <motion.p variants={fadeUp} className="text-sm font-sans-body uppercase tracking-[0.25em] text-muted-foreground">
               {t("hero.subtitle")}
