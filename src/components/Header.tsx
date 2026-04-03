@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import ShopifyCartDrawer from "./ShopifyCartDrawer";
-import LanguageSwitcher from "./LanguageSwitcher";
+
 import { useLanguage } from "@/i18n/LanguageContext";
 
 const Header = () => {
