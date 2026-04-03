@@ -68,9 +68,6 @@ const Header = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="hidden md:block">
-              <LanguageSwitcher />
-            </div>
             <Link to="/product" className="hidden md:block">
               <motion.span
                 whileHover={{ scale: 1.05 }}
