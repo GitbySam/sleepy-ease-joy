@@ -10,16 +10,8 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | null>(null);
 
 function detectLanguage(): Lang {
-  // Check localStorage first
   const saved = localStorage.getItem("sleepzy-lang") as Lang;
   if (saved && ["en", "fr", "es"].includes(saved)) return saved;
-
-  // Browser language detection
-  const browserLang = navigator.language || (navigator as any).userLanguage || "en";
-  const langCode = browserLang.toLowerCase().split("-")[0];
-
-  if (langCode === "fr") return "fr";
-  if (langCode === "es") return "es";
   return "en";
 }
 
