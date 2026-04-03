@@ -1,49 +1,32 @@
 
 
-# Optimisations Mobile pour Maximiser la Conversion
+## Analyse de la situation actuelle
 
-## Constat actuel
-Sur mobile (390px), plusieurs points freinent la conversion :
-- Le Hero prend beaucoup d'espace vertical sans CTA immédiatement visible (il faut scroller)
-- Pas de bouton d'achat flottant/sticky visible en permanence
-- Le header mobile affiche les drapeaux de langues qui prennent de la place utile
-- Les sections sont très espacées (py-24) ce qui rallonge le parcours
-- Pas de barre de progression/urgence visible en continu
+Le système i18n est déjà en place avec :
+- **3 langues** (en, fr, es) dans `translations.ts` (506 lignes de traductions)
+- **Détection automatique du navigateur** dans `detectLanguage()` — un visiteur français voit le site en français par défaut
+- **LanguageSwitcher** visible dans le Header (desktop + mobile) avec les drapeaux 🇺🇸🇫🇷🇪🇸
+- **localStorage** pour mémoriser le choix
 
-## Plan d'implémentation
+## Le problème
 
-### 1. Bouton CTA sticky en bas de l'écran (mobile uniquement)
-Ajouter un composant `StickyMobileCTA` qui apparaît dès que l'utilisateur scrolle au-delà du Hero. Bouton plein écran en bas avec le prix barré + prix promo + texte CTA. Visible uniquement sur mobile (`md:hidden`). Se masque quand le BundleOffer est visible à l'écran.
+Actuellement, `detectLanguage()` détecte la langue du navigateur et l'applique automatiquement. Un visiteur espagnol verra le site en espagnol, un français en français. Or tu veux que **tout le monde arrive en anglais**, puis puisse changer manuellement.
 
-**Fichier** : `src/components/StickyMobileCTA.tsx` (nouveau)
-**Modif** : `src/pages/Index.tsx` — ajouter le composant
+## Plan — Forcer l'anglais par défaut
 
-### 2. Réduire les espacements sur mobile
-Passer les sections de `py-24` à `py-14 md:py-24` pour réduire le temps de scroll et exposer plus vite le contenu de conversion (témoignages, offre bundle).
+### Modification unique : `src/i18n/LanguageContext.tsx`
 
-**Fichiers** : `ComparisonSlider.tsx`, `Benefits.tsx`, `BundleOffer.tsx`, `FAQ.tsx`, `Testimonials.tsx`, `InAction.tsx`
+Modifier la fonction `detectLanguage()` pour ne vérifier que le localStorage (choix explicite de l'utilisateur), et retourner `"en"` par défaut si aucun choix n'a été fait :
 
-### 3. Hero mobile plus compact
-- Réduire le `min-h-[80vh]` à `min-h-[60vh]` sur mobile pour que le CTA et les étoiles soient visibles sans scroller
-- Réduire la taille de l'image produit sur mobile
-- Remonter le CTA visuellement
+```typescript
+function detectLanguage(): Lang {
+  const saved = localStorage.getItem("sleepzy-lang") as Lang;
+  if (saved && ["en", "fr", "es"].includes(saved)) return saved;
+  return "en"; // Toujours anglais par défaut
+}
+```
 
-**Fichier** : `src/components/Hero.tsx`
+C'est tout. Le LanguageSwitcher reste en place dans le Header, les traductions fr/es restent disponibles. Dès qu'un utilisateur clique sur un drapeau, son choix est sauvegardé en localStorage et persistera lors de ses prochaines visites.
 
-### 4. Header mobile simplifié
-Masquer les drapeaux de langues derrière un menu hamburger ou les réduire à un seul icône globe sur mobile, libérant l'espace pour le logo et le panier.
-
-**Fichier** : `src/components/Header.tsx`
-
-### 5. Ajout d'une barre d'urgence/rareté persistante
-Ajouter sous le sticky CTA mobile un texte dynamique type "🔥 147 personnes regardent ce produit" ou un countdown timer pour créer l'urgence.
-
-**Fichier** : intégré dans `StickyMobileCTA.tsx`
-
-### 6. Traductions
-Ajouter les nouvelles clés dans `src/i18n/translations.ts` (sticky CTA text, urgence text) en EN/FR/ES.
-
----
-
-**Résumé** : 6 modifications ciblées pour raccourcir le parcours mobile, garder le CTA toujours visible, et ajouter de l'urgence — les 3 leviers les plus impactants sur la conversion mobile.
+**Aucun autre fichier à modifier.**
 
