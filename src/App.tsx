@@ -25,15 +25,19 @@ const RouteTracker = () => {
   return null;
 };
 
-const AppRoutes = () => {
+const CartSyncWrapper = () => {
   useCartSync();
+  return null;
+};
 
+const AppRoutes = () => {
   return (
     <LanguageProvider>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <CartSyncWrapper />
           <BrowserRouter>
             <RouteTracker />
             <Routes>
