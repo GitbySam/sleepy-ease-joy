@@ -125,10 +125,6 @@ const Header = () => {
                 )
               )}
 
-              <div className="mt-4 pt-4 border-t border-border w-40 flex justify-center">
-                <LanguageSwitcher />
-              </div>
-
               <Link to="/product" onClick={() => setMenuOpen(false)} className="mt-4">
                 <motion.span
                   whileTap={{ scale: 0.95 }}
