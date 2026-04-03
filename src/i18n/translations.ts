@@ -295,9 +295,9 @@ export const translations = {
   },
   "product.winterSaleTag": { en: "🌸 SPRING SALE", fr: "🌸 SOLDES DE PRINTEMPS", es: "🌸 REBAJAS DE PRIMAVERA" },
   "product.stockLeft": {
-    en: "Only 8 left in stock",
-    fr: "Plus que 8 en stock",
-    es: "Solo quedan 8 en stock",
+    en: "Low Stock — Only 3 left",
+    fr: "Stock faible — Plus que 3",
+    es: "Stock bajo — Solo quedan 3",
   },
   "product.reviews": { en: "(12,000+ reviews)", fr: "(12 000+ avis)", es: "(12 000+ opiniones)" },
   "product.color": { en: "Color", fr: "Couleur", es: "Color" },
