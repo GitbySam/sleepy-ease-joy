@@ -60,8 +60,8 @@ const Footer = () => {
   return (
     <footer className="bg-dark-blue text-dark-blue-foreground py-12 md:py-16">
       <div className="container mx-auto px-6">
-        {/* Logo + description always visible */}
-        <div className="mb-8 md:mb-0">
+        {/* Logo + description mobile only */}
+        <div className="mb-8 md:hidden">
           <h3 className="font-serif text-2xl font-bold mb-3 text-dark-blue-foreground">
             Sleep<span className="text-gold">&zy</span>
           </h3>
