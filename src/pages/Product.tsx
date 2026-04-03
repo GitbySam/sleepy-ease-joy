@@ -180,7 +180,7 @@ const Product = () => {
       <div className="container mx-auto px-4 py-8 md:py-12 pt-28 md:pt-32">
         <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6 group">
           <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-sans-body">{t("nav.home") || "Home"}</span>
+          <span className="text-sm font-sans-body">Home</span>
         </Link>
         <div className="grid md:grid-cols-2 gap-8 lg:gap-14 items-start">
           {/* LEFT — Product Image */}
