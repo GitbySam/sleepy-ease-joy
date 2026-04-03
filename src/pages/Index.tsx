@@ -1,20 +1,22 @@
+import { lazy, Suspense } from "react";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import TrustBar from "@/components/TrustBar";
-import Marquee from "@/components/Marquee";
-import InAction from "@/components/InAction";
-import Benefits from "@/components/Benefits";
-import ComparisonSlider from "@/components/ComparisonSlider";
-import Testimonials from "@/components/Testimonials";
-import CtaBridge from "@/components/CtaBridge";
-import BundleOffer from "@/components/BundleOffer";
-import FAQ from "@/components/FAQ";
-import Footer from "@/components/Footer";
 import SocialProofToasts from "@/components/SocialProofToasts";
 import InactivityPopup from "@/components/InactivityPopup";
-import ShopifyProducts from "@/components/ShopifyProducts";
 import StickyMobileCTA from "@/components/StickyMobileCTA";
 import ScrollToTop from "@/components/ScrollToTop";
+
+const Marquee = lazy(() => import("@/components/Marquee"));
+const InAction = lazy(() => import("@/components/InAction"));
+const ComparisonSlider = lazy(() => import("@/components/ComparisonSlider"));
+const ShopifyProducts = lazy(() => import("@/components/ShopifyProducts"));
+const Benefits = lazy(() => import("@/components/Benefits"));
+const Testimonials = lazy(() => import("@/components/Testimonials"));
+const CtaBridge = lazy(() => import("@/components/CtaBridge"));
+const BundleOffer = lazy(() => import("@/components/BundleOffer"));
+const FAQ = lazy(() => import("@/components/FAQ"));
+const Footer = lazy(() => import("@/components/Footer"));
 
 const Index = () => (
   <>
@@ -26,17 +28,21 @@ const Index = () => (
     <main>
       <Hero />
       <TrustBar />
-      <Marquee />
-      <InAction />
-      <ComparisonSlider />
-      <ShopifyProducts />
-      <Benefits />
-      <Testimonials />
-      <CtaBridge />
-      <BundleOffer />
-      <FAQ />
+      <Suspense fallback={null}>
+        <Marquee />
+        <InAction />
+        <ComparisonSlider />
+        <ShopifyProducts />
+        <Benefits />
+        <Testimonials />
+        <CtaBridge />
+        <BundleOffer />
+        <FAQ />
+      </Suspense>
     </main>
-    <Footer />
+    <Suspense fallback={null}>
+      <Footer />
+    </Suspense>
   </>
 );
 

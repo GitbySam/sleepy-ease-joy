@@ -5,6 +5,7 @@ import headDropVideo from "@/assets/embarrassing-head-drop.mp4";
 import mouthOpen from "@/assets/embarrassing-mouth-open.webp";
 import shoulder from "@/assets/embarrassing-shoulder.webp";
 import drool from "@/assets/embarrassing-drool.webp";
+import LazyVideo from "@/components/LazyVideo";
 import { useLanguage } from "@/i18n/LanguageContext";
 // @ts-ignore
 import "swiper/css";
@@ -32,13 +33,9 @@ const ComparisonSlider = () => {
     >
       <div className="aspect-[3/4] overflow-hidden">
         {scene.video ? (
-          <video
+          <LazyVideo
             src={scene.video}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full"
           />
         ) : (
           <img
