@@ -57,7 +57,7 @@ const Product = () => {
   const [loading, setLoading] = useState(true);
   const [selectedQty, setSelectedQty] = useState(initialQty);
   const [selectedColor, setSelectedColor] = useState("Grey");
-  const countdown = useCountdown();
+  const countdown = useCountdown(15);
   const { t, lang } = useLanguage();
 
   const addItem = useCartStore((s) => s.addItem);
