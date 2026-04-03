@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 const CtaBridge = () => {
-  const { t, lang } = useLanguage();
-  const currencySymbol = lang === "en" ? "$" : "€";
+  const { t } = useLanguage();
+  const currencySymbol = "$";
 
   return (
     <section className="py-10 md:py-16 bg-background">

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import ShopifyCartDrawer from "./ShopifyCartDrawer";
-import LanguageSwitcher from "./LanguageSwitcher";
+
 import { useLanguage } from "@/i18n/LanguageContext";
 
 const Header = () => {
@@ -68,9 +68,6 @@ const Header = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="hidden md:block">
-              <LanguageSwitcher />
-            </div>
             <Link to="/product" className="hidden md:block">
               <motion.span
                 whileHover={{ scale: 1.05 }}
@@ -127,10 +124,6 @@ const Header = () => {
                   </a>
                 )
               )}
-
-              <div className="mt-4 pt-4 border-t border-border w-40 flex justify-center">
-                <LanguageSwitcher />
-              </div>
 
               <Link to="/product" onClick={() => setMenuOpen(false)} className="mt-4">
                 <motion.span
