@@ -183,9 +183,9 @@ export const translations = {
   },
   "bundle.perUnit": { en: "/unit", fr: "/unité", es: "/unidad" },
   "bundle.lowStock": {
-    en: "Low Stock — Only 3 left",
-    fr: "Stock faible — Plus que 3",
-    es: "Stock bajo — Solo quedan 3",
+    en: "Low Stock — Only 8 left",
+    fr: "Stock faible — Plus que 8",
+    es: "Stock bajo — Solo quedan 8",
   },
   "bundle.cta": {
     en: "Save my dignity now",
