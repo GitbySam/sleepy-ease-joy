@@ -466,6 +466,41 @@ export const translations = {
     fr: "{count} personnes consultent ce produit",
     es: "{count} personas están viendo este producto",
   },
+
+  // Trust Bar
+  "trustBar.freeShipping": { en: "Free Shipping", fr: "Livraison gratuite", es: "Envío gratis" },
+  "trustBar.securePayment": { en: "Secure Payment", fr: "Paiement sécurisé", es: "Pago seguro" },
+  "trustBar.guarantee": { en: "90-Day Guarantee", fr: "Garantie 90 jours", es: "Garantía 90 días" },
+  "trustBar.ssl": { en: "SSL Encrypted", fr: "Chiffrement SSL", es: "Cifrado SSL" },
+
+  // Bundle Countdown
+  "bundle.countdown": {
+    en: "This offer expires in",
+    fr: "Cette offre expire dans",
+    es: "Esta oferta expira en",
+  },
+
+  // CTA Bridge
+  "ctaBridge.title": {
+    en: "Ready to sleep with dignity?",
+    fr: "Prêt(e) à dormir avec dignité ?",
+    es: "¿Listo/a para dormir con dignidad?",
+  },
+  "ctaBridge.desc": {
+    en: "Join 12,000+ travelers who stopped being embarrassed. 90-day money-back guarantee.",
+    fr: "Rejoignez 12 000+ voyageurs qui ont cessé d'être gênés. Garantie satisfait ou remboursé 90 jours.",
+    es: "Únete a 12 000+ viajeros que dejaron de pasar vergüenza. Garantía de 90 días.",
+  },
+  "ctaBridge.cta": {
+    en: "Shop now — 50% off",
+    fr: "Acheter — -50%",
+    es: "Comprar — -50%",
+  },
+  "ctaBridge.savings": {
+    en: "Save 50% today",
+    fr: "Économisez 50% aujourd'hui",
+    es: "Ahorra 50% hoy",
+  },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

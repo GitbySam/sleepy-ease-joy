@@ -1,12 +1,43 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check } from "lucide-react";
+import { Check, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
+
+const useCountdown = (minutes: number) => {
+  const [seconds, setSeconds] = useState(() => {
+    const saved = sessionStorage.getItem("bundle-countdown");
+    if (saved) {
+      const remaining = Math.max(0, parseInt(saved) - Math.floor(Date.now() / 1000));
+      return remaining > 0 ? remaining : minutes * 60;
+    }
+    const end = Math.floor(Date.now() / 1000) + minutes * 60;
+    sessionStorage.setItem("bundle-countdown", String(end));
+    return minutes * 60;
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSeconds((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+};
 
 const BundleOffer = () => {
   const [selected, setSelected] = useState(2);
   const { t, lang } = useLanguage();
+  const countdown = useCountdown(15);
 
   const currencySymbol = lang === "en" ? "$" : "€";
 
@@ -102,8 +133,17 @@ const BundleOffer = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="mb-8"
+          className="mb-8 space-y-3"
         >
+          {/* Countdown timer */}
+          <div className="flex items-center justify-center gap-2 bg-destructive/10 rounded-xl py-2.5 px-4">
+            <Clock size={16} className="text-destructive" />
+            <span className="text-sm font-bold text-destructive">
+              {t("bundle.countdown")} {countdown}
+            </span>
+          </div>
+
+          {/* Low stock */}
           <div className="flex items-center gap-2 mb-2">
             <span className="w-2.5 h-2.5 rounded-full bg-destructive animate-pulse-dot" />
             <span className="text-sm font-semibold text-destructive">{t("bundle.lowStock")}</span>
