@@ -16,16 +16,34 @@ const COLOR_MAP: Record<string, string> = {
   Red: "#DC2626",
 };
 
-function useCountdown() {
-  const [seconds, setSeconds] = useState(53934);
+function useCountdown(minutes: number) {
+  const [seconds, setSeconds] = useState(() => {
+    const saved = sessionStorage.getItem("bundle-countdown");
+    if (saved) {
+      const remaining = Math.max(0, parseInt(saved) - Math.floor(Date.now() / 1000));
+      return remaining > 0 ? remaining : minutes * 60;
+    }
+    const end = Math.floor(Date.now() / 1000) + minutes * 60;
+    sessionStorage.setItem("bundle-countdown", String(end));
+    return minutes * 60;
+  });
+
   useEffect(() => {
-    const interval = setInterval(() => setSeconds((s) => (s > 0 ? s - 1 : 0)), 1000);
+    const interval = setInterval(() => {
+      setSeconds((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
-  return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 }
 
 const Product = () => {
@@ -39,7 +57,7 @@ const Product = () => {
   const [loading, setLoading] = useState(true);
   const [selectedQty, setSelectedQty] = useState(initialQty);
   const [selectedColor, setSelectedColor] = useState("Grey");
-  const countdown = useCountdown();
+  const countdown = useCountdown(15);
   const { t, lang } = useLanguage();
 
   const addItem = useCartStore((s) => s.addItem);
