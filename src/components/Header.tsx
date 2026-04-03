@@ -52,9 +52,9 @@ const Header = () => {
         }`}
       >
         <div className="container mx-auto flex items-center justify-between py-4 px-6">
-          <a href="#" className="font-serif text-2xl font-bold text-foreground tracking-tight">
+          <Link to="/" className="font-serif text-2xl font-bold text-foreground tracking-tight">
             Sleep<span className="text-gold">&zy</span>
-          </a>
+          </Link>
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-8 font-sans-body text-sm text-muted-foreground">
