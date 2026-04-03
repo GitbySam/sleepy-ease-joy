@@ -1,15 +1,12 @@
 import { motion } from "framer-motion";
 import { Truck, ShieldCheck, RotateCcw, Lock } from "lucide-react";
-import { useLanguage } from "@/i18n/LanguageContext";
 
 const TrustBar = () => {
-  const { t } = useLanguage();
-
   const badges = [
-    { icon: Truck, label: t("trustBar.freeShipping") },
-    { icon: ShieldCheck, label: t("trustBar.securePayment") },
-    { icon: RotateCcw, label: t("trustBar.guarantee") },
-    { icon: Lock, label: t("trustBar.ssl") },
+    { icon: Truck, label: "Free Shipping" },
+    { icon: ShieldCheck, label: "Secure Payment" },
+    { icon: RotateCcw, label: "90-Day Guarantee" },
+    { icon: Lock, label: "SSL Encrypted" },
   ];
 
   return (
