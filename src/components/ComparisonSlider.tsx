@@ -33,13 +33,9 @@ const ComparisonSlider = () => {
     >
       <div className="aspect-[3/4] overflow-hidden">
         {scene.video ? (
-          <video
+          <LazyVideo
             src={scene.video}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full"
           />
         ) : (
           <img

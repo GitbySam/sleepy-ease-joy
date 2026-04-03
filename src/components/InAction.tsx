@@ -68,13 +68,9 @@ const InAction = () => {
             transition={{ delay: 3 * 0.15, duration: 0.6 }}
             className="group relative overflow-hidden rounded-2xl shadow-lg aspect-[3/4] md:aspect-[4/3] md:flex-1"
           >
-            <video
+            <LazyVideo
               src={demoVideo}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full"
             />
             <div className="absolute bottom-0 left-0 right-0 px-2 pb-2 pt-6 sm:px-4 sm:pb-4 sm:pt-8 bg-gradient-to-t from-black/60 via-black/20 to-transparent">
               <span className="text-[9px] sm:text-xs uppercase tracking-widest text-white/90 font-sans-body leading-none block drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
