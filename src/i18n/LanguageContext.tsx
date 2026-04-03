@@ -7,24 +7,26 @@ interface LanguageContextType {
   t: (key: TranslationKey) => string;
 }
 
-const LanguageContext = createContext<LanguageContextType | null>(null);
+const translate = (key: TranslationKey): string => {
+  const entry = translations[key as string];
+  if (!entry) return key as string;
+  return entry.en;
+};
+
+const defaultLanguageContext: LanguageContextType = {
+  lang: "en",
+  setLang: () => {},
+  t: translate,
+};
+
+const LanguageContext = createContext<LanguageContextType>(defaultLanguageContext);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const t = (key: TranslationKey): string => {
-    const entry = translations[key as string];
-    if (!entry) return key as string;
-    return entry.en;
-  };
-
   return (
-    <LanguageContext.Provider value={{ lang: "en", setLang: () => {}, t }}>
+    <LanguageContext.Provider value={defaultLanguageContext}>
       {children}
     </LanguageContext.Provider>
   );
 };
 
-export const useLanguage = () => {
-  const ctx = useContext(LanguageContext);
-  if (!ctx) throw new Error("useLanguage must be used within LanguageProvider");
-  return ctx;
-};
+export const useLanguage = () => useContext(LanguageContext);
