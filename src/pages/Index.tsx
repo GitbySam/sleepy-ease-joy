@@ -30,8 +30,8 @@ const Index = () => (
       <TrustBar />
       <Suspense fallback={null}>
         <Marquee />
-        <InAction />
         <ComparisonSlider />
+        <InAction />
         <ShopifyProducts />
         <Benefits />
         <Testimonials />
