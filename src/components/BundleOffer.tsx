@@ -37,6 +37,7 @@ const useCountdown = (minutes: number) => {
 const BundleOffer = () => {
   const [selected, setSelected] = useState(2);
   const { t, lang } = useLanguage();
+  const countdown = useCountdown(15);
 
   const currencySymbol = lang === "en" ? "$" : "€";
 
