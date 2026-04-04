@@ -50,6 +50,36 @@ export const translations = {
     fr: "Garantie dignité remboursée 90 jours",
     es: "Garantía de dignidad de 90 días",
   },
+  "hero.badge": {
+    en: "Best Seller 🏆",
+    fr: "Best Seller 🏆",
+    es: "Más vendido 🏆",
+  },
+  "hero.priceOld": {
+    en: "$59.99",
+    fr: "$59.99",
+    es: "$59.99",
+  },
+  "hero.priceNew": {
+    en: "$29.99",
+    fr: "$29.99",
+    es: "$29.99",
+  },
+  "hero.freeShipping": {
+    en: "🚚 Free shipping",
+    fr: "🚚 Livraison gratuite",
+    es: "🚚 Envío gratis",
+  },
+  "hero.securePayment": {
+    en: "🔒 Secure payment",
+    fr: "🔒 Paiement sécurisé",
+    es: "🔒 Pago seguro",
+  },
+  "hero.viewingNow": {
+    en: "people viewing right now",
+    fr: "personnes consultent en ce moment",
+    es: "personas viendo ahora",
+  },
 
   // ComparisonSlider
   "comparison.subtitle": {
