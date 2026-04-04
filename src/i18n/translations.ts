@@ -218,9 +218,9 @@ export const translations = {
     es: "Stock bajo — Solo quedan 8",
   },
   "bundle.cta": {
-    en: "Save my dignity now",
-    fr: "Sauver ma dignité maintenant",
-    es: "Salvar mi dignidad ahora",
+    en: "Shop Now",
+    fr: "Acheter maintenant",
+    es: "Comprar ahora",
   },
   "bundle.securePayment": { en: "🔒 Secure payment", fr: "🔒 Paiement sécurisé", es: "🔒 Pago seguro" },
   "bundle.freeShipping": { en: "🚚 Free shipping", fr: "🚚 Livraison gratuite", es: "🚚 Envío gratis" },
@@ -404,9 +404,9 @@ export const translations = {
     es: "⏰ Esta oferta expira cuando salgas de esta página",
   },
   "inactivity.cta": {
-    en: "PROTECT MY REPUTATION NOW",
-    fr: "PROTÉGER MA RÉPUTATION MAINTENANT",
-    es: "PROTEGER MI REPUTACIÓN AHORA",
+    en: "SHOP NOW",
+    fr: "ACHETER MAINTENANT",
+    es: "COMPRAR AHORA",
   },
   "inactivity.decline": {
     en: "No thanks, I enjoy being photographed drooling",
