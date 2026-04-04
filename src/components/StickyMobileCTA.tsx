@@ -3,11 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useViewerCount } from "@/hooks/useViewerCount";
 
 const StickyMobileCTA = () => {
   const [visible, setVisible] = useState(false);
   const { t, lang } = useLanguage();
-  const [viewerCount] = useState(() => Math.floor(Math.random() * 80) + 120);
+  const viewerCount = useViewerCount();
 
   useEffect(() => {
     const handleScroll = () => {

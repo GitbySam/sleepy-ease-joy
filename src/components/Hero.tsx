@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import heroBanner from "@/assets/hero-banner.jpg";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useViewerCount } from "@/hooks/useViewerCount";
 
 const stagger = {
   hidden: {},
@@ -13,21 +13,6 @@ const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
 };
-
-/** Random live viewer count for urgency */
-function useViewerCount() {
-  const [count, setCount] = useState(() => Math.floor(Math.random() * 30) + 25);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCount((prev) => {
-        const delta = Math.floor(Math.random() * 7) - 3; // -3 to +3
-        return Math.max(18, Math.min(68, prev + delta));
-      });
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
-  return count;
-}
 
 const StarRating = ({ size = "small" }: { size?: "small" | "large" }) => {
   const dim = size === "large" ? "w-5 h-5" : "w-4 h-4";
