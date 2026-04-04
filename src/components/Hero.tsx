@@ -165,7 +165,7 @@ const Hero = () => {
             <motion.div variants={fadeUp} className="flex items-baseline gap-3">
               <span className="text-3xl font-bold text-gold font-sans-body">{t("hero.priceNew")}</span>
               <span className="text-lg text-muted-foreground line-through font-sans-body">{t("hero.priceOld")}</span>
-              <span className="bg-red-500/10 text-red-500 text-xs font-bold px-3 py-1 rounded-full uppercase">-50%</span>
+              <span className="bg-red-500/10 text-red-500 text-xs font-bold px-3 py-1 rounded-full uppercase">-54%</span>
             </motion.div>
 
             {/* CTA */}
