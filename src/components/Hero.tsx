@@ -178,13 +178,9 @@ const Hero = () => {
           transition={{ duration: 1.2, ease: "easeOut" }}
           className="absolute inset-0"
         >
-          <video
+          <DeferredVideo
             src={demoVideo}
             poster={heroBanner}
-            autoPlay
-            loop
-            muted
-            playsInline
             className="w-full h-full object-cover object-[15%_center]"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-background/20" />
