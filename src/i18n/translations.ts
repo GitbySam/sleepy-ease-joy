@@ -56,14 +56,14 @@ export const translations = {
     es: "Más vendido 🏆",
   },
   "hero.priceOld": {
-    en: "$59.99",
-    fr: "$59.99",
-    es: "$59.99",
+    en: "$69.90",
+    fr: "69,90$",
+    es: "$69.90",
   },
   "hero.priceNew": {
-    en: "$29.99",
-    fr: "$29.99",
-    es: "$29.99",
+    en: "$34.95",
+    fr: "34,95$",
+    es: "$34.95",
   },
   "hero.freeShipping": {
     en: "🚚 Free shipping",
