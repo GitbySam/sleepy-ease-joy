@@ -1,32 +1,32 @@
 
 
-## Analyse de la situation actuelle
+## Remplacer l'image Hero par la vidéo demo
 
-Le système i18n est déjà en place avec :
-- **3 langues** (en, fr, es) dans `translations.ts` (506 lignes de traductions)
-- **Détection automatique du navigateur** dans `detectLanguage()` — un visiteur français voit le site en français par défaut
-- **LanguageSwitcher** visible dans le Header (desktop + mobile) avec les drapeaux 🇺🇸🇫🇷🇪🇸
-- **localStorage** pour mémoriser le choix
+### Concept
+Utiliser `demo-video.mp4` (actuellement dans la section "Sleep with dignity") comme fond vidéo du Hero, en remplacement de `hero-banner.jpg`. La vidéo tourne en boucle, muette, en autoplay — exactement comme les sites e-commerce premium.
 
-## Le problème
+### Modifications — fichier unique : `src/components/Hero.tsx`
 
-Actuellement, `detectLanguage()` détecte la langue du navigateur et l'applique automatiquement. Un visiteur espagnol verra le site en espagnol, un français en français. Or tu veux que **tout le monde arrive en anglais**, puis puisse changer manuellement.
+**Mobile Hero :**
+- Remplacer le `<img src={heroBanner}>` par un `<video>` avec `autoPlay`, `loop`, `muted`, `playsInline`
+- Source : `demoVideo` (import existant dans le projet via `@/assets/demo-video.mp4`)
+- Conserver le badge "Best Seller" et le compteur live en overlay
+- Garder le même ratio `aspect-[4/3]` et `object-cover`
 
-## Plan — Forcer l'anglais par défaut
+**Desktop Hero :**
+- Remplacer le `<img src={heroBanner}>` par un `<video>` identique
+- Conserver le gradient overlay `bg-gradient-to-r from-background via-background/70 to-background/20`
+- Conserver `object-cover` et le positionnement plein écran
 
-### Modification unique : `src/i18n/LanguageContext.tsx`
+**Import :**
+- Ajouter `import demoVideo from "@/assets/demo-video.mp4"`
+- Supprimer `import heroBanner` (devenu inutile)
 
-Modifier la fonction `detectLanguage()` pour ne vérifier que le localStorage (choix explicite de l'utilisateur), et retourner `"en"` par défaut si aucun choix n'a été fait :
+### Considérations techniques
+- `playsInline` est essentiel pour iOS (sinon la vidéo s'ouvre en plein écran)
+- `muted` est requis pour l'autoplay sur tous les navigateurs
+- Poster fallback : on peut garder `heroBanner` comme attribut `poster` de la balise `<video>` pour afficher l'image pendant le chargement — meilleure UX
 
-```typescript
-function detectLanguage(): Lang {
-  const saved = localStorage.getItem("sleepzy-lang") as Lang;
-  if (saved && ["en", "fr", "es"].includes(saved)) return saved;
-  return "en"; // Toujours anglais par défaut
-}
-```
-
-C'est tout. Le LanguageSwitcher reste en place dans le Header, les traductions fr/es restent disponibles. Dès qu'un utilisateur clique sur un drapeau, son choix est sauvegardé en localStorage et persistera lors de ses prochaines visites.
-
-**Aucun autre fichier à modifier.**
+### Résultat attendu
+Un Hero dynamique et engageant avec la vidéo de démo du produit en fond, tout en conservant les overlays texte, badges et CTA existants.
 
