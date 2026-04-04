@@ -99,13 +99,9 @@ const Hero = () => {
           transition={{ duration: 1, ease: "easeOut" }}
           className="relative w-full aspect-[4/3] overflow-hidden"
         >
-          <video
+          <DeferredVideo
             src={demoVideo}
             poster={heroBanner}
-            autoPlay
-            loop
-            muted
-            playsInline
             className="w-full h-full object-cover object-center"
           />
           {/* Best Seller badge */}
