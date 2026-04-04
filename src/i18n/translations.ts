@@ -404,9 +404,9 @@ export const translations = {
     es: "⏰ Esta oferta expira cuando salgas de esta página",
   },
   "inactivity.cta": {
-    en: "PROTECT MY REPUTATION NOW",
-    fr: "PROTÉGER MA RÉPUTATION MAINTENANT",
-    es: "PROTEGER MI REPUTACIÓN AHORA",
+    en: "SHOP NOW",
+    fr: "ACHETER MAINTENANT",
+    es: "COMPRAR AHORA",
   },
   "inactivity.decline": {
     en: "No thanks, I enjoy being photographed drooling",
