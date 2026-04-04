@@ -1,9 +1,62 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useState, useEffect, useRef, useCallback } from "react";
 import heroBanner from "@/assets/hero-banner.jpg";
 import demoVideo from "@/assets/demo-video.mp4";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useViewerCount } from "@/hooks/useViewerCount";
+
+/**
+ * Deferred video: shows poster immediately, loads video only after
+ * the component mounts + a short delay (better LCP on mobile).
+ */
+const DeferredVideo = ({
+  src,
+  poster,
+  className,
+}: {
+  src: string;
+  poster: string;
+  className: string;
+}) => {
+  const [ready, setReady] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    // Wait for idle or 1.5s to start loading the video
+    const id = typeof requestIdleCallback !== "undefined"
+      ? requestIdleCallback(() => setReady(true), { timeout: 1500 })
+      : setTimeout(() => setReady(true), 1500) as unknown as number;
+    return () => {
+      if (typeof cancelIdleCallback !== "undefined") cancelIdleCallback(id);
+      else clearTimeout(id);
+    };
+  }, []);
+
+  const handleCanPlay = useCallback(() => {
+    videoRef.current?.play().catch(() => {});
+  }, []);
+
+  if (!ready) {
+    return <img src={poster} alt="" className={className} loading="eager" />;
+  }
+
+  return (
+    <video
+      ref={videoRef}
+      poster={poster}
+      autoPlay
+      loop
+      muted
+      playsInline
+      preload="metadata"
+      onCanPlay={handleCanPlay}
+      className={className}
+    >
+      <source src={src} type="video/mp4" />
+    </video>
+  );
+};
 
 const stagger = {
   hidden: {},
