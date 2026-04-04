@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import heroBanner from "@/assets/hero-banner.jpg";
+import demoVideo from "@/assets/demo-video.mp4";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useViewerCount } from "@/hooks/useViewerCount";
 
@@ -45,9 +46,13 @@ const Hero = () => {
           transition={{ duration: 1, ease: "easeOut" }}
           className="relative w-full aspect-[4/3] overflow-hidden"
         >
-          <img
-            src={heroBanner}
-            alt="Sleep&zy pillow in use on airplane"
+          <video
+            src={demoVideo}
+            poster={heroBanner}
+            autoPlay
+            loop
+            muted
+            playsInline
             className="w-full h-full object-cover object-center"
           />
           {/* Best Seller badge */}
@@ -124,9 +129,13 @@ const Hero = () => {
           transition={{ duration: 1.2, ease: "easeOut" }}
           className="absolute inset-0"
         >
-          <img
-            src={heroBanner}
-            alt="Sleep&zy pillow in use on airplane"
+          <video
+            src={demoVideo}
+            poster={heroBanner}
+            autoPlay
+            loop
+            muted
+            playsInline
             className="w-full h-full object-cover object-[15%_center]"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-background/20" />
