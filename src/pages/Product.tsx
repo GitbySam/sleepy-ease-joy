@@ -97,9 +97,9 @@ const Product = () => {
   const duoVariant = coloredVariants.find(v => v.node.selectedOptions?.some(o => o.value === 'Duo Pack'))?.node;
   const familyVariant = coloredVariants.find(v => v.node.selectedOptions?.some(o => o.value === 'Family Pack'))?.node;
 
-  const singlePrice = singleVariant ? parseFloat(singleVariant.price.amount) : 34.95;
-  const duoPrice = duoVariant ? parseFloat(duoVariant.price.amount) : 64.90;
-  const familyPrice = familyVariant ? parseFloat(familyVariant.price.amount) : 69.90;
+  const singlePrice = singleVariant ? parseFloat(singleVariant.price.amount) : 29.95;
+  const duoPrice = duoVariant ? parseFloat(duoVariant.price.amount) : 59.90;
+  const familyPrice = familyVariant ? parseFloat(familyVariant.price.amount) : 64.90;
   const currencySymbol = lang === "en" ? "$" : "€";
   const oldPricePerUnit = singlePrice * 2;
 
