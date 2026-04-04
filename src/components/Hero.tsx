@@ -4,6 +4,16 @@ import heroBanner from "@/assets/hero-banner.jpg";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useViewerCount } from "@/hooks/useViewerCount";
 
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.12 } },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
+};
+
 const StarRating = ({ size = "small" }: { size?: "small" | "large" }) => {
   const dim = size === "large" ? "w-5 h-5" : "w-4 h-4";
   const box = size === "large" ? "w-6 h-6" : "w-5 h-5";
