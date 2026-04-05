@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import cartTrustBadges from "@/assets/cart-trust-badges.jpg";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -64,11 +65,16 @@ export const ShopifyCartDrawer = () => {
           </SheetDescription>
         </SheetHeader>
 
+        {/* Trust badges image */}
+        <div className="flex-shrink-0 pt-3">
+          <img src={cartTrustBadges} alt="Secure Payments · Free Shipping · 30 Days Satisfied or Refunded · Customer Service 7/7" className="w-full rounded-lg" />
+        </div>
+
         {/* Trust banner + social proof */}
         {items.length > 0 && (
-          <div className="flex-shrink-0 space-y-2 pt-3">
-            <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
-              <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+          <div className="flex-shrink-0 space-y-2 pt-2">
+            <div className="flex items-center gap-2 bg-gold/10 border border-gold/20 rounded-lg px-3 py-2">
+              <CheckCircle className="w-4 h-4 text-gold flex-shrink-0" />
               <span className="text-xs font-semibold text-foreground">{t("cart.trustBanner")}</span>
             </div>
             <div className="flex items-center justify-center gap-1.5 py-1">
