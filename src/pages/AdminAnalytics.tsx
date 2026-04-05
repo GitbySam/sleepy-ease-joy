@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Users, Eye, ShoppingCart, CreditCard, TrendingDown, FileText, DollarSign, RefreshCw, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -90,6 +90,7 @@ export default function AdminAnalytics() {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [days]);
 
   return (
