@@ -13,6 +13,8 @@ import Privacy from "./pages/Privacy";
 import Returns from "./pages/Returns";
 import Shipping from "./pages/Shipping";
 import NotFound from "./pages/NotFound";
+import { lazy, Suspense } from "react";
+const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
 import { useCartSync } from "./hooks/useCartSync";
 
 const queryClient = new QueryClient();
