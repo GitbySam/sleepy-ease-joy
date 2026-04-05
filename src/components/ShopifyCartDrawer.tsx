@@ -1,17 +1,21 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Minus, Plus, Trash2, ExternalLink, Loader2, ShieldCheck, Truck, RotateCcw, Lock } from "lucide-react";
+import { ShoppingCart, Minus, Plus, Trash2, Loader2, ShieldCheck, Truck, RotateCcw, Lock, Star, CheckCircle } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
+
+const TESTIMONIAL_KEYS = ["cart.testimonial1", "cart.testimonial2", "cart.testimonial3"] as const;
 
 export const ShopifyCartDrawer = () => {
   const { items, isLoading, isSyncing, isDrawerOpen, setDrawerOpen, updateQuantity, removeItem, getCheckoutUrl, syncCart } = useCartStore();
   const { t } = useLanguage();
   const totalItems = items.length;
   const totalPrice = items.reduce((sum, item) => sum + (item.bundlePrice ? item.bundlePrice : parseFloat(item.price.amount) * item.quantity), 0);
+
+  const [testimonialIndex, setTestimonialIndex] = useState(0);
 
   useEffect(() => {
     if (isDrawerOpen && !isLoading) {
@@ -20,10 +24,17 @@ export const ShopifyCartDrawer = () => {
     }
   }, [isDrawerOpen, isLoading, syncCart]);
 
+  useEffect(() => {
+    if (!isDrawerOpen || items.length === 0) return;
+    const interval = setInterval(() => {
+      setTestimonialIndex((prev) => (prev + 1) % TESTIMONIAL_KEYS.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [isDrawerOpen, items.length]);
+
   const handleCheckout = () => {
     const checkoutUrl = getCheckoutUrl();
     if (checkoutUrl) {
-      // Track InitiateCheckout
       trackInitiateCheckout({
         value: totalPrice,
         numItems: totalItems,
@@ -52,7 +63,24 @@ export const ShopifyCartDrawer = () => {
             {totalItems === 0 ? t("cart.empty") : `${totalItems} ${t("cart.items")}`}
           </SheetDescription>
         </SheetHeader>
-        <div className="flex flex-col flex-1 pt-6 min-h-0">
+
+        {/* Trust banner + social proof */}
+        {items.length > 0 && (
+          <div className="flex-shrink-0 space-y-2 pt-3">
+            <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
+              <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+              <span className="text-xs font-semibold text-foreground">{t("cart.trustBanner")}</span>
+            </div>
+            <div className="flex items-center justify-center gap-1.5 py-1">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-3.5 h-3.5 fill-gold text-gold" />
+              ))}
+              <span className="text-xs font-medium text-muted-foreground ml-1">{t("cart.socialProof")}</span>
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-col flex-1 pt-4 min-h-0">
           {items.length === 0 ? (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
@@ -102,8 +130,24 @@ export const ShopifyCartDrawer = () => {
                     </div>
                   ))}
                 </div>
+
+                {/* Free shipping bar */}
+                <div className="mt-4 bg-gold/10 border border-gold/20 rounded-lg px-3 py-2 text-center">
+                  <div className="w-full bg-gold/20 rounded-full h-1.5 mb-1.5">
+                    <div className="bg-gold h-1.5 rounded-full w-full" />
+                  </div>
+                  <span className="text-xs font-bold text-gold">{t("cart.freeShippingQualified")}</span>
+                </div>
               </div>
+
               <div className="flex-shrink-0 space-y-4 pt-4 border-t border-border bg-background">
+                {/* Rotating testimonial */}
+                <div className="text-center py-2 bg-muted/40 rounded-lg px-3">
+                  <p className="text-xs italic text-muted-foreground transition-opacity duration-500">
+                    {t(TESTIMONIAL_KEYS[testimonialIndex])}
+                  </p>
+                </div>
+
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold text-foreground">{t("cart.total")}</span>
                   <span className="text-xl font-bold text-foreground">
@@ -115,7 +159,7 @@ export const ShopifyCartDrawer = () => {
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <>
-                      <ExternalLink className="w-4 h-4 mr-2" />
+                      <Lock className="w-4 h-4 mr-2" />
                       {t("cart.checkout")}
                     </>
                   )}
