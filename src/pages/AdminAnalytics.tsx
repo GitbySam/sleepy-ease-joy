@@ -1,67 +1,30 @@
-import { useState } from "react";
-import { Users, Eye, ShoppingCart, CreditCard, Clock, TrendingDown, FileText, Smartphone, Monitor, Tablet } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Users, Eye, ShoppingCart, CreditCard, TrendingDown, FileText, DollarSign, RefreshCw, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, BarChart, Bar,
+  BarChart, Bar,
 } from "recharts";
 
-/* ── KPI data (update manually or connect to APIs later) ── */
-const KPI = [
-  { label: "Visiteurs", value: "211", icon: Users, color: "text-foreground" },
-  { label: "Pages vues", value: "347", icon: Eye, color: "text-foreground" },
-  { label: "Ajouts panier", value: "12", icon: ShoppingCart, color: "text-orange-500" },
-  { label: "Checkout", value: "13", icon: CreditCard, color: "text-violet-500" },
-  { label: "Durée session", value: "48s", icon: Clock, color: "text-foreground" },
-  { label: "Taux rebond", value: "82%", icon: TrendingDown, color: "text-foreground" },
-  { label: "Pages/visite", value: "1.64", icon: FileText, color: "text-foreground" },
-];
+/* ── Types ── */
+interface ShopifyAnalytics {
+  period: { days: number; since: string };
+  summary: {
+    totalOrders: number;
+    totalRevenue: number;
+    averageOrderValue: number;
+    paidOrders: number;
+    refundedOrders: number;
+    cancelledOrders: number;
+    newCustomers: number;
+    currency: string;
+  };
+  ordersByDay: Record<string, { orders: number; revenue: number }>;
+  topProducts: Array<{ title: string; quantity: number; revenue: number }>;
+  topCountries: Array<{ code: string; count: number }>;
+}
 
-/* ── Traffic data (last 14 days sample) ── */
-const trafficData = [
-  { date: "23/03", visitors: 8, pageViews: 12 },
-  { date: "24/03", visitors: 5, pageViews: 9 },
-  { date: "25/03", visitors: 12, pageViews: 20 },
-  { date: "26/03", visitors: 15, pageViews: 25 },
-  { date: "27/03", visitors: 10, pageViews: 18 },
-  { date: "28/03", visitors: 18, pageViews: 30 },
-  { date: "29/03", visitors: 22, pageViews: 35 },
-  { date: "30/03", visitors: 14, pageViews: 22 },
-  { date: "31/03", visitors: 20, pageViews: 32 },
-  { date: "01/04", visitors: 25, pageViews: 40 },
-  { date: "02/04", visitors: 18, pageViews: 28 },
-  { date: "03/04", visitors: 16, pageViews: 26 },
-  { date: "04/04", visitors: 30, pageViews: 50 },
-  { date: "05/04", visitors: 12, pageViews: 20 },
-];
-
-/* ── Device split ── */
-const deviceData = [
-  { name: "Mobile", value: 62, color: "#6366f1" },
-  { name: "Desktop", value: 34, color: "#06b6d4" },
-  { name: "Tablet", value: 4, color: "#f59e0b" },
-];
-const DEVICE_ICONS: Record<string, React.ElementType> = { Mobile: Smartphone, Desktop: Monitor, Tablet: Tablet };
-
-/* ── Top countries ── */
-const topCountries = [
-  { rank: 1, code: "US", count: 142 },
-  { rank: 2, code: "FR", count: 28 },
-  { rank: 3, code: "GB", count: 12 },
-  { rank: 4, code: "CA", count: 9 },
-  { rank: 5, code: "DE", count: 6 },
-];
-
-/* ── Top pages ── */
-const topPages = [
-  { path: "/", views: 211 },
-  { path: "/product/sleepzy-anti-embarrassment-travel-pillow", views: 89 },
-  { path: "/product/pack-duo", views: 34 },
-  { path: "/terms", views: 8 },
-  { path: "/shipping", views: 5 },
-];
-
-/* ── Meta Pixel events ── */
+/* ── Meta Pixel events (manual until Meta API connected) ── */
 const pixelEvents = [
   { event: "PageView", count: 502 },
   { event: "ViewContent", count: 123 },
@@ -74,16 +37,61 @@ const pixelEvents = [
 
 /* ── Tabs ── */
 const TABS = [
+  { id: "sales", label: "💰 Ventes (Live)" },
   { id: "traffic", label: "📈 Trafic" },
   { id: "sources", label: "🔗 Sources" },
-  { id: "sales", label: "💰 Ventes" },
   { id: "meta", label: "📱 Meta Ads" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
 
+const PERIOD_OPTIONS = [
+  { label: "7j", value: 7 },
+  { label: "14j", value: 14 },
+  { label: "30j", value: 30 },
+  { label: "90j", value: 90 },
+];
+
 export default function AdminAnalytics() {
-  const [activeTab, setActiveTab] = useState<TabId>("traffic");
+  const [activeTab, setActiveTab] = useState<TabId>("sales");
+  const [days, setDays] = useState(30);
+  const [data, setData] = useState<ShopifyAnalytics | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      
+      const res = await fetch(`${supabaseUrl}/functions/v1/shopify-analytics?days=${days}`, {
+        headers: {
+          'Authorization': `Bearer ${anonKey}`,
+          'apikey': anonKey,
+        },
+      });
+      
+      if (!res.ok) {
+        const errBody = await res.text();
+        throw new Error(`Erreur ${res.status}: ${errBody}`);
+      }
+      
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+      setData(json);
+    } catch (e: any) {
+      setError(e.message || "Erreur inconnue");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [days]);
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
@@ -91,150 +99,193 @@ export default function AdminAnalytics() {
       <header className="border-b bg-white px-4 py-6 md:px-8">
         <div className="mx-auto max-w-7xl flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
           <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">📊 Analytics Dashboard</h1>
-            <p className="text-sm text-gray-500 mt-1">Données depuis le 23 mars 2026</p>
+            <h1 className="text-2xl font-bold flex items-center gap-2">📊 Sleepzy Analytics</h1>
+            <p className="text-sm text-gray-500 mt-1">Données Shopify en temps réel</p>
           </div>
-          <p className="text-xs text-gray-400">Dernière mise à jour : 05/04/2026</p>
+          <div className="flex items-center gap-3">
+            <div className="flex gap-1 rounded-lg bg-gray-100 p-1">
+              {PERIOD_OPTIONS.map((p) => (
+                <button
+                  key={p.value}
+                  onClick={() => setDays(p.value)}
+                  className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                    days === p.value ? "bg-blue-600 text-white shadow" : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+            <button onClick={fetchData} className="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Rafraîchir">
+              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            </button>
+          </div>
         </div>
       </header>
 
       <div className="mx-auto max-w-7xl px-4 py-6 md:px-8 space-y-6">
-        {/* KPI cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-          {KPI.map((k) => (
-            <Card key={k.label} className="bg-white shadow-sm border">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
-                  <k.icon className="h-3.5 w-3.5" />
-                  {k.label}
-                </div>
-                <p className={`text-2xl font-bold ${k.color}`}>{k.value}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {/* Error banner */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">
+            <strong>Erreur:</strong> {error}
+            <button onClick={fetchData} className="ml-3 underline">Réessayer</button>
+          </div>
+        )}
 
-        {/* Tabs */}
-        <div className="flex gap-1 rounded-lg bg-gray-100 p-1">
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setActiveTab(t.id)}
-              className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${
-                activeTab === t.id ? "bg-blue-600 text-white shadow" : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
+        {/* Loading state */}
+        {loading && !data && (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            <span className="ml-3 text-gray-500">Chargement des données Shopify…</span>
+          </div>
+        )}
 
-        {/* Tab content */}
-        {activeTab === "traffic" && <TrafficTab />}
-        {activeTab === "sources" && <SourcesTab />}
-        {activeTab === "sales" && <SalesTab />}
-        {activeTab === "meta" && <MetaTab />}
+        {data && (
+          <>
+            {/* KPI cards */}
+            <SalesKPIs data={data} loading={loading} />
+
+            {/* Tabs */}
+            <div className="flex gap-1 rounded-lg bg-gray-100 p-1">
+              {TABS.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => setActiveTab(t.id)}
+                  className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${
+                    activeTab === t.id ? "bg-blue-600 text-white shadow" : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Tab content */}
+            {activeTab === "sales" && <SalesTab data={data} />}
+            {activeTab === "traffic" && <TrafficTab />}
+            {activeTab === "sources" && <SourcesTab />}
+            {activeTab === "meta" && <MetaTab />}
+          </>
+        )}
       </div>
     </div>
   );
 }
 
-/* ─────────── TRAFFIC TAB ─────────── */
-function TrafficTab() {
+/* ─────────── SALES KPIs ─────────── */
+function SalesKPIs({ data, loading }: { data: ShopifyAnalytics; loading: boolean }) {
+  const s = data.summary;
+  const kpis = [
+    { label: "Commandes", value: s.totalOrders.toString(), icon: ShoppingCart, color: "text-blue-600" },
+    { label: "Revenus", value: `${s.totalRevenue.toFixed(2)} ${s.currency}`, icon: DollarSign, color: "text-green-600" },
+    { label: "Panier moyen", value: `${s.averageOrderValue.toFixed(2)} ${s.currency}`, icon: CreditCard, color: "text-violet-600" },
+    { label: "Payées", value: s.paidOrders.toString(), icon: CreditCard, color: "text-green-500" },
+    { label: "Remboursées", value: s.refundedOrders.toString(), icon: RefreshCw, color: "text-orange-500" },
+    { label: "Annulées", value: s.cancelledOrders.toString(), icon: TrendingDown, color: "text-red-500" },
+    { label: "Nouveaux clients", value: s.newCustomers.toString(), icon: Users, color: "text-cyan-600" },
+  ];
+
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+      {kpis.map((k) => (
+        <Card key={k.label} className={`bg-white shadow-sm border ${loading ? "opacity-60" : ""}`}>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
+              <k.icon className="h-3.5 w-3.5" />
+              {k.label}
+            </div>
+            <p className={`text-xl font-bold ${k.color}`}>{k.value}</p>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+/* ─────────── SALES TAB (LIVE from Shopify) ─────────── */
+function SalesTab({ data }: { data: ShopifyAnalytics }) {
+  // Orders by day chart data
+  const chartData = Object.entries(data.ordersByDay)
+    .map(([date, vals]) => ({
+      date: new Date(date).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" }),
+      orders: vals.orders,
+      revenue: Math.round(vals.revenue * 100) / 100,
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
   return (
     <div className="space-y-6">
-      {/* Area chart */}
+      {/* Revenue chart */}
       <Card className="bg-white">
         <CardHeader>
-          <CardTitle className="text-base">Évolution du trafic (par jour)</CardTitle>
-          <p className="text-sm text-gray-500">Total période : <strong>211 visiteurs</strong> • <strong>347 pages vues</strong></p>
+          <CardTitle className="text-base">Revenus par jour</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={trafficData}>
+              <AreaChart data={chartData}>
                 <defs>
-                  <linearGradient id="gV" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="gP" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                  <linearGradient id="gRev" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="date" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} />
-                <Tooltip />
-                <Area type="monotone" dataKey="visitors" stroke="#06b6d4" fill="url(#gV)" name="Visiteurs" />
-                <Area type="monotone" dataKey="pageViews" stroke="#6366f1" fill="url(#gP)" name="Pages vues" />
+                <Tooltip formatter={(value: number) => [`${value} ${data.summary.currency}`, "Revenu"]} />
+                <Area type="monotone" dataKey="revenue" stroke="#22c55e" fill="url(#gRev)" name="Revenu" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Device pie */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Top products */}
         <Card className="bg-white">
-          <CardHeader><CardTitle className="text-base">Répartition par appareil</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base">Top Produits</CardTitle></CardHeader>
           <CardContent>
-            <div className="h-56">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={deviceData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={4} dataKey="value" label={({ name, value }) => `${name} ${value}%`}>
-                    {deviceData.map((d, i) => <Cell key={i} fill={d.color} />)}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex justify-center gap-4 mt-2">
-              {deviceData.map((d) => {
-                const Icon = DEVICE_ICONS[d.name];
-                return (
-                  <div key={d.name} className="flex items-center gap-1.5 text-xs text-gray-600">
-                    <Icon className="h-3.5 w-3.5" style={{ color: d.color }} />
-                    {d.name}: {Math.round(211 * d.value / 100)}
+            {data.topProducts.length === 0 ? (
+              <p className="text-gray-400 text-sm py-8 text-center">Aucune vente sur cette période</p>
+            ) : (
+              <div className="space-y-3">
+                {data.topProducts.map((p, i) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-xs font-bold text-gray-400 shrink-0">#{i + 1}</span>
+                      <span className="text-sm truncate">{p.title}</span>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <span className="text-xs text-gray-400">{p.quantity} vendus</span>
+                      <span className="text-sm font-semibold">{p.revenue.toFixed(2)} {data.summary.currency}</span>
+                    </div>
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 
         {/* Top countries */}
         <Card className="bg-white">
-          <CardHeader><CardTitle className="text-base">Top Pays</CardTitle></CardHeader>
-          <CardContent className="space-y-3">
-            {topCountries.map((c) => (
-              <div key={c.code} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-gray-400">#{c.rank}</span>
-                  <span className="font-medium text-sm">{c.code}</span>
-                </div>
-                <span className="text-sm font-semibold">{c.count}</span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        {/* Top pages */}
-        <Card className="bg-white">
-          <CardHeader><CardTitle className="text-base">Top Pages</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base">Commandes par pays</CardTitle></CardHeader>
           <CardContent>
-            <div className="h-56">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={topPages} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis type="number" tick={{ fontSize: 11 }} />
-                  <YAxis dataKey="path" type="category" width={120} tick={{ fontSize: 10 }} />
-                  <Tooltip />
-                  <Bar dataKey="views" fill="#6366f1" radius={[0, 4, 4, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            {data.topCountries.length === 0 ? (
+              <p className="text-gray-400 text-sm py-8 text-center">Aucune commande sur cette période</p>
+            ) : (
+              <div className="space-y-3">
+                {data.topCountries.map((c, i) => (
+                  <div key={c.code} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-gray-400">#{i + 1}</span>
+                      <span className="font-medium text-sm">{c.code}</span>
+                    </div>
+                    <span className="text-sm font-semibold">{c.count} commandes</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -242,84 +293,55 @@ function TrafficTab() {
   );
 }
 
-/* ─────────── SOURCES TAB ─────────── */
+/* ─────────── TRAFFIC TAB (manual data — needs own tracking or Meta API) ─────────── */
+function TrafficTab() {
+  return (
+    <Card className="bg-white">
+      <CardHeader>
+        <CardTitle className="text-base">Données de trafic</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-center py-12 text-gray-500">
+          <Eye className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+          <p className="text-lg font-medium mb-2">Données de trafic non disponibles via API</p>
+          <p className="text-sm max-w-md mx-auto">
+            Shopify ne permet pas d'accéder aux données de trafic (visiteurs, sessions, bounce rate) via API.
+            Pour automatiser ces données, connecte l'<strong>API Meta Marketing</strong> ou implémente un tracking interne.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+/* ─────────── SOURCES TAB (manual) ─────────── */
 function SourcesTab() {
-  const sources = [
-    { source: "Direct", visitors: 85, pct: "40%" },
-    { source: "Meta Ads (Facebook/Instagram)", visitors: 78, pct: "37%" },
-    { source: "Google Organic", visitors: 25, pct: "12%" },
-    { source: "Social (TikTok, Reddit, etc.)", visitors: 15, pct: "7%" },
-    { source: "Referral", visitors: 8, pct: "4%" },
-  ];
-
   return (
     <Card className="bg-white">
-      <CardHeader><CardTitle className="text-base">Sources de trafic</CardTitle></CardHeader>
+      <CardHeader>
+        <CardTitle className="text-base">Sources de trafic</CardTitle>
+      </CardHeader>
       <CardContent>
-        <div className="space-y-3">
-          {sources.map((s) => (
-            <div key={s.source} className="flex items-center justify-between">
-              <span className="text-sm">{s.source}</span>
-              <div className="flex items-center gap-3">
-                <div className="w-32 bg-gray-100 rounded-full h-2">
-                  <div className="bg-blue-500 h-2 rounded-full" style={{ width: s.pct }} />
-                </div>
-                <span className="text-sm font-semibold w-12 text-right">{s.visitors}</span>
-                <span className="text-xs text-gray-400 w-10 text-right">{s.pct}</span>
-              </div>
-            </div>
-          ))}
+        <div className="text-center py-12 text-gray-500">
+          <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+          <p className="text-lg font-medium mb-2">Sources non disponibles automatiquement</p>
+          <p className="text-sm max-w-md mx-auto">
+            Connecte l'<strong>API Meta Marketing</strong> pour récupérer les données de campagnes publicitaires,
+            ou fournis tes captures d'écran pour une mise à jour manuelle.
+          </p>
         </div>
       </CardContent>
     </Card>
   );
 }
 
-/* ─────────── SALES TAB ─────────── */
-function SalesTab() {
-  const funnelData = [
-    { stage: "Visiteurs", count: 211, pct: "100%" },
-    { stage: "Page produit", count: 123, pct: "58.3%" },
-    { stage: "Ajout panier", count: 12, pct: "5.7%" },
-    { stage: "Checkout", count: 13, pct: "6.2%" },
-    { stage: "Achat", count: 0, pct: "0%" },
-  ];
-
-  return (
-    <Card className="bg-white">
-      <CardHeader><CardTitle className="text-base">Funnel de conversion</CardTitle></CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {funnelData.map((f, i) => (
-            <div key={f.stage}>
-              <div className="flex justify-between text-sm mb-1">
-                <span>{f.stage}</span>
-                <span className="font-semibold">{f.count} <span className="text-gray-400 font-normal">({f.pct})</span></span>
-              </div>
-              <div className="w-full bg-gray-100 rounded-full h-3">
-                <div
-                  className="h-3 rounded-full transition-all"
-                  style={{
-                    width: `${(f.count / 211) * 100}%`,
-                    backgroundColor: i === 0 ? "#06b6d4" : i === 1 ? "#6366f1" : i === 2 ? "#f59e0b" : i === 3 ? "#8b5cf6" : "#ef4444",
-                  }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-/* ─────────── META ADS TAB ─────────── */
+/* ─────────── META ADS TAB (manual data) ─────────── */
 function MetaTab() {
   return (
     <Card className="bg-white">
       <CardHeader>
         <CardTitle className="text-base">Événements Meta Pixel</CardTitle>
-        <p className="text-sm text-gray-500">Pixel ID: 2093867758129616</p>
+        <p className="text-sm text-gray-500">Pixel ID: 2093867758129616 — <span className="text-orange-500 font-medium">Données manuelles</span></p>
       </CardHeader>
       <CardContent>
         <div className="h-72">
