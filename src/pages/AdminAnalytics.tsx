@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Users, Eye, ShoppingCart, CreditCard, Clock, TrendingDown, FileText, Smartphone, Monitor, Tablet, DollarSign, Package, RefreshCw, Loader2 } from "lucide-react";
+import { Users, Eye, ShoppingCart, CreditCard, TrendingDown, FileText, DollarSign, RefreshCw, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, BarChart, Bar,
+  BarChart, Bar,
 } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -24,14 +24,6 @@ interface ShopifyAnalytics {
   topProducts: Array<{ title: string; quantity: number; revenue: number }>;
   topCountries: Array<{ code: string; count: number }>;
 }
-
-/* ── Device split (from Meta Pixel — still manual for now) ── */
-const deviceData = [
-  { name: "Mobile", value: 62, color: "#6366f1" },
-  { name: "Desktop", value: 34, color: "#06b6d4" },
-  { name: "Tablet", value: 4, color: "#f59e0b" },
-];
-const DEVICE_ICONS: Record<string, React.ElementType> = { Mobile: Smartphone, Desktop: Monitor, Tablet: Tablet };
 
 /* ── Meta Pixel events (manual until Meta API connected) ── */
 const pixelEvents = [
@@ -72,14 +64,6 @@ export default function AdminAnalytics() {
     setLoading(true);
     setError(null);
     try {
-      const { data: result, error: fnError } = await supabase.functions.invoke("shopify-analytics", {
-        body: null,
-        method: "GET",
-        headers: {},
-      });
-      
-      // supabase.functions.invoke uses POST by default, let's use fetch directly
-      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
       
