@@ -1,32 +1,55 @@
 
 
-## Remplacer l'image Hero par la vidéo demo
+## Renforcer la confiance dans le Cart Drawer
 
-### Concept
-Utiliser `demo-video.mp4` (actuellement dans la section "Sleep with dignity") comme fond vidéo du Hero, en remplacement de `hero-banner.jpg`. La vidéo tourne en boucle, muette, en autoplay — exactement comme les sites e-commerce premium.
+### Constat
+Le drawer a deja des badges basiques (icones paiement, SSL, livraison gratuite, garantie 90j) mais ils sont petits, en bas, et peu visibles. Avec un bounce rate de 82% et seulement 12 AddToCart sur 211 visiteurs, chaque micro-hesitation dans le panier coute cher.
 
-### Modifications — fichier unique : `src/components/Hero.tsx`
+### Propositions (par ordre d'impact)
 
-**Mobile Hero :**
-- Remplacer le `<img src={heroBanner}>` par un `<video>` avec `autoPlay`, `loop`, `muted`, `playsInline`
-- Source : `demoVideo` (import existant dans le projet via `@/assets/demo-video.mp4`)
-- Conserver le badge "Best Seller" et le compteur live en overlay
-- Garder le même ratio `aspect-[4/3]` et `object-cover`
+**1. Bandeau de reassurance en haut du panier**
+Juste sous le header du drawer, ajouter un bandeau vert/dore compact :
+`"Free shipping + 90-day money-back guarantee"`
+Visible immediatement a l'ouverture, avant meme de voir les articles.
 
-**Desktop Hero :**
-- Remplacer le `<img src={heroBanner}>` par un `<video>` identique
-- Conserver le gradient overlay `bg-gradient-to-r from-background via-background/70 to-background/20`
-- Conserver `object-cover` et le positionnement plein écran
+**2. Mini social proof**
+Sous le bandeau : `"4.9/5 — 12,000+ happy sleepers"` avec des etoiles dorees.
+Rappel de la preuve sociale du Hero directement dans le contexte d'achat.
 
-**Import :**
-- Ajouter `import demoVideo from "@/assets/demo-video.mp4"`
-- Supprimer `import heroBanner` (devenu inutile)
+**3. Barre de progression livraison gratuite**
+Si le seuil est atteint : `"You qualify for FREE shipping!"` avec une barre pleine en or.
+Renforce le sentiment de bonne affaire.
 
-### Considérations techniques
-- `playsInline` est essentiel pour iOS (sinon la vidéo s'ouvre en plein écran)
-- `muted` est requis pour l'autoplay sur tous les navigateurs
-- Poster fallback : on peut garder `heroBanner` comme attribut `poster` de la balise `<video>` pour afficher l'image pendant le chargement — meilleure UX
+**4. Mini-temoignage rotatif**
+Un court temoignage (1 ligne) au-dessus du bouton checkout, par exemple :
+`"Best pillow I've ever bought!" — Sarah T.`
+Change toutes les 5 secondes entre 2-3 temoignages.
 
-### Résultat attendu
-Un Hero dynamique et engageant avec la vidéo de démo du produit en fond, tout en conservant les overlays texte, badges et CTA existants.
+**5. Bouton checkout plus rassurant**
+Remplacer l'icone ExternalLink (qui suggere "vous quittez le site") par un cadenas Lock + texte "Secure Checkout".
+
+### Fichier modifie
+- `src/components/ShopifyCartDrawer.tsx` uniquement
+- Traductions ajoutees dans `src/i18n/translations.ts`
+
+### Structure visuelle du drawer apres modification
+
+```text
+┌─────────────────────────┐
+│  Your Cart (1 item)     │
+├─────────────────────────┤
+│ ✅ Free shipping + 90d  │  ← nouveau bandeau
+│ ⭐ 4.9/5 — 12,000+     │  ← social proof
+├─────────────────────────┤
+│ [img] Sleep&zy DUO PACK │
+│       $59.90            │
+├─────────────────────────┤
+│ "Best pillow!" —Sarah   │  ← mini temoignage
+├─────────────────────────┤
+│ Total         $59.90    │
+│ [🔒 Secure Checkout]    │  ← Lock au lieu de ExternalLink
+│ VISA MC AMEX GPay PP    │
+│ 🔐 SSL Encrypted        │
+└─────────────────────────┘
+```
 
