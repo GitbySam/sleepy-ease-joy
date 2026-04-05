@@ -481,7 +481,7 @@ export const translations = {
   "cart.transportBag": { en: "Transport Bag included", fr: "Sac de transport inclus", es: "Bolsa de transporte incluida" },
   "cart.total": { en: "Total", fr: "Total", es: "Total" },
   "cart.checkout": { en: "Secure Checkout", fr: "Paiement sécurisé", es: "Pago seguro" },
-  "cart.trustBanner": { en: "Free shipping + 90-day money-back guarantee", fr: "Livraison gratuite + Garantie remboursée 90 jours", es: "Envío gratis + Garantía de devolución de 90 días" },
+  "cart.trustBanner": { en: "Free shipping + 30-day money-back guarantee", fr: "Livraison gratuite + Garantie remboursée 30 jours", es: "Envío gratis + Garantía de devolución de 30 días" },
   "cart.socialProof": { en: "4.9/5 — 12,000+ happy sleepers", fr: "4.9/5 — 12 000+ dormeurs satisfaits", es: "4.9/5 — 12 000+ durmientes felices" },
   "cart.freeShippingQualified": { en: "You qualify for FREE shipping!", fr: "Vous bénéficiez de la livraison GRATUITE !", es: "¡Calificas para envío GRATIS!" },
   "cart.testimonial1": { en: '"Best pillow I\'ve ever bought!" — Sarah T.', fr: '"Le meilleur oreiller que j\'ai acheté !" — Sarah T.', es: '"¡La mejor almohada que he comprado!" — Sarah T.' },
