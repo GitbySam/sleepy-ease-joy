@@ -1,4 +1,7 @@
-import { corsHeaders } from '@supabase/supabase-js/cors'
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 const SHOPIFY_STORE_DOMAIN = 'kdpwn5-0h.myshopify.com';
 const SHOPIFY_API_VERSION = '2025-07';
