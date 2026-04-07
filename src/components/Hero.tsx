@@ -92,11 +92,11 @@ const Hero = () => {
     <>
       {/* ========== MOBILE HERO ========== */}
       <section className="md:hidden flex flex-col pt-[56px]">
-        {/* Image — compact 4:3 with badge overlay */}
+        {/* Video — full-width, immersive */}
         <motion.div
-          initial={{ scale: 1.08, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1, ease: "easeOut" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
           className="relative w-full aspect-[4/3] overflow-hidden"
         >
           <DeferredVideo
@@ -104,69 +104,53 @@ const Hero = () => {
             poster={heroBanner}
             className="w-full h-full object-cover object-center"
           />
-          {/* Best Seller badge */}
-          <span className="absolute top-3 left-3 bg-gold text-primary-foreground text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-md">
-            {t("hero.badge")}
-          </span>
-          {/* Live viewers */}
-          <span className="absolute bottom-3 left-3 bg-foreground/80 text-background text-[10px] font-semibold px-2.5 py-1 rounded-full backdrop-blur-sm flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
-            🔥 {viewerCount} {t("hero.viewingNow")}
-          </span>
+          {/* Gradient overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
+          {/* Overlaid content — minimal, focused */}
+          <div className="absolute bottom-0 left-0 right-0 p-5 space-y-3">
+            {/* Stars — compact proof */}
+            <div className="flex items-center gap-1.5">
+              <StarRating size="small" />
+              <span className="text-[11px] text-white/80 font-sans-body">{t("hero.reviews")}</span>
+            </div>
+
+            {/* Title — short, high contrast */}
+            <h1 className="text-[22px] font-serif font-bold leading-[1.15] text-white">
+              {t("hero.title1")} <span className="text-gold italic">{t("hero.title2")}</span>
+            </h1>
+
+            {/* Price — single line */}
+            <div className="flex items-baseline gap-2">
+              <span className="text-lg font-bold text-gold font-sans-body">{t("hero.priceNew")}</span>
+              <span className="text-sm text-white/60 line-through font-sans-body">{t("hero.priceOld")}</span>
+              <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-50%</span>
+            </div>
+          </div>
         </motion.div>
 
-        {/* Content */}
-        <div className="px-5 py-4 bg-background">
-          <motion.div
-            variants={stagger}
-            initial="hidden"
-            animate="visible"
-            className="space-y-3"
-          >
-            {/* Social proof FIRST */}
-            <motion.div variants={fadeUp} className="flex items-center gap-2">
-              <StarRating size="small" />
-              <span className="text-xs text-muted-foreground font-sans-body">{t("hero.reviews")}</span>
-            </motion.div>
+        {/* CTA zone — isolated, maximum visibility */}
+        <div className="px-5 py-4 bg-background space-y-3">
+          <Link to="/product" className="block">
+            <motion.span
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.4 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-gold text-primary-foreground px-6 py-4 rounded-full text-sm font-bold shadow-gold-glow inline-flex items-center justify-center gap-2 uppercase tracking-wider w-full"
+            >
+              {t("hero.cta")}
+            </motion.span>
+          </Link>
 
-            {/* Subtitle */}
-            <motion.p variants={fadeUp} className="text-[10px] font-sans-body uppercase tracking-[0.25em] text-muted-foreground">
-              {t("hero.subtitle")}
-            </motion.p>
-
-            {/* Title — short, punchy */}
-            <motion.h1 variants={fadeUp} className="text-[22px] font-serif font-bold leading-[1.15] text-foreground">
-              {t("hero.title1")} <span className="text-gold italic">{t("hero.title2")}</span>
-            </motion.h1>
-
-            {/* Price anchor */}
-            <motion.div variants={fadeUp} className="flex items-baseline gap-2">
-              <span className="text-xl font-bold text-gold font-sans-body">{t("hero.priceNew")}</span>
-              <span className="text-sm text-muted-foreground line-through font-sans-body">{t("hero.priceOld")}</span>
-              <span className="bg-red-500/10 text-red-500 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">-50%</span>
-            </motion.div>
-
-            {/* CTA */}
-            <motion.div variants={fadeUp}>
-              <Link to="/product" className="block">
-                <motion.span
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-gold text-primary-foreground px-6 py-3.5 rounded-full text-sm font-bold shadow-gold-glow inline-flex items-center justify-center gap-2 uppercase tracking-wider w-full"
-                >
-                  {t("hero.cta")}
-                </motion.span>
-              </Link>
-            </motion.div>
-
-            {/* Micro-reassurances */}
-            <motion.div variants={fadeUp} className="flex items-center justify-center gap-4 text-[11px] text-muted-foreground font-sans-body">
-              <span>{t("hero.freeShipping")}</span>
-              <span className="w-px h-3 bg-border" />
-              <span>{t("hero.securePayment")}</span>
-              <span className="w-px h-3 bg-border" />
-              <span>✅ {t("hero.guarantee")}</span>
-            </motion.div>
-          </motion.div>
+          {/* Micro-reassurances — below CTA, secondary */}
+          <div className="flex items-center justify-center gap-3 text-[10px] text-muted-foreground font-sans-body">
+            <span>{t("hero.freeShipping")}</span>
+            <span className="w-px h-3 bg-border" />
+            <span>{t("hero.securePayment")}</span>
+            <span className="w-px h-3 bg-border" />
+            <span>✅ {t("hero.guarantee")}</span>
+          </div>
         </div>
       </section>
 
