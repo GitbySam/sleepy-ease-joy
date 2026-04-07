@@ -16,19 +16,19 @@ export const translations = {
 
   // Hero
   "hero.subtitle": {
-    en: "The anti-embarrassment travel pillow",
-    fr: "L'oreiller de voyage anti-gêne",
-    es: "La almohada de viaje anti-vergüenza",
+    en: "The travel pillow that keeps your head up",
+    fr: "L'oreiller de voyage qui maintient votre tête",
+    es: "La almohada de viaje que mantiene tu cabeza",
   },
   "hero.title1": {
-    en: "Drool-free. Lean-free.",
-    fr: "Sans bave. Sans appui.",
-    es: "Sin babas. Sin apoyarse.",
+    en: "Stop falling asleep",
+    fr: "Arrêtez de vous endormir",
+    es: "Deja de quedarte dormido",
   },
   "hero.title2": {
-    en: "Shame-free.",
-    fr: "Sans honte.",
-    es: "Sin vergüenza.",
+    en: "on strangers.",
+    fr: "sur des inconnus.",
+    es: "sobre extraños.",
   },
   "hero.desc": {
     en: "Mouth open. Head on a stranger's shoulder. Drool on your shirt. We've all been there. Sleep&zy keeps your head locked in place so you sleep with dignity.",
@@ -41,14 +41,14 @@ export const translations = {
     es: "Comprar ahora — -50%",
   },
   "hero.reviews": {
-    en: "4.9/5 — 12,000+ reviews",
-    fr: "4.9/5 — 12 000+ avis",
-    es: "4.9/5 — 12 000+ opiniones",
+    en: "4.8/5 — 2,400+ reviews",
+    fr: "4.8/5 — 2 400+ avis",
+    es: "4.8/5 — 2 400+ opiniones",
   },
   "hero.guarantee": {
-    en: "90-day dignity-back guarantee",
-    fr: "Garantie dignité remboursée 90 jours",
-    es: "Garantía de dignidad de 90 días",
+    en: "30-day money-back guarantee",
+    fr: "Garantie satisfait ou remboursé 30 jours",
+    es: "Garantía de devolución de 30 días",
   },
   "hero.badge": {
     en: "Best Seller 🏆",
@@ -155,9 +155,9 @@ export const translations = {
 
   // Testimonials
   "testimonials.subtitle": {
-    en: "12,000+ dignified sleepers",
-    fr: "12 000+ dormeurs dignes",
-    es: "12 000+ durmientes dignos",
+    en: "2,400+ dignified sleepers",
+    fr: "2 400+ dormeurs dignes",
+    es: "2 400+ durmientes dignos",
   },
   "testimonials.title": {
     en: "Real stories, real <gold>saves</gold>",
@@ -224,7 +224,7 @@ export const translations = {
   },
   "bundle.securePayment": { en: "🔒 Secure payment", fr: "🔒 Paiement sécurisé", es: "🔒 Pago seguro" },
   "bundle.freeShipping": { en: "🚚 Free shipping", fr: "🚚 Livraison gratuite", es: "🚚 Envío gratis" },
-  "bundle.guarantee": { en: "↩️ 90-day guarantee", fr: "↩️ Garantie 90 jours", es: "↩️ Garantía 90 días" },
+  "bundle.guarantee": { en: "↩️ 30-day guarantee", fr: "↩️ Garantie 30 jours", es: "↩️ Garantía 30 días" },
 
   // FAQ
   "faq.subtitle": { en: "Got questions?", fr: "Des questions ?", es: "¿Tienes preguntas?" },
@@ -289,9 +289,9 @@ export const translations = {
     es: "¿Cuál es la política de devoluciones?",
   },
   "faq.6.a": {
-    en: "We offer a 90-day dignity-back guarantee. If you're not 100% satisfied, send it back for a full refund, no questions asked.",
-    fr: "Nous offrons une garantie dignité remboursée de 90 jours. Si vous n'êtes pas 100% satisfait, renvoyez-le pour un remboursement complet, sans questions.",
-    es: "Ofrecemos una garantía de dignidad de 90 días. Si no estás 100% satisfecho, devuélvelo para un reembolso completo, sin preguntas.",
+    en: "We offer a 30-day money-back guarantee. If you're not 100% satisfied, send it back for a full refund, no questions asked.",
+    fr: "Nous offrons une garantie satisfait ou remboursé de 30 jours. Si vous n'êtes pas 100% satisfait, renvoyez-le pour un remboursement complet, sans questions.",
+    es: "Ofrecemos una garantía de devolución de 30 días. Si no estás 100% satisfecho, devuélvelo para un reembolso completo, sin preguntas.",
   },
 
   // Footer
@@ -329,7 +329,7 @@ export const translations = {
     fr: "Stock faible — Plus que 8",
     es: "Stock bajo — Solo quedan 8",
   },
-  "product.reviews": { en: "(12,000+ reviews)", fr: "(12 000+ avis)", es: "(12 000+ opiniones)" },
+  "product.reviews": { en: "(2,400+ reviews)", fr: "(2 400+ avis)", es: "(2 400+ opiniones)" },
   "product.color": { en: "Color", fr: "Couleur", es: "Color" },
   "product.selected": { en: "SELECTED", fr: "SÉLECTIONNÉ", es: "SELECCIONADO" },
   "product.yourPrice": { en: "Your price:", fr: "Votre prix :", es: "Tu precio:" },
@@ -337,7 +337,7 @@ export const translations = {
   "product.addedToCart": { en: "added to cart", fr: "ajouté au panier", es: "añadido al carrito" },
   "product.securePayment": { en: "Secure payment", fr: "Paiement sécurisé", es: "Pago seguro" },
   "product.freeShipping": { en: "Free shipping", fr: "Livraison gratuite", es: "Envío gratis" },
-  "product.guarantee90": { en: "90-day guarantee", fr: "Garantie 90 jours", es: "Garantía 90 días" },
+  "product.guarantee90": { en: "30-day guarantee", fr: "Garantie 30 jours", es: "Garantía 30 días" },
   "product.sslEncryption": {
     en: "Secure checkout with SSL encryption",
     fr: "Paiement sécurisé avec chiffrement SSL",
@@ -414,9 +414,9 @@ export const translations = {
     es: "No gracias, me gusta que me fotografíen babeando",
   },
   "inactivity.trust": {
-    en: "Secure payment • Free shipping • 90-day guarantee",
-    fr: "Paiement sécurisé • Livraison gratuite • Garantie 90 jours",
-    es: "Pago seguro • Envío gratis • Garantía 90 días",
+    en: "Secure payment • Free shipping • 30-day guarantee",
+    fr: "Paiement sécurisé • Livraison gratuite • Garantie 30 jours",
+    es: "Pago seguro • Envío gratis • Garantía 30 días",
   },
 
   // UpsellPopup
@@ -482,7 +482,7 @@ export const translations = {
   "cart.total": { en: "Total", fr: "Total", es: "Total" },
   "cart.checkout": { en: "Secure Checkout", fr: "Paiement sécurisé", es: "Pago seguro" },
   "cart.trustBanner": { en: "Free shipping + 30-day money-back guarantee", fr: "Livraison gratuite + Garantie remboursée 30 jours", es: "Envío gratis + Garantía de devolución de 30 días" },
-  "cart.socialProof": { en: "4.9/5 — 12,000+ happy sleepers", fr: "4.9/5 — 12 000+ dormeurs satisfaits", es: "4.9/5 — 12 000+ durmientes felices" },
+  "cart.socialProof": { en: "4.8/5 — 2,400+ happy sleepers", fr: "4.8/5 — 2 400+ dormeurs satisfaits", es: "4.8/5 — 2 400+ durmientes felices" },
   "cart.freeShippingQualified": { en: "You qualify for FREE shipping!", fr: "Vous bénéficiez de la livraison GRATUITE !", es: "¡Calificas para envío GRATIS!" },
   "cart.testimonial1": { en: '"Best pillow I\'ve ever bought!" — Sarah T.', fr: '"Le meilleur oreiller que j\'ai acheté !" — Sarah T.', es: '"¡La mejor almohada que he comprado!" — Sarah T.' },
   "cart.testimonial2": { en: '"Game changer for long flights" — Mike R.', fr: '"Un must pour les longs vols" — Mike R.', es: '"Un cambio total para vuelos largos" — Mike R.' },
@@ -506,7 +506,7 @@ export const translations = {
   // Trust Bar
   "trustBar.freeShipping": { en: "Free Shipping", fr: "Livraison gratuite", es: "Envío gratis" },
   "trustBar.securePayment": { en: "Secure Payment", fr: "Paiement sécurisé", es: "Pago seguro" },
-  "trustBar.guarantee": { en: "90-Day Guarantee", fr: "Garantie 90 jours", es: "Garantía 90 días" },
+  "trustBar.guarantee": { en: "30-Day Guarantee", fr: "Garantie 30 jours", es: "Garantía 30 días" },
   "trustBar.ssl": { en: "SSL Encrypted", fr: "Chiffrement SSL", es: "Cifrado SSL" },
 
   // Bundle Countdown
@@ -523,9 +523,9 @@ export const translations = {
     es: "¿Listo/a para dormir con dignidad?",
   },
   "ctaBridge.desc": {
-    en: "Join 12,000+ travelers who stopped being embarrassed. 90-day money-back guarantee.",
-    fr: "Rejoignez 12 000+ voyageurs qui ont cessé d'être gênés. Garantie satisfait ou remboursé 90 jours.",
-    es: "Únete a 12 000+ viajeros que dejaron de pasar vergüenza. Garantía de 90 días.",
+    en: "Join 2,400+ travelers who stopped being embarrassed. 30-day money-back guarantee.",
+    fr: "Rejoignez 2 400+ voyageurs qui ont cessé d'être gênés. Garantie satisfait ou remboursé 30 jours.",
+    es: "Únete a 2 400+ viajeros que dejaron de pasar vergüenza. Garantía de 30 días.",
   },
   "ctaBridge.cta": {
     en: "Shop now — 50% off",

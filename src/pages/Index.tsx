@@ -7,7 +7,6 @@ import InactivityPopup from "@/components/InactivityPopup";
 import StickyMobileCTA from "@/components/StickyMobileCTA";
 import ScrollToTop from "@/components/ScrollToTop";
 
-const Marquee = lazy(() => import("@/components/Marquee"));
 const InAction = lazy(() => import("@/components/InAction"));
 const ComparisonSlider = lazy(() => import("@/components/ComparisonSlider"));
 const ShopifyProducts = lazy(() => import("@/components/ShopifyProducts"));
@@ -29,7 +28,6 @@ const Index = () => (
       <Hero />
       <TrustBar />
       <Suspense fallback={null}>
-        <Marquee />
         <ComparisonSlider />
         <InAction />
         <ShopifyProducts />
