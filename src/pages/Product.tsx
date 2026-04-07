@@ -4,6 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check, ShieldCheck, Truck, RotateCcw, Clock, Loader2, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import pillowHero from "@/assets/product-pillow-grey.png";
+import inUse1 from "@/assets/product-inuse-1.jpg";
+import inUse2 from "@/assets/product-inuse-2.jpg";
+import inUse3 from "@/assets/product-inuse-3.jpg";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchProducts, type ShopifyProduct, applyDiscountToCart } from "@/lib/shopify";
 import { toast } from "sonner";
@@ -207,7 +210,24 @@ const Product = () => {
                 />
               </AnimatePresence>
             </div>
+
+            {/* In-use photos */}
+            <div className="grid grid-cols-3 gap-3 mt-4">
+              {[inUse1, inUse2, inUse3].map((src, i) => (
+                <div key={i} className="rounded-xl overflow-hidden border border-border">
+                  <img
+                    src={src}
+                    alt={`Sleep&zy in use ${i + 1}`}
+                    loading="lazy"
+                    width={640}
+                    height={640}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
           </motion.div>
+
 
           {/* RIGHT — Product Details */}
           <motion.div
