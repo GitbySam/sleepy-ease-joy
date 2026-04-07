@@ -195,15 +195,15 @@ const Hero = () => {
               {t("hero.subtitle")}
             </motion.p>
 
-            <motion.h1 variants={fadeUp} className="text-6xl lg:text-7xl font-serif font-bold leading-[1.1] text-foreground">
+            <motion.h1 variants={fadeUp} className="text-4xl lg:text-5xl font-serif font-bold leading-[1.1] text-foreground">
               {t("hero.title1")} <span className="text-gold italic">{t("hero.title2")}</span>
             </motion.h1>
 
             {/* Price anchor */}
             <motion.div variants={fadeUp} className="flex items-baseline gap-3">
-              <span className="text-3xl font-bold text-gold font-sans-body">{t("hero.priceNew")}</span>
-              <span className="text-lg text-muted-foreground line-through font-sans-body">{t("hero.priceOld")}</span>
-              <span className="bg-red-500/10 text-red-500 text-xs font-bold px-3 py-1 rounded-full uppercase">-50%</span>
+              <span className="text-2xl font-bold text-gold font-sans-body">{t("hero.priceNew")}</span>
+              <span className="text-base text-muted-foreground line-through font-sans-body">{t("hero.priceOld")}</span>
+              <span className="bg-red-500/10 text-red-500 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase">-50%</span>
             </motion.div>
 
             {/* CTA */}
