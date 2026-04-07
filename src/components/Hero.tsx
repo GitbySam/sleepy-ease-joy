@@ -91,7 +91,7 @@ const Hero = () => {
   return (
     <>
       {/* ========== MOBILE HERO ========== */}
-      <section className="md:hidden flex flex-col pt-[56px]">
+      <section className="md:hidden flex flex-col pt-[90px]">
         {/* Video — full-width, immersive */}
         <motion.div
           initial={{ opacity: 0 }}
