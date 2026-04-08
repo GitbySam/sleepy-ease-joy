@@ -1,11 +1,26 @@
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
 import { useLanguage } from "@/i18n/LanguageContext";
+import pillowGrey from "@/assets/product-pillow-grey-new.png";
+import pillowBlack from "@/assets/product-pillow-black.webp";
+import pillowRed from "@/assets/product-pillow-red.webp";
+
+const COLOR_IMAGES: Record<string, string> = {
+  Grey: pillowGrey,
+  Black: pillowBlack,
+  Red: pillowRed,
+};
+
+const COLOR_MAP: Record<string, string> = {
+  Grey: "#9CA3AF",
+  Black: "#1F2937",
+  Red: "#DC2626",
+};
 
 const ShopifyProducts = () => {
   const { t } = useLanguage();
