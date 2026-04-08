@@ -27,7 +27,7 @@ const Index = () => (
     <main>
       <Hero />
       <TrustBar />
-      <Suspense fallback={null}>
+      <Suspense fallback={<div style={{ minHeight: '4000px' }} />}>
         <ComparisonSlider />
         <InAction />
         <ShopifyProducts />
