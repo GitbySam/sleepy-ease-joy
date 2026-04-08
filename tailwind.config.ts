@@ -72,8 +72,8 @@ export default {
         },
       },
       fontFamily: {
-        serif: ["'Playfair Display'", "serif"],
-        sans: ["'DM Sans'", "sans-serif"],
+        serif: ["'Playfair Display'", "'Playfair Display Fallback'", "serif"],
+        sans: ["'DM Sans'", "'DM Sans Fallback'", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
