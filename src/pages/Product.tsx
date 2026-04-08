@@ -212,7 +212,7 @@ const Product = () => {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3 }}
-                  src={product?.node.images?.edges?.[0]?.node?.url || pillowHero}
+                  src={COLOR_IMAGES[selectedColor] || pillowGrey}
                   alt={`Sleep&zy Cervical Pillow - ${selectedColor}`}
                   className="w-full max-w-sm drop-shadow-xl animate-float"
                 />
