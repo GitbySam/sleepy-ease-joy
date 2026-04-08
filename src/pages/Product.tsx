@@ -61,6 +61,8 @@ function useCountdown(minutes: number) {
 const Product = () => {
   const [searchParams] = useSearchParams();
   const bundleParam = parseInt(searchParams.get("bundle") || "1", 10);
+  const colorParam = searchParams.get("color");
+  const initialColor = colorParam && ["Grey", "Black", "Red"].includes(colorParam) ? colorParam : "Grey";
   const promoCode = searchParams.get("promo") || null;
   const hasPromo = promoCode === "SLEEPZY10";
   const promoMultiplier = hasPromo ? 0.9 : 1;
@@ -68,7 +70,7 @@ const Product = () => {
   const [product, setProduct] = useState<ShopifyProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedQty, setSelectedQty] = useState(initialQty);
-  const [selectedColor, setSelectedColor] = useState("Grey");
+  const [selectedColor, setSelectedColor] = useState(initialColor);
   const countdown = useCountdown(15);
   const { t, lang } = useLanguage();
 
