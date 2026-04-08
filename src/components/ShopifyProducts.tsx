@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Loader2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
-import { useCartStore } from "@/stores/cartStore";
-import { toast } from "sonner";
 import { useLanguage } from "@/i18n/LanguageContext";
 import pillowGrey from "@/assets/product-pillow-grey-new.png";
 import pillowBlack from "@/assets/product-pillow-black.webp";
@@ -27,13 +25,12 @@ const COLORS = Object.keys(COLOR_MAP) as Array<keyof typeof COLOR_MAP>;
 interface ProductCardProps {
   product: ShopifyProduct;
   selectedColor: string;
-  onAddToCart: (product: ShopifyProduct) => void;
-  isLoading: boolean;
   t: (key: string) => string;
 }
 
-const ProductCard = ({ product, selectedColor, onAddToCart, isLoading, t }: ProductCardProps) => {
+const ProductCard = ({ product, selectedColor, t }: ProductCardProps) => {
   const price = product.node.priceRange.minVariantPrice;
+  const productUrl = `/product/${product.node.handle}?color=${selectedColor}`;
 
   return (
     <motion.div
@@ -42,7 +39,7 @@ const ProductCard = ({ product, selectedColor, onAddToCart, isLoading, t }: Prod
       viewport={{ once: true }}
       className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm hover:shadow-md transition-shadow w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] max-w-sm"
     >
-      <Link to={`/product/${product.node.handle}?color=${selectedColor}`}>
+      <Link to={productUrl}>
         <div className="aspect-square bg-muted/30 flex items-center justify-center overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.img
@@ -59,7 +56,7 @@ const ProductCard = ({ product, selectedColor, onAddToCart, isLoading, t }: Prod
         </div>
       </Link>
       <div className="p-5 space-y-3">
-        <Link to={`/product/${product.node.handle}?color=${selectedColor}`}>
+        <Link to={productUrl}>
           <h3 className="font-semibold text-foreground text-lg hover:text-gold transition-colors">
             {product.node.title}
           </h3>
@@ -72,20 +69,16 @@ const ProductCard = ({ product, selectedColor, onAddToCart, isLoading, t }: Prod
           <span className="text-xl font-bold text-foreground">
             ${parseFloat(price.amount).toFixed(2)}
           </span>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => onAddToCart(product)}
-            disabled={isLoading}
-            className="bg-gold text-primary-foreground px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 shadow-gold-glow disabled:opacity-50"
-          >
-            {isLoading ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <ShoppingBag size={16} />
-            )}
-            {t("products.add")}
-          </motion.button>
+          <Link to={productUrl}>
+            <motion.span
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-gold text-primary-foreground px-5 py-2 rounded-full text-sm font-semibold inline-flex items-center gap-2 shadow-gold-glow"
+            >
+              {t("products.shopNow")}
+              <ArrowRight size={16} />
+            </motion.span>
+          </Link>
         </div>
       </div>
     </motion.div>
@@ -97,8 +90,6 @@ const ShopifyProducts = () => {
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedColor, setSelectedColor] = useState("Grey");
-  const addItem = useCartStore((s) => s.addItem);
-  const isLoading = useCartStore((s) => s.isLoading);
 
   useEffect(() => {
     fetchProducts(20)
@@ -107,25 +98,11 @@ const ShopifyProducts = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleAddToCart = async (product: ShopifyProduct) => {
-    const variant = product.node.variants.edges[0]?.node;
-    if (!variant) return;
-    await addItem({
-      product,
-      variantId: variant.id,
-      variantTitle: variant.title,
-      price: variant.price,
-      quantity: 1,
-      selectedOptions: variant.selectedOptions || [],
-    });
-    toast.success(`${product.node.title} ${t("products.addedToCart")}`);
-  };
-
   if (loading) {
     return (
       <section className="py-20">
         <div className="container mx-auto px-6 text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
+          <div className="w-8 h-8 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin mx-auto" />
         </div>
       </section>
     );
@@ -180,8 +157,6 @@ const ShopifyProducts = () => {
               key={product.node.id}
               product={product}
               selectedColor={selectedColor}
-              onAddToCart={handleAddToCart}
-              isLoading={isLoading}
               t={t}
             />
           ))}
