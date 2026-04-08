@@ -5,14 +5,16 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Preconnect to Google Fonts for faster font loading -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <!-- Preconnect to font CDN and Shopify -->
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Preload critical font files to prevent layout shifts -->
+    <link rel="preconnect" href="https://kdpwn5-0h.myshopify.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin />
+    <!-- Preload critical font files -->
     <link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/dmsans/v17/rP2Yp2ywxg089UriI5-g4vlH9VoD8Cmcqbu0-K6z9mXg.woff2" />
     <link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/playfairdisplay/v40/nuFiD-vYSZviVYUb_rj3ij__anPXDTzYgEM86xQ.woff2" />
     <link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/playfairdisplay/v40/nuFkD-vYSZviVYUb_rj3ij__anPXDTnogkk7yRZrPA.woff2" />
-    <!-- Font files preloaded above; @font-face declarations inlined in index.css -->
+    <!-- Preload LCP hero image so browser discovers it before JS -->
+    <link rel="preload" as="image" type="image/webp" href="/hero-banner.webp" fetchpriority="high" />
     <title>Sleep&zy™ — The Ergonomic Cervical Travel Pillow</title>
     <meta name="description" content="Sleep like First Class with Sleep&zy™. The revolutionary travel pillow with 360° neck support. Free shipping & 90-day guarantee.">
     <meta name="author" content="Lovable" />
