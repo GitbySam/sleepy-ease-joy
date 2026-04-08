@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 interface LazyVideoProps {
   src: string;
@@ -29,6 +29,10 @@ const LazyVideo = ({ src, className, autoPlay = true, loop = true, muted = true,
     return () => observer.disconnect();
   }, []);
 
+  const handleCanPlay = useCallback((e: React.SyntheticEvent<HTMLVideoElement>) => {
+    if (autoPlay) e.currentTarget.play().catch(() => {});
+  }, [autoPlay]);
+
   return (
     <div ref={ref} className={className}>
       {isVisible && (
@@ -38,6 +42,8 @@ const LazyVideo = ({ src, className, autoPlay = true, loop = true, muted = true,
           loop={loop}
           muted={muted}
           playsInline={playsInline}
+          preload="none"
+          onCanPlay={handleCanPlay}
           className="w-full h-full object-cover"
         />
       )}
