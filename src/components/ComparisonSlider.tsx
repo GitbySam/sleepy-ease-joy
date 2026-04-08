@@ -15,7 +15,7 @@ const ComparisonSlider = () => {
 
   const scenes = [
     { img: null, video: headDropVideo, caption: t("comparison.headDrop"), emoji: "😩" },
-    { img: mouthOpen, video: null, caption: t("comparison.flyCatcher"), emoji: "😮" },
+    { img: null, video: mouthOpenVideo, caption: t("comparison.flyCatcher"), emoji: "😮" },
     { img: shoulder, video: null, caption: t("comparison.strangerCuddler"), emoji: "😳" },
     { img: drool, video: null, caption: t("comparison.droolTrail"), emoji: "🤤" },
   ];
