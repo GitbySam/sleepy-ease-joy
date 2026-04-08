@@ -3,7 +3,15 @@ import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ShieldCheck, Truck, RotateCcw, Clock, Loader2, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import pillowHero from "@/assets/product-pillow-grey.png";
+import pillowGrey from "@/assets/product-pillow-grey-new.png";
+import pillowBlack from "@/assets/product-pillow-black.webp";
+import pillowRed from "@/assets/product-pillow-red.webp";
+
+const COLOR_IMAGES: Record<string, string> = {
+  Grey: pillowGrey,
+  Black: pillowBlack,
+  Red: pillowRed,
+};
 import inUse1 from "@/assets/product-inuse-1.jpg";
 import inUse2 from "@/assets/product-inuse-2.jpg";
 import inUse3 from "@/assets/product-inuse-3.jpg";
