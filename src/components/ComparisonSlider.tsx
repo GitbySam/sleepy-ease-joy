@@ -4,7 +4,7 @@ import { Autoplay } from "swiper/modules";
 import headDropVideo from "@/assets/embarrassing-head-drop.mp4";
 import mouthOpenVideo from "@/assets/embarrassing-mouth-open.mp4";
 import shoulder from "@/assets/embarrassing-shoulder.webp";
-import drool from "@/assets/embarrassing-drool.webp";
+import droolVideo from "@/assets/drool-video.mp4";
 import LazyVideo from "@/components/LazyVideo";
 import { useLanguage } from "@/i18n/LanguageContext";
 // @ts-ignore
