@@ -102,7 +102,7 @@ const ShopifyProducts = () => {
     return (
       <section className="py-20">
         <div className="container mx-auto px-6 text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
+          <div className="w-8 h-8 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin mx-auto" />
         </div>
       </section>
     );
@@ -157,8 +157,6 @@ const ShopifyProducts = () => {
               key={product.node.id}
               product={product}
               selectedColor={selectedColor}
-              onAddToCart={handleAddToCart}
-              isLoading={isLoading}
               t={t}
             />
           ))}
