@@ -2,13 +2,11 @@ import { lazy, Suspense } from "react";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import TrustBar from "@/components/TrustBar";
-import SocialProofToasts from "@/components/SocialProofToasts";
-import InactivityPopup from "@/components/InactivityPopup";
 import StickyMobileCTA from "@/components/StickyMobileCTA";
 import ScrollToTop from "@/components/ScrollToTop";
 
-const InAction = lazy(() => import("@/components/InAction"));
 const ComparisonSlider = lazy(() => import("@/components/ComparisonSlider"));
+const InAction = lazy(() => import("@/components/InAction"));
 const ShopifyProducts = lazy(() => import("@/components/ShopifyProducts"));
 const Benefits = lazy(() => import("@/components/Benefits"));
 const Testimonials = lazy(() => import("@/components/Testimonials"));
@@ -16,30 +14,52 @@ const CtaBridge = lazy(() => import("@/components/CtaBridge"));
 const BundleOffer = lazy(() => import("@/components/BundleOffer"));
 const FAQ = lazy(() => import("@/components/FAQ"));
 const Footer = lazy(() => import("@/components/Footer"));
+const SocialProofToasts = lazy(() => import("@/components/SocialProofToasts"));
+const InactivityPopup = lazy(() => import("@/components/InactivityPopup"));
+
+const Placeholder = ({ height = "400px" }: { height?: string }) => (
+  <div style={{ minHeight: height }} />
+);
 
 const Index = () => (
   <>
     <Header />
-    <SocialProofToasts />
-    <InactivityPopup />
     <StickyMobileCTA />
     <ScrollToTop />
     <main>
       <Hero />
       <TrustBar />
-      <Suspense fallback={<div style={{ minHeight: '4000px' }} />}>
+      <Suspense fallback={<Placeholder height="600px" />}>
         <ComparisonSlider />
+      </Suspense>
+      <Suspense fallback={<Placeholder height="500px" />}>
         <InAction />
+      </Suspense>
+      <Suspense fallback={<Placeholder />}>
         <ShopifyProducts />
+      </Suspense>
+      <Suspense fallback={<Placeholder />}>
         <Benefits />
+      </Suspense>
+      <Suspense fallback={<Placeholder />}>
         <Testimonials />
+      </Suspense>
+      <Suspense fallback={<Placeholder height="200px" />}>
         <CtaBridge />
+      </Suspense>
+      <Suspense fallback={<Placeholder />}>
         <BundleOffer />
+      </Suspense>
+      <Suspense fallback={<Placeholder height="300px" />}>
         <FAQ />
       </Suspense>
     </main>
-    <Suspense fallback={<div style={{ minHeight: '300px' }} />}>
+    <Suspense fallback={<Placeholder height="300px" />}>
       <Footer />
+    </Suspense>
+    <Suspense fallback={null}>
+      <SocialProofToasts />
+      <InactivityPopup />
     </Suspense>
   </>
 );
