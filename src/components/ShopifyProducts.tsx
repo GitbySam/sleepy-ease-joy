@@ -90,7 +90,7 @@ const ProductCard = ({ product, onAddToCart, isLoading, t }: ProductCardProps) =
 
         <div className="flex items-center justify-between pt-2">
           <span className="text-xl font-bold text-foreground">
-            {parseFloat(price.amount).toFixed(2).replace(".", ",")} {price.currencyCode === "EUR" ? "€" : price.currencyCode}
+            ${parseFloat(price.amount).toFixed(2)}
           </span>
           <motion.button
             whileHover={{ scale: 1.05 }}
