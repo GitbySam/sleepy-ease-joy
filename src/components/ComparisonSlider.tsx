@@ -17,7 +17,7 @@ const ComparisonSlider = () => {
     { img: null, video: headDropVideo, caption: t("comparison.headDrop"), emoji: "😩" },
     { img: null, video: mouthOpenVideo, caption: t("comparison.flyCatcher"), emoji: "😮" },
     { img: shoulder, video: null, caption: t("comparison.strangerCuddler"), emoji: "😳" },
-    { img: drool, video: null, caption: t("comparison.droolTrail"), emoji: "🤤" },
+    { img: null, video: droolVideo, caption: t("comparison.droolTrail"), emoji: "🤤" },
   ];
 
   const titleParts = t("comparison.title").split(/<gold>|<\/gold>/);
