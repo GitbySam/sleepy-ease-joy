@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
-import heroBanner from "@/assets/hero-banner.jpg";
+import heroBanner from "@/assets/hero-banner.webp";
 import demoVideo from "@/assets/demo-video.mp4";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useViewerCount } from "@/hooks/useViewerCount";
@@ -38,7 +38,7 @@ const DeferredVideo = ({
   }, []);
 
   if (!ready) {
-    return <img src={poster} alt="" className={className} loading="eager" />;
+    return <img src={poster} alt="" className={className} loading="eager" fetchPriority="high" />;
   }
 
   return (
