@@ -38,7 +38,7 @@ const Index = () => (
         <FAQ />
       </Suspense>
     </main>
-    <Suspense fallback={null}>
+    <Suspense fallback={<div style={{ minHeight: '300px' }} />}>
       <Footer />
     </Suspense>
   </>
