@@ -26,13 +26,13 @@ const COLORS = Object.keys(COLOR_MAP) as Array<keyof typeof COLOR_MAP>;
 
 interface ProductCardProps {
   product: ShopifyProduct;
+  selectedColor: string;
   onAddToCart: (product: ShopifyProduct) => void;
   isLoading: boolean;
   t: (key: string) => string;
 }
 
-const ProductCard = ({ product, onAddToCart, isLoading, t }: ProductCardProps) => {
-  const [selectedColor, setSelectedColor] = useState("Grey");
+const ProductCard = ({ product, selectedColor, onAddToCart, isLoading, t }: ProductCardProps) => {
   const price = product.node.priceRange.minVariantPrice;
 
   return (
@@ -42,7 +42,7 @@ const ProductCard = ({ product, onAddToCart, isLoading, t }: ProductCardProps) =
       viewport={{ once: true }}
       className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm hover:shadow-md transition-shadow w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] max-w-sm"
     >
-      <Link to={`/product/${product.node.handle}`}>
+      <Link to={`/product/${product.node.handle}?color=${selectedColor}`}>
         <div className="aspect-square bg-muted/30 flex items-center justify-center overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.img
@@ -59,7 +59,7 @@ const ProductCard = ({ product, onAddToCart, isLoading, t }: ProductCardProps) =
         </div>
       </Link>
       <div className="p-5 space-y-3">
-        <Link to={`/product/${product.node.handle}`}>
+        <Link to={`/product/${product.node.handle}?color=${selectedColor}`}>
           <h3 className="font-semibold text-foreground text-lg hover:text-gold transition-colors">
             {product.node.title}
           </h3>
@@ -67,26 +67,6 @@ const ProductCard = ({ product, onAddToCart, isLoading, t }: ProductCardProps) =
         <p className="text-muted-foreground text-sm line-clamp-2">
           {product.node.description}
         </p>
-
-        {/* Color selector */}
-        <div className="flex items-center gap-2">
-          {COLORS.map((color) => (
-            <button
-              key={color}
-              onClick={(e) => {
-                e.preventDefault();
-                setSelectedColor(color);
-              }}
-              className={`w-7 h-7 rounded-full border-2 transition-all ${
-                selectedColor === color
-                  ? "border-gold scale-110 shadow-md"
-                  : "border-border hover:scale-105"
-              }`}
-              style={{ backgroundColor: COLOR_MAP[color] }}
-              title={color}
-            />
-          ))}
-        </div>
 
         <div className="flex items-center justify-between pt-2">
           <span className="text-xl font-bold text-foreground">
@@ -116,6 +96,7 @@ const ShopifyProducts = () => {
   const { t } = useLanguage();
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedColor, setSelectedColor] = useState("Grey");
   const addItem = useCartStore((s) => s.addItem);
   const isLoading = useCartStore((s) => s.isLoading);
 
@@ -168,12 +149,41 @@ const ShopifyProducts = () => {
   return (
     <section id="products" className="py-20 gradient-section-warm">
       <div className="container mx-auto px-6">
-        <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-12">
+        <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-4">
           {t("products.title")}
         </h2>
+
+        {/* Global color selector */}
+        <div className="flex items-center justify-center gap-3 mb-12">
+          {COLORS.map((color) => (
+            <button
+              key={color}
+              onClick={() => setSelectedColor(color)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full border-2 transition-all text-sm font-medium ${
+                selectedColor === color
+                  ? "border-gold bg-gold/10 text-foreground shadow-md scale-105"
+                  : "border-border text-muted-foreground hover:border-gold/50 hover:scale-105"
+              }`}
+            >
+              <span
+                className="w-4 h-4 rounded-full border border-border/50"
+                style={{ backgroundColor: COLOR_MAP[color] }}
+              />
+              {color}
+            </button>
+          ))}
+        </div>
+
         <div className="flex flex-wrap justify-center gap-8">
           {products.map((product) => (
-            <ProductCard key={product.node.id} product={product} onAddToCart={handleAddToCart} isLoading={isLoading} t={t} />
+            <ProductCard
+              key={product.node.id}
+              product={product}
+              selectedColor={selectedColor}
+              onAddToCart={handleAddToCart}
+              isLoading={isLoading}
+              t={t}
+            />
           ))}
         </div>
       </div>
