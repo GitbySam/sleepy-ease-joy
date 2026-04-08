@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
 import { useLanguage } from "@/i18n/LanguageContext";
