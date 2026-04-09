@@ -15,6 +15,7 @@ const COLOR_IMAGES: Record<string, string> = {
 import inUse1 from "@/assets/product-inuse-1.jpg";
 import inUse2 from "@/assets/product-inuse-2.jpg";
 import inUse3 from "@/assets/product-inuse-3.jpg";
+import inUseCar from "@/assets/lifestyle-car.jpg";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchProducts, type ShopifyProduct, applyDiscountToCart } from "@/lib/shopify";
 import { toast } from "sonner";
