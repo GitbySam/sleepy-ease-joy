@@ -68,9 +68,7 @@ const Header = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="hidden md:block">
-              <LanguageSwitcher />
-            </div>
+            {/* LanguageSwitcher hidden but system still active */}
             <Link to="/product" className="hidden md:block">
               <motion.span
                 whileHover={{ scale: 1.05 }}
@@ -128,9 +126,7 @@ const Header = () => {
                 )
               )}
 
-              <div className="mt-4 pt-4 border-t border-border w-40 flex justify-center">
-                <LanguageSwitcher />
-              </div>
+              {/* LanguageSwitcher hidden but system still active */}
 
               <Link to="/product" onClick={() => setMenuOpen(false)} className="mt-4">
                 <motion.span
