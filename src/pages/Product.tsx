@@ -223,8 +223,8 @@ const Product = () => {
             </div>
 
             {/* In-use photos */}
-            <div className="grid grid-cols-3 gap-3 mt-4">
-              {[inUse1, inUse2, inUse3].map((src, i) => (
+            <div className="grid grid-cols-4 gap-3 mt-4">
+              {[inUse1, inUse2, inUse3, inUseCar].map((src, i) => (
                 <div key={i} className="rounded-xl overflow-hidden border border-border aspect-square">
                   <img
                     src={src}
