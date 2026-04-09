@@ -12,11 +12,15 @@ const COLOR_IMAGES: Record<string, string> = {
   Black: pillowBlack,
   Red: pillowRed,
 };
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import inUse1 from "@/assets/product-inuse-1.jpg";
 import inUse2 from "@/assets/product-inuse-2.jpg";
 import inUse3 from "@/assets/product-inuse-3.jpg";
 import inUseCar from "@/assets/lifestyle-car.jpg";
 import inUsePlane from "@/assets/lifestyle-plane.jpg";
+import inUsePlane2 from "@/assets/lifestyle-plane2.jpg";
+import inUseCar2 from "@/assets/lifestyle-car2.jpg";
+import inUsePlane3 from "@/assets/lifestyle-plane3.jpg";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchProducts, type ShopifyProduct, applyDiscountToCart } from "@/lib/shopify";
 import { toast } from "sonner";
@@ -73,6 +77,7 @@ const Product = () => {
   const [loading, setLoading] = useState(true);
   const [selectedQty, setSelectedQty] = useState(initialQty);
   const [selectedColor, setSelectedColor] = useState(initialColor);
+  const [galleryOffset, setGalleryOffset] = useState(0);
   const countdown = useCountdown(15);
   const { t, lang } = useLanguage();
 
@@ -223,21 +228,46 @@ const Product = () => {
               </AnimatePresence>
             </div>
 
-            {/* In-use photos */}
-            <div className="grid grid-cols-5 gap-2 mt-4">
-              {[inUse1, inUse2, inUse3, inUseCar, inUsePlane].map((src, i) => (
-                <div key={i} className="rounded-xl overflow-hidden border border-border aspect-square">
-                  <img
-                    src={src}
-                    alt={`Sleep&zy in use ${i + 1}`}
-                    loading="lazy"
-                    width={640}
-                    height={640}
-                    className="w-full h-full object-cover"
-                  />
+            {/* In-use photos carousel */}
+            {(() => {
+              const allPhotos = [inUse1, inUse2, inUse3, inUseCar, inUsePlane, inUsePlane2, inUseCar2, inUsePlane3];
+              const visibleCount = 5;
+              const maxOffset = allPhotos.length - visibleCount;
+              return (
+                <div className="relative mt-4 group">
+                  <div className="overflow-hidden rounded-xl">
+                    <div
+                      className="flex gap-2 transition-transform duration-300 ease-in-out"
+                      style={{ transform: `translateX(-${(galleryOffset / visibleCount) * 100}%)` }}
+                    >
+                      {allPhotos.map((src, i) => (
+                        <div key={i} className="shrink-0 rounded-xl overflow-hidden border border-border aspect-square" style={{ width: `calc((100% - ${(visibleCount - 1) * 8}px) / ${visibleCount})` }}>
+                          <img src={src} alt={`Sleep&zy in use ${i + 1}`} loading="lazy" width={640} height={640} className="w-full h-full object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {galleryOffset > 0 && (
+                    <button
+                      onClick={() => setGalleryOffset(Math.max(0, galleryOffset - 1))}
+                      className="absolute left-1 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm border border-border rounded-full w-7 h-7 flex items-center justify-center shadow-md hover:bg-background transition-colors z-10"
+                      aria-label="Previous photos"
+                    >
+                      <ChevronLeft size={16} className="text-foreground" />
+                    </button>
+                  )}
+                  {galleryOffset < maxOffset && (
+                    <button
+                      onClick={() => setGalleryOffset(Math.min(maxOffset, galleryOffset + 1))}
+                      className="absolute right-1 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm border border-border rounded-full w-7 h-7 flex items-center justify-center shadow-md hover:bg-background transition-colors z-10"
+                      aria-label="Next photos"
+                    >
+                      <ChevronRight size={16} className="text-foreground" />
+                    </button>
+                  )}
                 </div>
-              ))}
-            </div>
+              );
+            })()}
           </motion.div>
 
 
