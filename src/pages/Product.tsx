@@ -12,11 +12,15 @@ const COLOR_IMAGES: Record<string, string> = {
   Black: pillowBlack,
   Red: pillowRed,
 };
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import inUse1 from "@/assets/product-inuse-1.jpg";
 import inUse2 from "@/assets/product-inuse-2.jpg";
 import inUse3 from "@/assets/product-inuse-3.jpg";
 import inUseCar from "@/assets/lifestyle-car.jpg";
 import inUsePlane from "@/assets/lifestyle-plane.jpg";
+import inUsePlane2 from "@/assets/lifestyle-plane2.jpg";
+import inUseCar2 from "@/assets/lifestyle-car2.jpg";
+import inUsePlane3 from "@/assets/lifestyle-plane3.jpg";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchProducts, type ShopifyProduct, applyDiscountToCart } from "@/lib/shopify";
 import { toast } from "sonner";
