@@ -77,6 +77,7 @@ const Product = () => {
   const [loading, setLoading] = useState(true);
   const [selectedQty, setSelectedQty] = useState(initialQty);
   const [selectedColor, setSelectedColor] = useState(initialColor);
+  const [galleryOffset, setGalleryOffset] = useState(0);
   const countdown = useCountdown(15);
   const { t, lang } = useLanguage();
 
