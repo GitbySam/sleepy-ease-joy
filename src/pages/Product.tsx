@@ -16,6 +16,7 @@ import inUse1 from "@/assets/product-inuse-1.jpg";
 import inUse2 from "@/assets/product-inuse-2.jpg";
 import inUse3 from "@/assets/product-inuse-3.jpg";
 import inUseCar from "@/assets/lifestyle-car.jpg";
+import inUsePlane from "@/assets/lifestyle-plane.jpg";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchProducts, type ShopifyProduct, applyDiscountToCart } from "@/lib/shopify";
 import { toast } from "sonner";
@@ -223,8 +224,8 @@ const Product = () => {
             </div>
 
             {/* In-use photos */}
-            <div className="grid grid-cols-4 gap-3 mt-4">
-              {[inUse1, inUse2, inUse3, inUseCar].map((src, i) => (
+            <div className="grid grid-cols-5 gap-2 mt-4">
+              {[inUse1, inUse2, inUse3, inUseCar, inUsePlane].map((src, i) => (
                 <div key={i} className="rounded-xl overflow-hidden border border-border aspect-square">
                   <img
                     src={src}
