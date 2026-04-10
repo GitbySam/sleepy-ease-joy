@@ -164,6 +164,7 @@ export default function AdminAnalytics() {
 
             {/* Tab content */}
             {activeTab === "sales" && <SalesTab data={data} />}
+            {activeTab === "cart" && <CartEventsTab days={days} />}
             {activeTab === "traffic" && <TrafficTab />}
             {activeTab === "sources" && <SourcesTab />}
             {activeTab === "meta" && <MetaTab />}
