@@ -25,12 +25,6 @@ interface ShopifyAnalytics {
   topCountries: Array<{ code: string; count: number }>;
 }
 
-interface CartEventStats {
-  total: number;
-  byDay: Array<{ date: string; count: number }>;
-  byBundle: Array<{ label: string; count: number }>;
-}
-
 /* ── Meta Pixel events (manual until Meta API connected) ── */
 const pixelEvents = [
   { event: "PageView", count: 502 },
