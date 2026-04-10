@@ -39,6 +39,7 @@ const pixelEvents = [
 /* ── Tabs ── */
 const TABS = [
   { id: "sales", label: "💰 Ventes (Live)" },
+  { id: "cart", label: "🛒 Ajouts panier" },
   { id: "traffic", label: "📈 Trafic" },
   { id: "sources", label: "🔗 Sources" },
   { id: "meta", label: "📱 Meta Ads" },
