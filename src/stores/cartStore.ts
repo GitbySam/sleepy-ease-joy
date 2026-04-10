@@ -49,14 +49,14 @@ export const useCartStore = create<CartStore>()(
         set({ isLoading: true });
         try {
           // Track add-to-cart event
-          supabase.from('cart_events').insert({
+          supabase.from('cart_events').insert([{
             variant_id: item.variantId,
             bundle_label: item.bundleLabel || 'single',
             quantity: item.quantity,
             price: item.bundlePrice ?? item.price ?? null,
             user_agent: navigator.userAgent,
             referrer: document.referrer || null,
-          }).then(); // fire-and-forget
+          }]).then(); // fire-and-forget
 
           if (!cartId) {
             const result = await createShopifyCart({ ...item, lineId: null });
