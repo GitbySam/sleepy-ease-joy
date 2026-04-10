@@ -5,6 +5,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar,
 } from "recharts";
+import { supabase } from "@/integrations/supabase/client";
 
 /* ── Types ── */
 interface ShopifyAnalytics {
@@ -38,6 +39,7 @@ const pixelEvents = [
 /* ── Tabs ── */
 const TABS = [
   { id: "sales", label: "💰 Ventes (Live)" },
+  { id: "cart", label: "🛒 Ajouts panier" },
   { id: "traffic", label: "📈 Trafic" },
   { id: "sources", label: "🔗 Sources" },
   { id: "meta", label: "📱 Meta Ads" },
@@ -162,6 +164,7 @@ export default function AdminAnalytics() {
 
             {/* Tab content */}
             {activeTab === "sales" && <SalesTab data={data} />}
+            {activeTab === "cart" && <CartEventsTab days={days} />}
             {activeTab === "traffic" && <TrafficTab />}
             {activeTab === "sources" && <SourcesTab />}
             {activeTab === "meta" && <MetaTab />}
@@ -365,5 +368,163 @@ function MetaTab() {
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+/* ─────────── CART EVENTS TAB (Live from DB) ─────────── */
+function CartEventsTab({ days }: { days: number }) {
+  const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0);
+  const [byDay, setByDay] = useState<Array<{ date: string; count: number }>>([]);
+  const [byBundle, setByBundle] = useState<Array<{ label: string; count: number }>>([]);
+
+  useEffect(() => {
+    const fetchCartEvents = async () => {
+      setLoading(true);
+      const since = new Date();
+      since.setDate(since.getDate() - days);
+
+      const { data, error } = await supabase
+        .from('cart_events')
+        .select('created_at, bundle_label, quantity')
+        .gte('created_at', since.toISOString())
+        .order('created_at', { ascending: true });
+
+      if (error || !data) {
+        console.error('Cart events fetch error:', error);
+        setLoading(false);
+        return;
+      }
+
+      setTotal(data.length);
+
+      // Group by day
+      const dayMap: Record<string, number> = {};
+      const bundleMap: Record<string, number> = {};
+      data.forEach((row) => {
+        const day = new Date(row.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+        dayMap[day] = (dayMap[day] || 0) + 1;
+        const label = row.bundle_label || 'unknown';
+        bundleMap[label] = (bundleMap[label] || 0) + 1;
+      });
+
+      setByDay(Object.entries(dayMap).map(([date, count]) => ({ date, count })));
+      setByBundle(
+        Object.entries(bundleMap)
+          .map(([label, count]) => ({ label, count }))
+          .sort((a, b) => b.count - a.count)
+      );
+      setLoading(false);
+    };
+
+    fetchCartEvents();
+  }, [days]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <span className="ml-3 text-gray-500">Chargement des événements panier…</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* KPI */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <Card className="bg-white shadow-sm border">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
+              <ShoppingCart className="h-3.5 w-3.5" />
+              Ajouts au panier
+            </div>
+            <p className="text-2xl font-bold text-blue-600">{total}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-white shadow-sm border">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
+              <ShoppingCart className="h-3.5 w-3.5" />
+              Moy. / jour
+            </div>
+            <p className="text-2xl font-bold text-green-600">{days > 0 ? (total / days).toFixed(1) : 0}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-white shadow-sm border">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
+              <ShoppingCart className="h-3.5 w-3.5" />
+              Packs distincts
+            </div>
+            <p className="text-2xl font-bold text-violet-600">{byBundle.length}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Chart: Add to cart by day */}
+      <Card className="bg-white">
+        <CardHeader>
+          <CardTitle className="text-base">Ajouts au panier par jour</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {byDay.length === 0 ? (
+            <p className="text-gray-400 text-sm py-8 text-center">Aucun ajout au panier sur cette période</p>
+          ) : (
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={byDay}>
+                  <defs>
+                    <linearGradient id="gCart" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                  <Tooltip formatter={(value: number) => [value, "Ajouts"]} />
+                  <Area type="monotone" dataKey="count" stroke="#3b82f6" fill="url(#gCart)" name="Ajouts" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Breakdown by bundle */}
+      <Card className="bg-white">
+        <CardHeader>
+          <CardTitle className="text-base">Répartition par pack</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {byBundle.length === 0 ? (
+            <p className="text-gray-400 text-sm py-8 text-center">Aucune donnée</p>
+          ) : (
+            <>
+              <div className="h-60">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={byBundle}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                    <Tooltip />
+                    <Bar dataKey="count" fill="#8b5cf6" radius={[4, 4, 0, 0]} name="Ajouts" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-4 space-y-2">
+                {byBundle.map((b) => (
+                  <div key={b.label} className="flex justify-between text-sm border-b border-gray-50 pb-1">
+                    <span className="text-gray-600">{b.label}</span>
+                    <span className="font-semibold">{b.count}</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

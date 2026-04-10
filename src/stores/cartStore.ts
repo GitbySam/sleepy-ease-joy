@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { supabase } from '@/integrations/supabase/client';
 import {
   type CartItemData,
   type ShopifyProduct,
@@ -47,6 +48,16 @@ export const useCartStore = create<CartStore>()(
 
         set({ isLoading: true });
         try {
+          // Track add-to-cart event
+          supabase.from('cart_events').insert([{
+            variant_id: item.variantId,
+            bundle_label: item.bundleLabel || 'single',
+            quantity: item.quantity,
+            price: typeof item.bundlePrice === 'number' ? item.bundlePrice : (typeof item.price === 'number' ? item.price : null),
+            user_agent: navigator.userAgent,
+            referrer: document.referrer || null,
+          }]).then(); // fire-and-forget
+
           if (!cartId) {
             const result = await createShopifyCart({ ...item, lineId: null });
             if (result) {
