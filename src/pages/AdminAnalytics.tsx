@@ -3,8 +3,9 @@ import { Users, Eye, ShoppingCart, CreditCard, TrendingDown, FileText, DollarSig
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar,
+  BarChart, Bar, LineChart, Line,
 } from "recharts";
+import { supabase } from "@/integrations/supabase/client";
 
 /* ── Types ── */
 interface ShopifyAnalytics {
@@ -22,6 +23,12 @@ interface ShopifyAnalytics {
   ordersByDay: Record<string, { orders: number; revenue: number }>;
   topProducts: Array<{ title: string; quantity: number; revenue: number }>;
   topCountries: Array<{ code: string; count: number }>;
+}
+
+interface CartEventStats {
+  total: number;
+  byDay: Array<{ date: string; count: number }>;
+  byBundle: Array<{ label: string; count: number }>;
 }
 
 /* ── Meta Pixel events (manual until Meta API connected) ── */
