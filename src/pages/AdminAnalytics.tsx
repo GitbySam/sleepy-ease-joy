@@ -3,7 +3,7 @@ import { Users, Eye, ShoppingCart, CreditCard, TrendingDown, FileText, DollarSig
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, LineChart, Line,
+  BarChart, Bar,
 } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 
