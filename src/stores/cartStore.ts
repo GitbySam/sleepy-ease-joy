@@ -53,7 +53,7 @@ export const useCartStore = create<CartStore>()(
             variant_id: item.variantId,
             bundle_label: item.bundleLabel || 'single',
             quantity: item.quantity,
-            price: item.bundlePrice ?? item.price ?? null,
+            price: typeof item.bundlePrice === 'number' ? item.bundlePrice : (typeof item.price === 'number' ? item.price : null),
             user_agent: navigator.userAgent,
             referrer: document.referrer || null,
           }]).then(); // fire-and-forget
