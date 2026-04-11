@@ -2,8 +2,9 @@ import { lazy, Suspense } from "react";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import TrustBar from "@/components/TrustBar";
-import StickyMobileCTA from "@/components/StickyMobileCTA";
 import ScrollToTop from "@/components/ScrollToTop";
+
+const StickyMobileCTA = lazy(() => import("@/components/StickyMobileCTA"));
 
 const ComparisonSlider = lazy(() => import("@/components/ComparisonSlider"));
 const InAction = lazy(() => import("@/components/InAction"));
@@ -24,7 +25,7 @@ const Placeholder = ({ height = "400px" }: { height?: string }) => (
 const Index = () => (
   <>
     <Header />
-    <StickyMobileCTA />
+    <Suspense fallback={null}><StickyMobileCTA /></Suspense>
     <ScrollToTop />
     <main>
       <Hero />

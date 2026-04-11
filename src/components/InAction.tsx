@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import lifestyleAirplane from "@/assets/lifestyle-airplane.webp";
 import lifestyleTrain from "@/assets/lifestyle-train.webp";
 import lifestyleCar from "@/assets/lifestyle-car.webp";
-import demoVideo from "@/assets/demo-video.mp4";
+const demoVideo = "/demo-video.mp4";
 import LazyVideo from "@/components/LazyVideo";
 import { useLanguage } from "@/i18n/LanguageContext";
 

@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
-import ShopifyCartDrawer from "./ShopifyCartDrawer";
-import LanguageSwitcher from "./LanguageSwitcher";
+const ShopifyCartDrawer = lazy(() => import("./ShopifyCartDrawer"));
 import { useLanguage } from "@/i18n/LanguageContext";
 
 const Header = () => {
@@ -79,7 +78,7 @@ const Header = () => {
                 <span>{t("nav.shopNow")}</span>
               </motion.span>
             </Link>
-            <ShopifyCartDrawer />
+            <Suspense fallback={null}><ShopifyCartDrawer /></Suspense>
 
             {/* Mobile hamburger */}
             <button
