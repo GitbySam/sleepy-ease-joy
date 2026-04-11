@@ -92,13 +92,8 @@ const Hero = () => {
     <>
       {/* ========== MOBILE HERO ========== */}
       <section className="md:hidden flex flex-col pt-[90px]">
-        {/* Video — full-width, immersive */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          className="relative w-full aspect-[4/3] overflow-hidden"
-        >
+        {/* Video — full-width, no animation delay */}
+        <div className="relative w-full aspect-square overflow-hidden">
           <DeferredVideo
             src={demoVideo}
             poster={heroBanner}
@@ -107,13 +102,19 @@ const Hero = () => {
           {/* Gradient overlay for text readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-          {/* Overlaid content — minimal, focused */}
+          {/* Overlaid content — instant, no animations */}
           <div className="absolute bottom-0 left-0 right-0 p-5 space-y-3">
             {/* Stars — compact proof */}
             <div className="flex items-center gap-1.5">
               <StarRating size="small" />
               <span className="text-[11px] text-white/80 font-sans-body">{t("hero.reviews")}</span>
             </div>
+
+            {/* Live viewers — urgence sociale */}
+            <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white text-[11px] font-semibold px-2.5 py-1 rounded-full">
+              <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+              🔥 {viewerCount} {t("hero.viewingNow")}
+            </span>
 
             {/* Title — short, high contrast */}
             <h1 className="text-[22px] font-serif font-bold leading-[1.15] text-white">
@@ -127,20 +128,14 @@ const Hero = () => {
               <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-50%</span>
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        {/* CTA zone — isolated, maximum visibility */}
+        {/* CTA zone — visible immediately, no delay */}
         <div className="px-5 py-4 bg-background space-y-3">
           <Link to="/product" className="block">
-            <motion.span
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.4 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-gold text-primary-foreground px-6 py-4 rounded-full text-sm font-bold shadow-gold-glow inline-flex items-center justify-center gap-2 uppercase tracking-wider w-full"
-            >
+            <span className="bg-gold text-primary-foreground px-6 py-4 rounded-full text-sm font-bold shadow-gold-glow inline-flex items-center justify-center gap-2 uppercase tracking-wider w-full">
               {t("hero.cta")}
-            </motion.span>
+            </span>
           </Link>
 
           {/* Micro-reassurances — below CTA, secondary */}
