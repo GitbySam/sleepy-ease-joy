@@ -3,19 +3,19 @@ import App from "./App.tsx";
 import "./index.css";
 import { initMetaPixel, initScrollTracking, initTimeOnSite } from "./lib/metaPixel";
 
-// Defer Meta Pixel initialization to avoid blocking TTI
+// Initialize Meta Pixel after first render to capture all visitors
 if (typeof requestIdleCallback !== "undefined") {
   requestIdleCallback(() => {
     initMetaPixel();
     initScrollTracking();
     initTimeOnSite();
-  }, { timeout: 3000 });
+  }, { timeout: 500 });
 } else {
   setTimeout(() => {
     initMetaPixel();
     initScrollTracking();
     initTimeOnSite();
-  }, 3000);
+  }, 500);
 }
 
 createRoot(document.getElementById("root")!).render(<App />);
