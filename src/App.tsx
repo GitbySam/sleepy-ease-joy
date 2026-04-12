@@ -44,12 +44,12 @@ const AppRoutes = () => {
             <RouteTracker />
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/product" element={<Product />} />
-              <Route path="/product/:handle" element={<Product />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/returns" element={<Returns />} />
-              <Route path="/shipping" element={<Shipping />} />
+              <Route path="/product" element={<Suspense fallback={null}><Product /></Suspense>} />
+              <Route path="/product/:handle" element={<Suspense fallback={null}><Product /></Suspense>} />
+              <Route path="/terms" element={<Suspense fallback={null}><Terms /></Suspense>} />
+              <Route path="/privacy" element={<Suspense fallback={null}><Privacy /></Suspense>} />
+              <Route path="/returns" element={<Suspense fallback={null}><Returns /></Suspense>} />
+              <Route path="/shipping" element={<Suspense fallback={null}><Shipping /></Suspense>} />
               <Route path="/admin/analytics" element={<Suspense fallback={null}><AdminAnalytics /></Suspense>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
