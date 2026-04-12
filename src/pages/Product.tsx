@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ShieldCheck, Truck, RotateCcw, Clock, Loader2, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import pillowGrey from "@/assets/product-pillow-grey-new.png";
+import pillowGrey from "@/assets/product-pillow-grey-new.webp";
 import pillowBlack from "@/assets/product-pillow-black.webp";
 import pillowRed from "@/assets/product-pillow-red.webp";
 
@@ -13,14 +13,14 @@ const COLOR_IMAGES: Record<string, string> = {
   Red: pillowRed,
 };
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import inUse1 from "@/assets/product-inuse-1.jpg";
-import inUse2 from "@/assets/product-inuse-2.jpg";
+import inUse1 from "@/assets/product-inuse-1.webp";
+import inUse2 from "@/assets/product-inuse-2.webp";
 import inUse3 from "@/assets/product-inuse-3.jpg";
-import inUseCar from "@/assets/lifestyle-car.jpg";
-import inUsePlane from "@/assets/lifestyle-plane.jpg";
-import inUsePlane2 from "@/assets/lifestyle-plane2.jpg";
-import inUseCar2 from "@/assets/lifestyle-car2.jpg";
-import inUsePlane3 from "@/assets/lifestyle-plane3.jpg";
+import inUseCar from "@/assets/lifestyle-car.webp";
+import inUsePlane from "@/assets/lifestyle-plane.webp";
+import inUsePlane2 from "@/assets/lifestyle-plane2.webp";
+import inUseCar2 from "@/assets/lifestyle-car2.webp";
+import inUsePlane3 from "@/assets/lifestyle-plane3.webp";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchProducts, type ShopifyProduct, applyDiscountToCart } from "@/lib/shopify";
 import { toast } from "sonner";

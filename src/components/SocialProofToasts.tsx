@@ -4,18 +4,18 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import type { TranslationKey } from "@/i18n/translations";
 
 const messageKeys: { emoji: string; name: string; city: string; lineKey: TranslationKey }[] = [
-  { emoji: "😴", name: "Sarah L.", city: "NYC", lineKey: "social.lines.1" },
-  { emoji: "🫣", name: "James D.", city: "LA", lineKey: "social.lines.2" },
-  { emoji: "✈️", name: "Emily M.", city: "Chicago", lineKey: "social.lines.3" },
-  { emoji: "😮‍💨", name: "Mike B.", city: "Houston", lineKey: "social.lines.4" },
-  { emoji: "📸", name: "Jessica R.", city: "Phoenix", lineKey: "social.lines.5" },
-  { emoji: "🙈", name: "Chris P.", city: "Philadelphia", lineKey: "social.lines.6" },
-  { emoji: "😤", name: "Ashley F.", city: "San Antonio", lineKey: "social.lines.7" },
-  { emoji: "💤", name: "David G.", city: "San Diego", lineKey: "social.lines.8" },
-  { emoji: "🫡", name: "Amanda V.", city: "Dallas", lineKey: "social.lines.9" },
-  { emoji: "😎", name: "Ryan C.", city: "Austin", lineKey: "social.lines.10" },
-  { emoji: "🛡️", name: "Lauren H.", city: "Denver", lineKey: "social.lines.11" },
-  { emoji: "✅", name: "Brandon W.", city: "Seattle", lineKey: "social.lines.12" },
+  { emoji: "😴", name: "Sarah L.", city: "Toronto", lineKey: "social.lines.1" },
+  { emoji: "🫣", name: "Marc-André D.", city: "Montréal", lineKey: "social.lines.2" },
+  { emoji: "✈️", name: "Emily M.", city: "Vancouver", lineKey: "social.lines.3" },
+  { emoji: "😮‍💨", name: "Jake B.", city: "Calgary", lineKey: "social.lines.4" },
+  { emoji: "📸", name: "Isabelle R.", city: "Ottawa", lineKey: "social.lines.5" },
+  { emoji: "🙈", name: "Chris P.", city: "Edmonton", lineKey: "social.lines.6" },
+  { emoji: "😤", name: "Amélie F.", city: "Québec City", lineKey: "social.lines.7" },
+  { emoji: "💤", name: "David G.", city: "Winnipeg", lineKey: "social.lines.8" },
+  { emoji: "🫡", name: "Sophie V.", city: "Halifax", lineKey: "social.lines.9" },
+  { emoji: "😎", name: "Ryan C.", city: "Mississauga", lineKey: "social.lines.10" },
+  { emoji: "🛡️", name: "Lauren H.", city: "Victoria", lineKey: "social.lines.11" },
+  { emoji: "✅", name: "Jean-Philippe W.", city: "Laval", lineKey: "social.lines.12" },
 ];
 
 const SocialProofToasts = () => {

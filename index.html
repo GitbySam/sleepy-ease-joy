@@ -35,7 +35,44 @@
 </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- ======= STATIC SHELL — visible in <500ms while React loads ======= -->
+      <div id="shell" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0a0a;color:#fff;min-height:100vh">
+        <!-- Marquee bar -->
+        <div style="background:#111;text-align:center;padding:8px 0;font-size:13px;letter-spacing:.15em;color:#d4a853">
+          Limited Offer -50% &nbsp;•&nbsp; Free Shipping &nbsp;•&nbsp; Secure Payment
+        </div>
+        <!-- Nav -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:rgba(20,20,20,.85)">
+          <span style="font-size:22px;font-weight:700;letter-spacing:-.5px">Sleep<span style="color:#d4a853">&amp;zy</span></span>
+          <span style="background:#d4a853;color:#0a0a0a;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:700">Shop Now</span>
+        </div>
+        <!-- Hero image + overlay -->
+        <div style="position:relative;width:100%;aspect-ratio:1/1;overflow:hidden">
+          <img src="/hero-banner.webp" alt="Sleep&zy travel pillow" style="width:100%;height:100%;object-fit:cover" fetchpriority="high"/>
+          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75),rgba(0,0,0,.2),transparent)"></div>
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:20px">
+            <div style="font-size:11px;color:rgba(255,255,255,.8);margin-bottom:6px">⭐⭐⭐⭐⭐ 4.8/5 — 2,400+ reviews</div>
+            <h1 style="font-size:22px;font-weight:700;line-height:1.15;margin:0 0 8px">Stop falling asleep <em style="color:#d4a853">on strangers.</em></h1>
+            <div style="display:flex;align-items:baseline;gap:8px">
+              <span style="font-size:18px;font-weight:700;color:#d4a853">$29.95</span>
+              <span style="font-size:14px;color:rgba(255,255,255,.5);text-decoration:line-through">$64.90</span>
+              <span style="background:#ef4444;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px">-50%</span>
+            </div>
+          </div>
+        </div>
+        <!-- CTA -->
+        <div style="padding:16px 20px;text-align:center">
+          <a href="/product" style="display:block;background:#d4a853;color:#0a0a0a;padding:16px;border-radius:999px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;text-decoration:none">
+            Shop Now — 50% OFF
+          </a>
+          <div style="margin-top:10px;font-size:10px;color:rgba(255,255,255,.5);display:flex;justify-content:center;gap:12px">
+            <span>🚚 Free shipping</span><span>🔒 Secure payment</span><span>✅ 30-day guarantee</span>
+          </div>
+        </div>
+      </div>
+      <!-- ======= END SHELL ======= -->
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
