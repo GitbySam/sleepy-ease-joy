@@ -116,27 +116,32 @@ const Hero = () => {
               🔥 {viewerCount} {t("hero.viewingNow")}
             </span>
 
+            {/* Subtitle */}
+            <p className="text-[11px] font-sans-body uppercase tracking-[0.2em] text-white/70">
+              {t("hero.subtitle")}
+            </p>
+
             {/* Title — short, high contrast */}
             <h1 className="text-[22px] font-serif font-bold leading-[1.15] text-white">
               {t("hero.title1")} <span className="text-gold italic">{t("hero.title2")}</span>
             </h1>
-
-            {/* Price — single line */}
-            <div className="flex items-baseline gap-2">
-              <span className="text-lg font-bold text-gold font-sans-body">{t("hero.priceNew")}</span>
-              <span className="text-sm text-white/60 line-through font-sans-body">{t("hero.priceOld")}</span>
-              <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-50%</span>
-            </div>
           </div>
         </div>
 
         {/* CTA zone — visible immediately, no delay */}
         <div className="px-5 py-4 bg-background space-y-3">
           <Link to="/product" className="block">
-            <span className="bg-gold text-primary-foreground px-6 py-4 rounded-full text-sm font-bold shadow-gold-glow inline-flex items-center justify-center gap-2 uppercase tracking-wider w-full">
+            <span className="bg-gold text-primary-foreground px-6 py-4 rounded-full text-sm font-bold shadow-gold-glow inline-flex items-center justify-center gap-2 tracking-wider w-full">
               {t("hero.cta")}
             </span>
           </Link>
+
+          {/* Price */}
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-base font-bold text-foreground font-sans-body">{t("hero.priceNew")}</span>
+            <span className="text-sm text-muted-foreground line-through font-sans-body">{t("hero.priceOld")}</span>
+            <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-50%</span>
+          </div>
 
           {/* Micro-reassurances — below CTA, secondary */}
           <div className="flex items-center justify-center gap-3 text-[10px] text-muted-foreground font-sans-body">
