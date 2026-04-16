@@ -1,8 +1,16 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Clock } from "lucide-react";
-import { Link } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
+import { useCartStore } from "@/stores/cartStore";
+
+const COLOR_MAP: Record<string, string> = {
+  Grey: "#9CA3AF",
+  Black: "#1F2937",
+  Red: "#DC2626",
+};
+const COLORS = Object.keys(COLOR_MAP);
 
 const useCountdown = (minutes: number) => {
   const [seconds, setSeconds] = useState(() => {
@@ -36,19 +44,66 @@ const useCountdown = (minutes: number) => {
 
 const BundleOffer = () => {
   const [selected, setSelected] = useState(2);
+  const [selectedColor, setSelectedColor] = useState("Grey");
+  const [product, setProduct] = useState<ShopifyProduct | null>(null);
   const { t, lang } = useLanguage();
   const countdown = useCountdown(15);
+  const addItem = useCartStore((s) => s.addItem);
+  const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
+  const isLoading = useCartStore((s) => s.isLoading);
+
+  useEffect(() => {
+    fetchProducts(20)
+      .then((products) => {
+        if (products.length > 0) setProduct(products[0]);
+      })
+      .catch(console.error);
+  }, []);
 
   const currencySymbol = lang === "en" ? "$" : "€";
 
   const bundles = [
-    { qty: 1, label: "1 Sleep&zy", price: `${currencySymbol}29.95`, oldPrice: `${currencySymbol}64.90`, perUnit: `${currencySymbol}29.95${t("bundle.perUnit")}`, tag: null },
-    { qty: 2, label: "2 Sleep&zy", price: `${currencySymbol}59.90`, oldPrice: `${currencySymbol}129.80`, perUnit: `${currencySymbol}29.95${t("bundle.perUnit")}`, tag: "BEST SELLER" },
-    { qty: 3, label: "3 Sleep&zy", price: `${currencySymbol}64.90`, oldPrice: `${currencySymbol}194.70`, perUnit: `${currencySymbol}21.63${t("bundle.perUnit")}`, tag: "BEST VALUE" },
+    { qty: 1, label: "1 Sleep&zy", price: `${currencySymbol}29.95`, oldPrice: `${currencySymbol}64.90`, perUnit: `${currencySymbol}29.95${t("bundle.perUnit")}`, tag: null, packValue: "Single", priceNum: 29.95 },
+    { qty: 2, label: "2 Sleep&zy", price: `${currencySymbol}59.90`, oldPrice: `${currencySymbol}129.80`, perUnit: `${currencySymbol}29.95${t("bundle.perUnit")}`, tag: "BEST SELLER", packValue: "Duo Pack", priceNum: 59.90 },
+    { qty: 3, label: "3 Sleep&zy", price: `${currencySymbol}64.90`, oldPrice: `${currencySymbol}194.70`, perUnit: `${currencySymbol}21.63${t("bundle.perUnit")}`, tag: "BEST VALUE", packValue: "Family Pack", priceNum: 64.90 },
   ];
 
   const titleParts = t("bundle.title").split(/<gold>|<\/gold>/);
   const socialParts = t("bundle.socialProof").split(/<bold>|<\/bold>/);
+
+  const handleAddToCart = async () => {
+    if (!product) return;
+    const selectedBundle = bundles[selected];
+
+    const variants = product.node.variants.edges;
+    const matchingVariant = variants.find((v) => {
+      const opts = v.node.selectedOptions || [];
+      const hasColor = opts.some((o) => o.name === "Color" && o.value === selectedColor);
+      const hasPack = opts.some((o) => o.value === selectedBundle.packValue);
+      return hasColor && hasPack;
+    })?.node;
+
+    if (!matchingVariant) {
+      console.error("No matching variant found", { color: selectedColor, pack: selectedBundle.packValue });
+      return;
+    }
+
+    const bundleLabel = selectedBundle.tag || selectedBundle.label;
+
+    await addItem({
+      product,
+      variantId: matchingVariant.id,
+      variantTitle: matchingVariant.title,
+      price: matchingVariant.price,
+      quantity: 1,
+      selectedOptions: matchingVariant.selectedOptions || [],
+      bundleLabel,
+      bundlePrice: selectedBundle.priceNum,
+      bundleUnitSize: 1,
+    });
+
+    setTimeout(() => setDrawerOpen(true), 500);
+  };
 
   return (
     <section id="offer" className="py-14 md:py-24 bg-card">
@@ -75,6 +130,27 @@ const BundleOffer = () => {
         >
           <span className="font-bold">{socialParts[1]}</span>{socialParts[2]}
         </motion.p>
+
+        {/* Color selector */}
+        <div className="flex items-center justify-center gap-3 mb-8">
+          {COLORS.map((color) => (
+            <button
+              key={color}
+              onClick={() => setSelectedColor(color)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full border-2 transition-all text-sm font-medium ${
+                selectedColor === color
+                  ? "border-gold bg-gold/10 text-foreground shadow-md scale-105"
+                  : "border-border text-muted-foreground hover:border-gold/50 hover:scale-105"
+              }`}
+            >
+              <span
+                className="w-4 h-4 rounded-full border border-border/50"
+                style={{ backgroundColor: COLOR_MAP[color] }}
+              />
+              {color}
+            </button>
+          ))}
+        </div>
 
         <div className="space-y-4 mb-8">
           {bundles.map((b, i) => (
@@ -153,15 +229,15 @@ const BundleOffer = () => {
           </div>
         </motion.div>
 
-        <Link to={`/product?bundle=${bundles[selected].qty}`}>
-          <motion.span
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
-            className="block w-full bg-gold text-primary-foreground text-center py-4 rounded-full text-lg font-bold shadow-gold-glow uppercase tracking-wider"
-          >
-            {t("bundle.cta")}
-          </motion.span>
-        </Link>
+        <motion.button
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
+          onClick={handleAddToCart}
+          disabled={!product || isLoading}
+          className="block w-full bg-gold text-primary-foreground text-center py-4 rounded-full text-lg font-bold shadow-gold-glow uppercase tracking-wider disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {t("bundle.cta")}
+        </motion.button>
 
         <div className="flex justify-center gap-6 mt-6 text-xs text-muted-foreground">
           <span>{t("bundle.securePayment")}</span>
