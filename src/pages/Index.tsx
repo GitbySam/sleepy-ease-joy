@@ -30,9 +30,6 @@ const Index = () => (
     <main>
       <Hero />
       <TrustBar />
-      <Suspense fallback={<Placeholder height="600px" />}>
-        <ComparisonSlider />
-      </Suspense>
       <Suspense fallback={<Placeholder height="500px" />}>
         <InAction />
       </Suspense>
@@ -44,6 +41,9 @@ const Index = () => (
       </Suspense>
       <Suspense fallback={<Placeholder />}>
         <Testimonials />
+      </Suspense>
+      <Suspense fallback={<Placeholder height="600px" />}>
+        <ComparisonSlider />
       </Suspense>
       <Suspense fallback={<Placeholder height="200px" />}>
         <CtaBridge />
