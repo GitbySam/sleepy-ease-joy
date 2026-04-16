@@ -21,14 +21,14 @@ export const translations = {
     es: "Sí. Todos hemos estado ahí.",
   },
   "hero.title1": {
-    en: "Stop falling asleep",
-    fr: "Arrêtez de vous endormir",
-    es: "Deja de quedarte dormido",
+    en: "Sleep with dignity.",
+    fr: "Dormez avec dignité.",
+    es: "Duerme con dignidad.",
   },
   "hero.title2": {
-    en: "on strangers.",
-    fr: "sur des inconnus.",
-    es: "sobre extraños.",
+    en: "Every flight.",
+    fr: "À chaque vol.",
+    es: "En cada vuelo.",
   },
   "hero.desc": {
     en: "Mouth open. Head on a stranger's shoulder. Drool on your shirt. We've all been there. Sleep&zy keeps your head locked in place so you sleep with dignity.",
