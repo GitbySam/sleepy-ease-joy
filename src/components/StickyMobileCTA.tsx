@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag } from "lucide-react";
-import { Link } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useViewerCount } from "@/hooks/useViewerCount";
 
@@ -44,19 +43,21 @@ const StickyMobileCTA = () => {
             <p className="text-[11px] text-center text-muted-foreground mb-2">
               🔥 {t("sticky.viewing").replace("{count}", String(viewerCount))}
             </p>
-            <Link to="/product" className="block">
-              <motion.div
-                whileTap={{ scale: 0.97 }}
-                className="w-full bg-gold text-primary-foreground text-center py-3.5 rounded-full font-bold shadow-gold-glow flex items-center justify-center gap-2"
-              >
-                <ShoppingBag size={18} />
-                <span className="text-sm uppercase tracking-wider">{t("sticky.cta")}</span>
-                <span className="text-sm font-normal ml-1">
-                  <span className="line-through opacity-60">{currencySymbol}64.90</span>{" "}
-                  <span className="font-bold">{currencySymbol}29.95</span>
-                </span>
-              </motion.div>
-            </Link>
+            <motion.div
+              whileTap={{ scale: 0.97 }}
+              onClick={() => {
+                const offer = document.getElementById("offer");
+                if (offer) offer.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="w-full bg-gold text-primary-foreground text-center py-3.5 rounded-full font-bold shadow-gold-glow flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <ShoppingBag size={18} />
+              <span className="text-sm uppercase tracking-wider">{t("sticky.cta")}</span>
+              <span className="text-sm font-normal ml-1">
+                <span className="line-through opacity-60">{currencySymbol}64.90</span>{" "}
+                <span className="font-bold">{currencySymbol}29.95</span>
+              </span>
+            </motion.div>
           </div>
         </motion.div>
       )}
