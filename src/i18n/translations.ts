@@ -16,9 +16,9 @@ export const translations = {
 
   // Hero
   "hero.subtitle": {
-    en: "The travel pillow that keeps your head up",
-    fr: "L'oreiller de voyage qui maintient votre tête",
-    es: "La almohada de viaje que mantiene tu cabeza",
+    en: "As seen on Instagram",
+    fr: "Vu sur Instagram",
+    es: "Visto en Instagram",
   },
   "hero.title1": {
     en: "Stop falling asleep",
