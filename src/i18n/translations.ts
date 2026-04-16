@@ -16,9 +16,9 @@ export const translations = {
 
   // Hero
   "hero.subtitle": {
-    en: "The travel pillow that keeps your head up",
-    fr: "L'oreiller de voyage qui maintient votre tête",
-    es: "La almohada de viaje que mantiene tu cabeza",
+    en: "Yeah. We've all been there.",
+    fr: "Ouais. On y est tous passés.",
+    es: "Sí. Todos hemos estado ahí.",
   },
   "hero.title1": {
     en: "Stop falling asleep",
@@ -113,16 +113,32 @@ export const translations = {
     es: "Duerme con <gold>dignidad.</gold> En todas partes.",
   },
   "inAction.flight": { en: "✈️ In-flight", fr: "✈️ En vol", es: "✈️ En vuelo" },
-  "inAction.flightCaption": { en: "Window seat. Zero embarrassment.", fr: "Siège hublot. Zéro gêne.", es: "Asiento ventana. Cero vergüenza." },
+  "inAction.flightCaption": {
+    en: "Window seat. Zero embarrassment.",
+    fr: "Siège hublot. Zéro gêne.",
+    es: "Asiento ventana. Cero vergüenza.",
+  },
   "inAction.train": { en: "🚄 On the train", fr: "🚄 Dans le train", es: "🚄 En el tren" },
-  "inAction.trainCaption": { en: "Head up. Dignity intact.", fr: "Tête haute. Dignité intacte.", es: "Cabeza en alto. Dignidad intacta." },
+  "inAction.trainCaption": {
+    en: "Head up. Dignity intact.",
+    fr: "Tête haute. Dignité intacte.",
+    es: "Cabeza en alto. Dignidad intacta.",
+  },
   "inAction.car": { en: "🚗 Road trip", fr: "🚗 Road trip", es: "🚗 Road trip" },
-  "inAction.carCaption": { en: "Passenger seat naps, perfected.", fr: "Siestes en voiture, perfectionnées.", es: "Siestas de copiloto, perfeccionadas." },
+  "inAction.carCaption": {
+    en: "Passenger seat naps, perfected.",
+    fr: "Siestes en voiture, perfectionnées.",
+    es: "Siestas de copiloto, perfeccionadas.",
+  },
   "inAction.demo": { en: "🎬 Demo", fr: "🎬 Démo", es: "🎬 Demo" },
   "inAction.demoCaption": { en: "See it in action.", fr: "Voyez-le en action.", es: "Véalo en acción." },
 
   // Benefits
-  "benefits.subtitle": { en: "Designed by sleep specialists", fr: "Conçu par des spécialistes du sommeil", es: "Diseñado por especialistas del sueño" },
+  "benefits.subtitle": {
+    en: "Designed by sleep specialists",
+    fr: "Conçu par des spécialistes du sommeil",
+    es: "Diseñado por especialistas del sueño",
+  },
   "benefits.title": {
     en: "Why you'll never be <gold>that person</gold> again",
     fr: "Pourquoi vous ne serez plus jamais <gold>cette personne</gold>",
@@ -140,7 +156,11 @@ export const translations = {
     fr: "Le soutien du menton maintient votre mâchoire en place. Pas de bave, pas de bouche ouverte.",
     es: "El soporte del mentón mantiene tu mandíbula en su lugar. Sin baba, sin boca abierta.",
   },
-  "benefits.noPhotos.title": { en: "No Embarrassing Photos", fr: "Pas de photos gênantes", es: "Sin fotos vergonzosas" },
+  "benefits.noPhotos.title": {
+    en: "No Embarrassing Photos",
+    fr: "Pas de photos gênantes",
+    es: "Sin fotos vergonzosas",
+  },
   "benefits.noPhotos.desc": {
     en: "You look composed even when fully asleep. No more viral office Slack moments.",
     fr: "Vous avez l'air serein même en dormant profondément. Fini les photos virales au bureau.",
@@ -367,18 +387,58 @@ export const translations = {
   // SocialProofToasts
   "social.from": { en: "from", fr: "de", es: "de" },
   "social.minAgo": { en: "min ago", fr: "il y a min", es: "hace min" },
-  "social.lines.1": { en: "just saved her dignity", fr: "vient de sauver sa dignité", es: "acaba de salvar su dignidad" },
+  "social.lines.1": {
+    en: "just saved her dignity",
+    fr: "vient de sauver sa dignité",
+    es: "acaba de salvar su dignidad",
+  },
   "social.lines.2": { en: "no more drool photos", fr: "fini les photos de bave", es: "se acabaron las fotos de baba" },
   "social.lines.3": { en: "never embarrassed again", fr: "plus jamais gêné(e)", es: "nunca más avergonzado/a" },
-  "social.lines.4": { en: "no more head-on-stranger moments", fr: "fini la tête sur l'épaule d'un inconnu", es: "se acabó caer en hombro ajeno" },
-  "social.lines.5": { en: "deleted the evidence, got Sleep&zy", fr: "preuves supprimées, Sleep&zy acheté", es: "eliminó las pruebas, compró Sleep&zy" },
-  "social.lines.6": { en: "mouth officially stays closed", fr: "bouche officiellement fermée", es: "boca oficialmente cerrada" },
-  "social.lines.7": { en: "saved a friend from embarrassment too", fr: "a aussi sauvé un(e) ami(e)", es: "también salvó a un amigo" },
-  "social.lines.8": { en: "sleeps with dignity now", fr: "dort avec dignité maintenant", es: "ahora duerme con dignidad" },
-  "social.lines.9": { en: "no more viral Slack photos", fr: "fini les photos virales sur Slack", es: "se acabaron las fotos virales en Slack" },
-  "social.lines.10": { en: "reputation officially protected", fr: "réputation officiellement protégée", es: "reputación oficialmente protegida" },
-  "social.lines.11": { en: "anti-embarrassment kit secured", fr: "kit anti-gêne sécurisé", es: "kit anti-vergüenza asegurado" },
-  "social.lines.12": { en: "no more drooling in public", fr: "fini de baver en public", es: "se acabó babear en público" },
+  "social.lines.4": {
+    en: "no more head-on-stranger moments",
+    fr: "fini la tête sur l'épaule d'un inconnu",
+    es: "se acabó caer en hombro ajeno",
+  },
+  "social.lines.5": {
+    en: "deleted the evidence, got Sleep&zy",
+    fr: "preuves supprimées, Sleep&zy acheté",
+    es: "eliminó las pruebas, compró Sleep&zy",
+  },
+  "social.lines.6": {
+    en: "mouth officially stays closed",
+    fr: "bouche officiellement fermée",
+    es: "boca oficialmente cerrada",
+  },
+  "social.lines.7": {
+    en: "saved a friend from embarrassment too",
+    fr: "a aussi sauvé un(e) ami(e)",
+    es: "también salvó a un amigo",
+  },
+  "social.lines.8": {
+    en: "sleeps with dignity now",
+    fr: "dort avec dignité maintenant",
+    es: "ahora duerme con dignidad",
+  },
+  "social.lines.9": {
+    en: "no more viral Slack photos",
+    fr: "fini les photos virales sur Slack",
+    es: "se acabaron las fotos virales en Slack",
+  },
+  "social.lines.10": {
+    en: "reputation officially protected",
+    fr: "réputation officiellement protégée",
+    es: "reputación oficialmente protegida",
+  },
+  "social.lines.11": {
+    en: "anti-embarrassment kit secured",
+    fr: "kit anti-gêne sécurisé",
+    es: "kit anti-vergüenza asegurado",
+  },
+  "social.lines.12": {
+    en: "no more drooling in public",
+    fr: "fini de baver en public",
+    es: "se acabó babear en público",
+  },
 
   // InactivityPopup
   "inactivity.title": {
@@ -392,7 +452,11 @@ export const translations = {
     es: "La próxima vez que te duermas en público, ¿estarás listo/a?",
   },
   "inactivity.extra10": { en: "EXTRA 10% OFF", fr: "-10% SUPPLÉMENTAIRES", es: "-10% EXTRA" },
-  "inactivity.orderNow": { en: "Order now and get an", fr: "Commandez maintenant et bénéficiez d'une", es: "Pide ahora y obtén un" },
+  "inactivity.orderNow": {
+    en: "Order now and get an",
+    fr: "Commandez maintenant et bénéficiez d'une",
+    es: "Pide ahora y obtén un",
+  },
   "inactivity.additional10": {
     en: "additional 10% off your entire order!",
     fr: "réduction supplémentaire de 10% sur toute la commande !",
@@ -432,7 +496,11 @@ export const translations = {
     es: "<bold>¡Protección total!</bold> La almohada evita que caiga la cabeza. La diadema bloquea la luz para dormir más profundamente — sin cara de zombie.",
   },
   "upsell.today": { en: "-50% TODAY", fr: "-50% AUJOURD'HUI", es: "-50% HOY" },
-  "upsell.productName": { en: "Sleep&zy™ MP3 Sleep Headband", fr: "Sleep&zy™ MP3 Sleep Headband", es: "Sleep&zy™ MP3 Sleep Headband" },
+  "upsell.productName": {
+    en: "Sleep&zy™ MP3 Sleep Headband",
+    fr: "Sleep&zy™ MP3 Sleep Headband",
+    es: "Sleep&zy™ MP3 Sleep Headband",
+  },
   "upsell.onlyLeft": {
     en: "Only 4 left at this price!",
     fr: "Plus que 4 à ce prix !",
@@ -478,19 +546,51 @@ export const translations = {
   "cart.title": { en: "Cart", fr: "Panier", es: "Carrito" },
   "cart.empty": { en: "Your cart is empty", fr: "Votre panier est vide", es: "Tu carrito está vacío" },
   "cart.items": { en: "item(s) in your cart", fr: "article(s) dans votre panier", es: "artículo(s) en tu carrito" },
-  "cart.transportBag": { en: "Transport Bag included", fr: "Sac de transport inclus", es: "Bolsa de transporte incluida" },
+  "cart.transportBag": {
+    en: "Transport Bag included",
+    fr: "Sac de transport inclus",
+    es: "Bolsa de transporte incluida",
+  },
   "cart.total": { en: "Total", fr: "Total", es: "Total" },
   "cart.checkout": { en: "Secure Checkout", fr: "Paiement sécurisé", es: "Pago seguro" },
-  "cart.trustBanner": { en: "Free shipping + 30-day money-back guarantee", fr: "Livraison gratuite + Garantie remboursée 30 jours", es: "Envío gratis + Garantía de devolución de 30 días" },
-  "cart.socialProof": { en: "4.8/5 — 2,400+ happy sleepers", fr: "4.8/5 — 2 400+ dormeurs satisfaits", es: "4.8/5 — 2 400+ durmientes felices" },
-  "cart.freeShippingQualified": { en: "You qualify for FREE shipping!", fr: "Vous bénéficiez de la livraison GRATUITE !", es: "¡Calificas para envío GRATIS!" },
-  "cart.testimonial1": { en: '"Best pillow I\'ve ever bought!" — Sarah T.', fr: '"Le meilleur oreiller que j\'ai acheté !" — Sarah T.', es: '"¡La mejor almohada que he comprado!" — Sarah T.' },
-  "cart.testimonial2": { en: '"Game changer for long flights" — Mike R.', fr: '"Un must pour les longs vols" — Mike R.', es: '"Un cambio total para vuelos largos" — Mike R.' },
-  "cart.testimonial3": { en: '"I finally sleep on trains!" — Emma L.', fr: '"Je dors enfin dans le train !" — Emma L.', es: '"¡Por fin duermo en el tren!" — Emma L.' },
+  "cart.trustBanner": {
+    en: "Free shipping + 30-day money-back guarantee",
+    fr: "Livraison gratuite + Garantie remboursée 30 jours",
+    es: "Envío gratis + Garantía de devolución de 30 días",
+  },
+  "cart.socialProof": {
+    en: "4.8/5 — 2,400+ happy sleepers",
+    fr: "4.8/5 — 2 400+ dormeurs satisfaits",
+    es: "4.8/5 — 2 400+ durmientes felices",
+  },
+  "cart.freeShippingQualified": {
+    en: "You qualify for FREE shipping!",
+    fr: "Vous bénéficiez de la livraison GRATUITE !",
+    es: "¡Calificas para envío GRATIS!",
+  },
+  "cart.testimonial1": {
+    en: '"Best pillow I\'ve ever bought!" — Sarah T.',
+    fr: '"Le meilleur oreiller que j\'ai acheté !" — Sarah T.',
+    es: '"¡La mejor almohada que he comprado!" — Sarah T.',
+  },
+  "cart.testimonial2": {
+    en: '"Game changer for long flights" — Mike R.',
+    fr: '"Un must pour les longs vols" — Mike R.',
+    es: '"Un cambio total para vuelos largos" — Mike R.',
+  },
+  "cart.testimonial3": {
+    en: '"I finally sleep on trains!" — Emma L.',
+    fr: '"Je dors enfin dans le train !" — Emma L.',
+    es: '"¡Por fin duermo en el tren!" — Emma L.',
+  },
 
   // Shopify Products
   "products.title": { en: "Our Products", fr: "Nos Produits", es: "Nuestros Productos" },
-  "products.empty": { en: "No products available at the moment. Check back soon!", fr: "Aucun produit disponible pour le moment. Revenez bientôt !", es: "No hay productos disponibles por el momento. ¡Vuelve pronto!" },
+  "products.empty": {
+    en: "No products available at the moment. Check back soon!",
+    fr: "Aucun produit disponible pour le moment. Revenez bientôt !",
+    es: "No hay productos disponibles por el momento. ¡Vuelve pronto!",
+  },
   "products.add": { en: "Add", fr: "Ajouter", es: "Añadir" },
   "products.shopNow": { en: "Shop Now", fr: "Découvrir", es: "Ver más" },
   "products.addedToCart": { en: "added to cart", fr: "ajouté au panier", es: "añadido al carrito" },
