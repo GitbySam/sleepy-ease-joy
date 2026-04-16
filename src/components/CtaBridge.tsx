@@ -22,16 +22,19 @@ const CtaBridge = () => {
           <p className="text-muted-foreground font-sans-body text-sm md:text-base">
             {t("ctaBridge.desc")}
           </p>
-          <Link to="/product">
-            <motion.span
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              className="inline-flex items-center gap-2 bg-gold text-primary-foreground px-8 py-4 rounded-full text-base font-bold shadow-gold-glow uppercase tracking-wider mt-2"
+          <motion.span
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
+            className="inline-block mt-2"
+          >
+            <Link
+              to="/product"
+              className="inline-flex items-center gap-2 bg-gold text-primary-foreground px-8 py-4 rounded-full text-base font-bold shadow-gold-glow uppercase tracking-wider"
             >
               {t("ctaBridge.cta")}
               <ArrowRight size={18} />
-            </motion.span>
-          </Link>
+            </Link>
+          </motion.span>
           <p className="text-xs text-muted-foreground">
             <span className="line-through">{currencySymbol}64.90</span>{" "}
             <span className="text-gold font-bold">{currencySymbol}29.95</span>{" "}
