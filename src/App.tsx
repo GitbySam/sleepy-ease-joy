@@ -6,14 +6,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { trackPageView } from "./lib/metaPixel";
 import { LanguageProvider } from "@/i18n/LanguageContext";
+import { lazy, Suspense } from "react";
 import Index from "./pages/Index";
+import NotFound from "./pages/NotFound";
 const Product = lazy(() => import("./pages/Product"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Returns = lazy(() => import("./pages/Returns"));
 const Shipping = lazy(() => import("./pages/Shipping"));
-import NotFound from "./pages/NotFound";
-import { lazy, Suspense } from "react";
 const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
 import { useCartSync } from "./hooks/useCartSync";
 
