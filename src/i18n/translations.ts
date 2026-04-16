@@ -21,14 +21,14 @@ export const translations = {
     es: "Visto en Instagram",
   },
   "hero.title1": {
-    en: "Stop falling asleep",
-    fr: "Arrêtez de vous endormir",
-    es: "Deja de quedarte dormido",
+    en: "Sleep like her.",
+    fr: "Dormez comme elle.",
+    es: "Duerme como ella.",
   },
   "hero.title2": {
-    en: "on strangers.",
-    fr: "sur des inconnus.",
-    es: "sobre extraños.",
+    en: "On every flight.",
+    fr: "À chaque vol.",
+    es: "En cada vuelo.",
   },
   "hero.desc": {
     en: "Mouth open. Head on a stranger's shoulder. Drool on your shirt. We've all been there. Sleep&zy keeps your head locked in place so you sleep with dignity.",
