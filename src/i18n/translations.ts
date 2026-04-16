@@ -16,8 +16,8 @@ export const translations = {
 
   // Hero
   "hero.subtitle": {
-    en: "Yeah. We've all been there.",
-    fr: "Ouais. On y est tous passés.",
+    en: "The travel pillow that keeps your head up",
+    fr: "L'oreiller de voyage qui maintient votre tête",
     es: "Sí. Todos hemos estado ahí.",
   },
   "hero.title1": {
