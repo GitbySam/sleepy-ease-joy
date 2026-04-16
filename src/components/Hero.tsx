@@ -199,24 +199,24 @@ const Hero = () => {
               {t("hero.title1")} <span className="text-gold italic">{t("hero.title2")}</span>
             </motion.h1>
 
-            {/* Price anchor */}
-            <motion.div variants={fadeUp} className="flex items-baseline gap-3">
-              <span className="text-2xl font-bold text-gold font-sans-body">{t("hero.priceNew")}</span>
-              <span className="text-base text-muted-foreground line-through font-sans-body">{t("hero.priceOld")}</span>
-              <span className="bg-red-500/10 text-red-500 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase">-50%</span>
-            </motion.div>
-
             {/* CTA */}
             <motion.div variants={fadeUp} className="flex flex-row gap-4 items-center">
               <Link to="/product">
                 <motion.span
                   whileHover={{ scale: 1.06 }}
                   whileTap={{ scale: 0.95 }}
-                  className="bg-gold text-primary-foreground px-8 py-4 rounded-full text-base font-bold shadow-gold-glow inline-flex items-center gap-2 uppercase tracking-wider"
+                  className="bg-gold text-primary-foreground px-8 py-4 rounded-full text-base font-bold shadow-gold-glow inline-flex items-center gap-2 tracking-wider"
                 >
                   {t("hero.cta")}
                 </motion.span>
               </Link>
+            </motion.div>
+
+            {/* Price anchor */}
+            <motion.div variants={fadeUp} className="flex items-baseline gap-3">
+              <span className="text-xl font-bold text-foreground font-sans-body">{t("hero.priceNew")}</span>
+              <span className="text-base text-muted-foreground line-through font-sans-body">{t("hero.priceOld")}</span>
+              <span className="bg-red-500/10 text-red-500 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase">-50%</span>
             </motion.div>
 
             {/* Micro-reassurances */}
