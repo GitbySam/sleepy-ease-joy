@@ -21,14 +21,14 @@ export const translations = {
     es: "La almohada de viaje que mantiene tu cabeza",
   },
   "hero.title1": {
-    en: "Sleep with dignity.",
-    fr: "Dormez avec dignité.",
-    es: "Duerme con dignidad.",
+    en: "Stop falling asleep",
+    fr: "Arrêtez de vous endormir",
+    es: "Deja de quedarte dormido",
   },
   "hero.title2": {
-    en: "Every flight.",
-    fr: "À chaque vol.",
-    es: "En cada vuelo.",
+    en: "on strangers.",
+    fr: "sur des inconnus.",
+    es: "sobre extraños.",
   },
   "hero.desc": {
     en: "Mouth open. Head on a stranger's shoulder. Drool on your shirt. We've all been there. Sleep&zy keeps your head locked in place so you sleep with dignity.",
