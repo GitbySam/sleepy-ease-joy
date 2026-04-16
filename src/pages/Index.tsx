@@ -42,14 +42,14 @@ const Index = () => (
       <Suspense fallback={<Placeholder />}>
         <Testimonials />
       </Suspense>
+      <Suspense fallback={<Placeholder />}>
+        <BundleOffer />
+      </Suspense>
       <Suspense fallback={<Placeholder height="600px" />}>
         <ComparisonSlider />
       </Suspense>
       <Suspense fallback={<Placeholder height="200px" />}>
         <CtaBridge />
-      </Suspense>
-      <Suspense fallback={<Placeholder />}>
-        <BundleOffer />
       </Suspense>
       <Suspense fallback={<Placeholder height="300px" />}>
         <FAQ />
