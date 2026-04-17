@@ -22,6 +22,7 @@ export type Database = {
           price: number | null
           quantity: number
           referrer: string | null
+          source: string | null
           user_agent: string | null
           variant_id: string
         }
@@ -32,6 +33,7 @@ export type Database = {
           price?: number | null
           quantity?: number
           referrer?: string | null
+          source?: string | null
           user_agent?: string | null
           variant_id: string
         }
@@ -42,6 +44,7 @@ export type Database = {
           price?: number | null
           quantity?: number
           referrer?: string | null
+          source?: string | null
           user_agent?: string | null
           variant_id?: string
         }

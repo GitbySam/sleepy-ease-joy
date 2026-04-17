@@ -1,0 +1,1 @@
+ALTER TABLE public.cart_events ADD COLUMN source text;
