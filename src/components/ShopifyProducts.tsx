@@ -66,9 +66,10 @@ const ProductCard = ({ product, selectedColor, t }: ProductCardProps) => {
         </p>
 
         <div className="flex items-center justify-between pt-2">
-          <span className="text-xl font-bold text-foreground">
-            ${parseFloat(price.amount).toFixed(2)}
-          </span>
+          <div className="flex items-baseline gap-2">
+            <span className="text-sm text-muted-foreground line-through">$59.90</span>
+            <span className="text-xl font-bold text-foreground">$24.95</span>
+          </div>
           <Link to={productUrl}>
             <motion.span
               whileHover={{ scale: 1.05 }}
