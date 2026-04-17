@@ -29,7 +29,8 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product, selectedColor, t }: ProductCardProps) => {
-  const price = product.node.priceRange.minVariantPrice;
+  // Fixed retail price — overrides Shopify price for display
+  const displayPrice = 24.95;
   const productUrl = `/product/${product.node.handle}?color=${selectedColor}`;
 
   return (
@@ -67,7 +68,7 @@ const ProductCard = ({ product, selectedColor, t }: ProductCardProps) => {
 
         <div className="flex items-center justify-between pt-2">
           <span className="text-xl font-bold text-foreground">
-            ${parseFloat(price.amount).toFixed(2)}
+            ${displayPrice.toFixed(2)}
           </span>
           <Link to={productUrl}>
             <motion.span
