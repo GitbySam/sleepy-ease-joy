@@ -10,21 +10,61 @@ const StickyMobileCTA = () => {
   const viewerCount = useViewerCount();
 
   useEffect(() => {
-    const handleScroll = () => {
-      // Show after scrolling past hero (~500px)
-      const pastHero = window.scrollY > 500;
-      // Hide when bundle offer section is in viewport
+    let inactivityTimer: ReturnType<typeof setTimeout> | null = null;
+    let lastScrollY = window.scrollY;
+    let lastScrollTime = Date.now();
+
+    const showSticky = () => setVisible(true);
+    const hideSticky = () => setVisible(false);
+
+    const isOfferCtaVisible = () => {
       const offerSection = document.getElementById("offer");
-      let offerVisible = false;
-      if (offerSection) {
-        const rect = offerSection.getBoundingClientRect();
-        offerVisible = rect.top < window.innerHeight && rect.bottom > 0;
+      if (!offerSection) return false;
+      const rect = offerSection.getBoundingClientRect();
+      return rect.bottom - 200 < window.innerHeight && rect.bottom > 0;
+    };
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const currentTime = Date.now();
+      const scrollSpeed = Math.abs(currentScrollY - lastScrollY) / (currentTime - lastScrollTime);
+
+      // Ne jamais montrer si on est encore dans le Hero ou si le CTA bundle est visible
+      const pastHero = currentScrollY > 100;
+      if (!pastHero || isOfferCtaVisible()) {
+        hideSticky();
+        if (inactivityTimer) clearTimeout(inactivityTimer);
+        lastScrollY = currentScrollY;
+        lastScrollTime = currentTime;
+        return;
       }
-      setVisible(pastHero && !offerVisible);
+
+      // Intention de quitter : scroll rapide vers le haut
+      const scrollingUpFast = currentScrollY < lastScrollY && scrollSpeed > 1.5;
+      if (scrollingUpFast) {
+        showSticky();
+        if (inactivityTimer) clearTimeout(inactivityTimer);
+        lastScrollY = currentScrollY;
+        lastScrollTime = currentTime;
+        return;
+      }
+
+      // Inactivité : reset le timer à chaque scroll
+      hideSticky();
+      if (inactivityTimer) clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        if (!isOfferCtaVisible()) showSticky();
+      }, 3000);
+
+      lastScrollY = currentScrollY;
+      lastScrollTime = currentTime;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (inactivityTimer) clearTimeout(inactivityTimer);
+    };
   }, []);
 
   const currencySymbol = lang === "en" ? "$" : "€";
