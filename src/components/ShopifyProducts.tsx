@@ -67,7 +67,7 @@ const ProductCard = ({ product, selectedColor, t }: ProductCardProps) => {
 
         <div className="flex items-center justify-between pt-2">
           <div className="flex items-baseline gap-2">
-            <span className="text-sm text-muted-foreground line-through">$59.90</span>
+            <span className="text-sm text-muted-foreground line-through">$29.95</span>
             <span className="text-xl font-bold text-foreground">$24.95</span>
           </div>
           <Link to={productUrl}>
