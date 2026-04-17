@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Eye, ShoppingCart, FileText, Loader2 } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Eye, ShoppingCart, FileText, Loader2, RefreshCw, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -169,50 +169,77 @@ function MetaTab() {
 /* ─────────── CART EVENTS TAB (Live from DB) ─────────── */
 function CartEventsTab({ days }: { days: number }) {
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [total, setTotal] = useState(0);
+  const [todayTotal, setTodayTotal] = useState(0);
+  const [todayByBundle, setTodayByBundle] = useState<Array<{ label: string; count: number }>>([]);
   const [byDay, setByDay] = useState<Array<{ date: string; count: number }>>([]);
   const [byBundle, setByBundle] = useState<Array<{ label: string; count: number }>>([]);
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+
+  const fetchCartEvents = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    else setLoading(true);
+
+    const since = new Date();
+    since.setDate(since.getDate() - days);
+
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const { data, error } = await supabase
+      .from('cart_events')
+      .select('created_at, bundle_label, quantity')
+      .gte('created_at', since.toISOString())
+      .order('created_at', { ascending: true });
+
+    if (error || !data) {
+      console.error('Cart events fetch error:', error);
+      setLoading(false);
+      setRefreshing(false);
+      return;
+    }
+
+    setTotal(data.length);
+
+    const dayMap: Record<string, number> = {};
+    const bundleMap: Record<string, number> = {};
+    const todayBundleMap: Record<string, number> = {};
+    let todayCount = 0;
+
+    data.forEach((row) => {
+      const createdAt = new Date(row.created_at);
+      const day = createdAt.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+      dayMap[day] = (dayMap[day] || 0) + 1;
+      const label = row.bundle_label || 'unknown';
+      bundleMap[label] = (bundleMap[label] || 0) + 1;
+
+      if (createdAt >= startOfToday) {
+        todayCount += 1;
+        todayBundleMap[label] = (todayBundleMap[label] || 0) + 1;
+      }
+    });
+
+    setTodayTotal(todayCount);
+    setTodayByBundle(
+      Object.entries(todayBundleMap)
+        .map(([label, count]) => ({ label, count }))
+        .sort((a, b) => b.count - a.count)
+    );
+    setByDay(Object.entries(dayMap).map(([date, count]) => ({ date, count })));
+    setByBundle(
+      Object.entries(bundleMap)
+        .map(([label, count]) => ({ label, count }))
+        .sort((a, b) => b.count - a.count)
+    );
+    setLastUpdate(new Date());
+    setLoading(false);
+    setRefreshing(false);
+  }, [days]);
 
   useEffect(() => {
-    const fetchCartEvents = async () => {
-      setLoading(true);
-      const since = new Date();
-      since.setDate(since.getDate() - days);
-
-      const { data, error } = await supabase
-        .from('cart_events')
-        .select('created_at, bundle_label, quantity')
-        .gte('created_at', since.toISOString())
-        .order('created_at', { ascending: true });
-
-      if (error || !data) {
-        console.error('Cart events fetch error:', error);
-        setLoading(false);
-        return;
-      }
-
-      setTotal(data.length);
-
-      const dayMap: Record<string, number> = {};
-      const bundleMap: Record<string, number> = {};
-      data.forEach((row) => {
-        const day = new Date(row.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
-        dayMap[day] = (dayMap[day] || 0) + 1;
-        const label = row.bundle_label || 'unknown';
-        bundleMap[label] = (bundleMap[label] || 0) + 1;
-      });
-
-      setByDay(Object.entries(dayMap).map(([date, count]) => ({ date, count })));
-      setByBundle(
-        Object.entries(bundleMap)
-          .map(([label, count]) => ({ label, count }))
-          .sort((a, b) => b.count - a.count)
-      );
-      setLoading(false);
-    };
-
     fetchCartEvents();
-  }, [days]);
+  }, [fetchCartEvents]);
 
   if (loading) {
     return (
@@ -225,12 +252,53 @@ function CartEventsTab({ days }: { days: number }) {
 
   return (
     <div className="space-y-6">
+      {/* Refresh bar */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <p className="text-xs text-gray-500">
+          {lastUpdate ? `Mis à jour à ${lastUpdate.toLocaleTimeString('fr-FR')}` : '—'}
+        </p>
+        <button
+          onClick={() => fetchCartEvents(true)}
+          disabled={refreshing}
+          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white shadow hover:bg-blue-700 transition disabled:opacity-60"
+        >
+          <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+          {refreshing ? 'Rafraîchissement…' : 'Rafraîchir'}
+        </button>
+      </div>
+
+      {/* Today highlight card */}
+      <Card className="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md border-0">
+        <CardContent className="p-5">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <div className="flex items-center gap-1.5 text-xs text-blue-100 mb-1">
+                <Calendar className="h-3.5 w-3.5" />
+                Aujourd'hui ({new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long' })})
+              </div>
+              <p className="text-4xl font-bold">{todayTotal}</p>
+              <p className="text-xs text-blue-100 mt-1">ajouts au panier depuis 00h00</p>
+            </div>
+            {todayByBundle.length > 0 && (
+              <div className="text-xs space-y-1 min-w-[160px]">
+                {todayByBundle.map((b) => (
+                  <div key={b.label} className="flex justify-between gap-3 border-b border-white/20 pb-0.5">
+                    <span className="text-blue-100">{b.label}</span>
+                    <span className="font-semibold">{b.count}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <Card className="bg-white shadow-sm border">
           <CardContent className="p-4">
             <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
               <ShoppingCart className="h-3.5 w-3.5" />
-              Ajouts au panier
+              Ajouts ({days}j)
             </div>
             <p className="text-2xl font-bold text-blue-600">{total}</p>
           </CardContent>
