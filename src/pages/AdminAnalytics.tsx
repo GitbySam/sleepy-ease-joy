@@ -175,6 +175,8 @@ function CartEventsTab({ days }: { days: number }) {
   const [todayByBundle, setTodayByBundle] = useState<Array<{ label: string; count: number }>>([]);
   const [byDay, setByDay] = useState<Array<{ date: string; count: number }>>([]);
   const [byBundle, setByBundle] = useState<Array<{ label: string; count: number }>>([]);
+  const [bySource, setBySource] = useState<Array<{ source: string; count: number }>>([]);
+  const [todayBySource, setTodayBySource] = useState<Array<{ source: string; count: number }>>([]);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
   const fetchCartEvents = useCallback(async (isRefresh = false) => {
@@ -189,7 +191,7 @@ function CartEventsTab({ days }: { days: number }) {
 
     const { data, error } = await supabase
       .from('cart_events')
-      .select('created_at, bundle_label, quantity')
+      .select('created_at, bundle_label, quantity, source')
       .gte('created_at', since.toISOString())
       .order('created_at', { ascending: true });
 
@@ -205,18 +207,30 @@ function CartEventsTab({ days }: { days: number }) {
     const dayMap: Record<string, number> = {};
     const bundleMap: Record<string, number> = {};
     const todayBundleMap: Record<string, number> = {};
+    const sourceMap: Record<string, number> = {};
+    const todaySourceMap: Record<string, number> = {};
     let todayCount = 0;
 
-    data.forEach((row) => {
+    const sourceLabel = (s: string | null) => {
+      if (s === 'landing') return 'Landing page';
+      if (s === 'product') return 'Page produit';
+      if (s === 'other') return 'Autre page';
+      return 'Inconnu (avant tracking)';
+    };
+
+    data.forEach((row: { created_at: string; bundle_label: string | null; quantity: number; source: string | null }) => {
       const createdAt = new Date(row.created_at);
       const day = createdAt.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
       dayMap[day] = (dayMap[day] || 0) + 1;
       const label = row.bundle_label || 'unknown';
       bundleMap[label] = (bundleMap[label] || 0) + 1;
+      const src = sourceLabel(row.source);
+      sourceMap[src] = (sourceMap[src] || 0) + 1;
 
       if (createdAt >= startOfToday) {
         todayCount += 1;
         todayBundleMap[label] = (todayBundleMap[label] || 0) + 1;
+        todaySourceMap[src] = (todaySourceMap[src] || 0) + 1;
       }
     });
 
@@ -226,10 +240,20 @@ function CartEventsTab({ days }: { days: number }) {
         .map(([label, count]) => ({ label, count }))
         .sort((a, b) => b.count - a.count)
     );
+    setTodayBySource(
+      Object.entries(todaySourceMap)
+        .map(([source, count]) => ({ source, count }))
+        .sort((a, b) => b.count - a.count)
+    );
     setByDay(Object.entries(dayMap).map(([date, count]) => ({ date, count })));
     setByBundle(
       Object.entries(bundleMap)
         .map(([label, count]) => ({ label, count }))
+        .sort((a, b) => b.count - a.count)
+    );
+    setBySource(
+      Object.entries(sourceMap)
+        .map(([source, count]) => ({ source, count }))
         .sort((a, b) => b.count - a.count)
     );
     setLastUpdate(new Date());
