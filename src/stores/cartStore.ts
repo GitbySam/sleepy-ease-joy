@@ -49,6 +49,8 @@ export const useCartStore = create<CartStore>()(
         set({ isLoading: true });
         try {
           // Track add-to-cart event
+          const path = typeof window !== 'undefined' ? window.location.pathname : '';
+          const source = path.startsWith('/product') ? 'product' : path === '/' || path === '' ? 'landing' : 'other';
           supabase.from('cart_events').insert([{
             variant_id: item.variantId,
             bundle_label: item.bundleLabel || 'single',
@@ -56,6 +58,7 @@ export const useCartStore = create<CartStore>()(
             price: typeof item.bundlePrice === 'number' ? item.bundlePrice : (typeof item.price === 'number' ? item.price : null),
             user_agent: navigator.userAgent,
             referrer: document.referrer || null,
+            source,
           }]).then(); // fire-and-forget
 
           if (!cartId) {
