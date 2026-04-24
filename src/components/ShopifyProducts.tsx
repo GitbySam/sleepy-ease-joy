@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCartStore } from "@/stores/cartStore";
+import { trackAddToCart } from "@/lib/metaPixel";
+import { toast } from "sonner";
 import pillowGrey from "@/assets/product-pillow-grey-new.webp";
 import pillowBlack from "@/assets/product-pillow-black.webp";
 import pillowRed from "@/assets/product-pillow-red.webp";
@@ -32,6 +34,51 @@ const ProductCard = ({ product, selectedColor, t }: ProductCardProps) => {
   // Fixed retail price — overrides Shopify price for display
   const displayPrice = 24.95;
   const productUrl = `/product/${product.node.handle}?color=${selectedColor}`;
+  const { addItem, setDrawerOpen } = useCartStore();
+
+  const handleShopNow = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Find the Single variant for the selected color
+    const coloredVariants = product.node.variants.edges.filter(v =>
+      v.node.selectedOptions?.some(o => o.name === "Color" && o.value === selectedColor)
+    );
+    const singleVariant =
+      coloredVariants.find(v => v.node.selectedOptions?.some(o => o.value === "Single"))?.node ||
+      coloredVariants[0]?.node;
+
+    if (!singleVariant) {
+      toast.error("Variant not available");
+      return;
+    }
+
+    await addItem({
+      product,
+      variantId: singleVariant.id,
+      variantTitle: singleVariant.title,
+      price: singleVariant.price,
+      quantity: 1,
+      selectedOptions: singleVariant.selectedOptions || [],
+      bundleLabel: "1 Sleep&zy",
+      bundlePrice: displayPrice,
+      bundleUnitSize: 1,
+    });
+
+    trackAddToCart({
+      contentName: `1 Sleep&zy (${selectedColor})`,
+      contentId: singleVariant.id,
+      value: displayPrice,
+      currency: "USD",
+      quantity: 1,
+    });
+
+    toast.success(`1 Sleep&zy (${selectedColor}) ${t("product.addedToCart")}`, {
+      position: "top-center",
+    });
+
+    setTimeout(() => setDrawerOpen(true), 500);
+  };
 
   return (
     <motion.div
@@ -40,7 +87,7 @@ const ProductCard = ({ product, selectedColor, t }: ProductCardProps) => {
       viewport={{ once: true }}
       className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm hover:shadow-md transition-shadow w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] max-w-sm"
     >
-      <Link to={productUrl}>
+      <a href={productUrl}>
         <div className="aspect-square bg-muted/30 flex items-center justify-center overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.img
@@ -55,13 +102,13 @@ const ProductCard = ({ product, selectedColor, t }: ProductCardProps) => {
             />
           </AnimatePresence>
         </div>
-      </Link>
+      </a>
       <div className="p-5 space-y-3">
-        <Link to={productUrl}>
+        <a href={productUrl}>
           <h3 className="font-semibold text-foreground text-lg hover:text-gold transition-colors">
             {product.node.title}
           </h3>
-        </Link>
+        </a>
         <p className="text-muted-foreground text-sm line-clamp-2">
           {product.node.description}
         </p>
@@ -70,16 +117,16 @@ const ProductCard = ({ product, selectedColor, t }: ProductCardProps) => {
           <span className="text-xl font-bold text-foreground">
             ${displayPrice.toFixed(2)}
           </span>
-          <Link to={productUrl}>
-            <motion.span
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-gold text-primary-foreground px-5 py-2 rounded-full text-sm font-semibold inline-flex items-center gap-2 shadow-gold-glow"
-            >
-              {t("products.shopNow")}
-              <ArrowRight size={16} />
-            </motion.span>
-          </Link>
+          <motion.button
+            type="button"
+            onClick={handleShopNow}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-gold text-primary-foreground px-5 py-2 rounded-full text-sm font-semibold inline-flex items-center gap-2 shadow-gold-glow"
+          >
+            {t("products.shopNow")}
+            <ArrowRight size={16} />
+          </motion.button>
         </div>
       </div>
     </motion.div>
