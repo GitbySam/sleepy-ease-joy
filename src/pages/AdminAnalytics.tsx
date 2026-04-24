@@ -21,6 +21,7 @@ const pixelEvents = [
 /* ── Tabs ── */
 const TABS = [
   { id: "cart", label: "🛒 Ajouts panier" },
+  { id: "funnel", label: "🎯 Funnel" },
   { id: "traffic", label: "📈 Trafic" },
   { id: "sources", label: "🔗 Sources" },
   { id: "meta", label: "📱 Meta Ads" },
@@ -84,6 +85,7 @@ export default function AdminAnalytics() {
 
         {/* Tab content */}
         {activeTab === "cart" && <CartEventsTab days={days} />}
+        {activeTab === "funnel" && <FunnelTab days={days} />}
         {activeTab === "traffic" && <TrafficTab />}
         {activeTab === "sources" && <SourcesTab />}
         {activeTab === "meta" && <MetaTab />}
@@ -453,6 +455,282 @@ function CartEventsTab({ days }: { days: number }) {
           )}
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+/* ─────────── FUNNEL TAB ─────────── */
+function FunnelTab({ days }: { days: number }) {
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+  const [checkoutCount, setCheckoutCount] = useState(0);
+  const [todayCart, setTodayCart] = useState(0);
+  const [todayCheckout, setTodayCheckout] = useState(0);
+  const [checkoutByDay, setCheckoutByDay] = useState<Array<{ date: string; cart: number; checkout: number }>>([]);
+  const [checkoutByBundle, setCheckoutByBundle] = useState<Array<{ label: string; count: number }>>([]);
+  const [checkoutValue, setCheckoutValue] = useState(0);
+  const [todayCheckoutValue, setTodayCheckoutValue] = useState(0);
+  const [withDiscount, setWithDiscount] = useState(0);
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+
+  const fetchData = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    else setLoading(true);
+
+    const since = new Date();
+    since.setDate(since.getDate() - days);
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const [cartRes, checkoutRes] = await Promise.all([
+      supabase.from('cart_events').select('created_at').gte('created_at', since.toISOString()),
+      supabase.from('checkout_events').select('*').gte('created_at', since.toISOString()),
+    ]);
+
+    if (cartRes.error || checkoutRes.error) {
+      console.error('Funnel fetch error:', cartRes.error || checkoutRes.error);
+      setLoading(false);
+      setRefreshing(false);
+      return;
+    }
+
+    const cartData = cartRes.data || [];
+    const checkoutData = checkoutRes.data || [];
+
+    setCartCount(cartData.length);
+    setCheckoutCount(checkoutData.length);
+
+    let tCart = 0;
+    let tCheckout = 0;
+    let totalValue = 0;
+    let todayValue = 0;
+    let discountCount = 0;
+    const dayCart: Record<string, number> = {};
+    const dayCheckout: Record<string, number> = {};
+    const bundleMap: Record<string, number> = {};
+
+    cartData.forEach((row: { created_at: string }) => {
+      const d = new Date(row.created_at);
+      const day = d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+      dayCart[day] = (dayCart[day] || 0) + 1;
+      if (d >= startOfToday) tCart += 1;
+    });
+
+    checkoutData.forEach((row: {
+      created_at: string;
+      total_price: number | null;
+      bundle_labels: string[] | null;
+      discount_code: string | null;
+    }) => {
+      const d = new Date(row.created_at);
+      const day = d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+      dayCheckout[day] = (dayCheckout[day] || 0) + 1;
+      const price = Number(row.total_price || 0);
+      totalValue += price;
+      if (d >= startOfToday) {
+        tCheckout += 1;
+        todayValue += price;
+      }
+      if (row.discount_code) discountCount += 1;
+      (row.bundle_labels || []).forEach((label) => {
+        bundleMap[label] = (bundleMap[label] || 0) + 1;
+      });
+    });
+
+    setTodayCart(tCart);
+    setTodayCheckout(tCheckout);
+    setCheckoutValue(Math.round(totalValue * 100) / 100);
+    setTodayCheckoutValue(Math.round(todayValue * 100) / 100);
+    setWithDiscount(discountCount);
+
+    const allDays = Array.from(new Set([...Object.keys(dayCart), ...Object.keys(dayCheckout)])).sort();
+    setCheckoutByDay(allDays.map(date => ({
+      date,
+      cart: dayCart[date] || 0,
+      checkout: dayCheckout[date] || 0,
+    })));
+
+    setCheckoutByBundle(
+      Object.entries(bundleMap)
+        .map(([label, count]) => ({ label, count }))
+        .sort((a, b) => b.count - a.count)
+    );
+
+    setLastUpdate(new Date());
+    setLoading(false);
+    setRefreshing(false);
+  }, [days]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <span className="ml-3 text-gray-500">Chargement du funnel…</span>
+      </div>
+    );
+  }
+
+  const conversionRate = cartCount > 0 ? Math.round((checkoutCount / cartCount) * 1000) / 10 : 0;
+  const todayConversionRate = todayCart > 0 ? Math.round((todayCheckout / todayCart) * 1000) / 10 : 0;
+  const abandonRate = cartCount > 0 ? Math.round(((cartCount - checkoutCount) / cartCount) * 1000) / 10 : 0;
+  const aov = checkoutCount > 0 ? Math.round((checkoutValue / checkoutCount) * 100) / 100 : 0;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <p className="text-xs text-gray-500">
+          {lastUpdate ? `Mis à jour à ${lastUpdate.toLocaleTimeString('fr-FR')}` : '—'}
+        </p>
+        <button
+          onClick={() => fetchData(true)}
+          disabled={refreshing}
+          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white shadow hover:bg-blue-700 transition disabled:opacity-60"
+        >
+          <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+          {refreshing ? 'Rafraîchissement…' : 'Rafraîchir'}
+        </button>
+      </div>
+
+      {/* Today highlight */}
+      <Card className="bg-gradient-to-r from-violet-600 to-violet-700 text-white shadow-md border-0">
+        <CardContent className="p-5">
+          <div className="flex items-center gap-1.5 text-xs text-violet-100 mb-3">
+            <Calendar className="h-3.5 w-3.5" />
+            Aujourd'hui ({new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long' })})
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-violet-200">Ajouts panier</p>
+              <p className="text-3xl font-bold">{todayCart}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-violet-200">Checkouts initiés</p>
+              <p className="text-3xl font-bold">{todayCheckout}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-violet-200">Conversion</p>
+              <p className="text-3xl font-bold">{todayConversionRate}%</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-violet-200">Valeur totale</p>
+              <p className="text-3xl font-bold">${todayCheckoutValue}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Funnel visual */}
+      <Card className="bg-white">
+        <CardHeader>
+          <CardTitle className="text-base">Entonnoir de conversion ({days}j)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <FunnelStep label="🛒 Ajouts au panier" value={cartCount} maxValue={cartCount} color="bg-blue-500" />
+            <FunnelStep
+              label="💳 Checkouts initiés (clic sur Checkout)"
+              value={checkoutCount}
+              maxValue={cartCount}
+              color="bg-violet-500"
+              sublabel={`${conversionRate}% des ajouts`}
+            />
+          </div>
+          <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t">
+            <div>
+              <p className="text-xs text-gray-500">Taux de conversion</p>
+              <p className="text-2xl font-bold text-violet-600">{conversionRate}%</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 flex items-center gap-1">Abandon panier</p>
+              <p className="text-2xl font-bold text-red-500">{abandonRate}%</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Panier moyen</p>
+              <p className="text-2xl font-bold text-green-600">${aov}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Avec code promo</p>
+              <p className="text-2xl font-bold text-amber-600">{withDiscount}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Daily comparison chart */}
+      <Card className="bg-white">
+        <CardHeader>
+          <CardTitle className="text-base">Ajouts vs Checkouts par jour</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {checkoutByDay.length === 0 ? (
+            <p className="text-gray-400 text-sm py-8 text-center">Aucune donnée</p>
+          ) : (
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={checkoutByDay}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                  <Tooltip />
+                  <Bar dataKey="cart" fill="#3b82f6" name="Ajouts panier" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="checkout" fill="#8b5cf6" name="Checkouts initiés" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Bundle distribution at checkout */}
+      <Card className="bg-white">
+        <CardHeader>
+          <CardTitle className="text-base">Packs présents au moment du checkout</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {checkoutByBundle.length === 0 ? (
+            <p className="text-gray-400 text-sm py-8 text-center">Aucun checkout enregistré</p>
+          ) : (
+            <div className="space-y-2">
+              {checkoutByBundle.map((b) => (
+                <div key={b.label} className="flex justify-between text-sm border-b border-gray-50 pb-1">
+                  <span className="text-gray-600">{b.label}</span>
+                  <span className="font-semibold">{b.count}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm text-amber-900">
+        <p className="font-semibold mb-1">💡 Note :</p>
+        <p>Le tracking des checkouts vient d'être activé. Les données s'accumuleront à partir de maintenant. Pour le taux de conversion final (checkout → commande payée), il faudra croiser avec les commandes Shopify une fois le token Admin API renouvelé.</p>
+      </div>
+    </div>
+  );
+}
+
+function FunnelStep({ label, value, maxValue, color, sublabel }: { label: string; value: number; maxValue: number; color: string; sublabel?: string }) {
+  const pct = maxValue > 0 ? Math.round((value / maxValue) * 100) : 0;
+  return (
+    <div>
+      <div className="flex justify-between text-sm mb-1">
+        <span className="text-gray-700 font-medium">{label}</span>
+        <span className="text-gray-500">
+          <span className="font-semibold text-gray-900">{value}</span>
+          {sublabel && <span className="ml-2 text-xs">· {sublabel}</span>}
+        </span>
+      </div>
+      <div className="h-6 bg-gray-100 rounded-full overflow-hidden">
+        <div className={`h-full ${color} rounded-full transition-all flex items-center justify-end pr-2`} style={{ width: `${Math.max(pct, 2)}%` }}>
+          {pct >= 15 && <span className="text-[10px] text-white font-semibold">{pct}%</span>}
+        </div>
+      </div>
     </div>
   );
 }

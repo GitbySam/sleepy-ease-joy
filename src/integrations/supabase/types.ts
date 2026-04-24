@@ -50,6 +50,48 @@ export type Database = {
         }
         Relationships: []
       }
+      checkout_events: {
+        Row: {
+          bundle_labels: string[] | null
+          created_at: string
+          currency: string | null
+          discount_code: string | null
+          id: string
+          referrer: string | null
+          source: string | null
+          total_items: number
+          total_price: number | null
+          user_agent: string | null
+          variant_ids: string[] | null
+        }
+        Insert: {
+          bundle_labels?: string[] | null
+          created_at?: string
+          currency?: string | null
+          discount_code?: string | null
+          id?: string
+          referrer?: string | null
+          source?: string | null
+          total_items?: number
+          total_price?: number | null
+          user_agent?: string | null
+          variant_ids?: string[] | null
+        }
+        Update: {
+          bundle_labels?: string[] | null
+          created_at?: string
+          currency?: string | null
+          discount_code?: string | null
+          id?: string
+          referrer?: string | null
+          source?: string | null
+          total_items?: number
+          total_price?: number | null
+          user_agent?: string | null
+          variant_ids?: string[] | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
