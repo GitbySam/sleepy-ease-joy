@@ -176,6 +176,8 @@ function CartEventsTab({ days }: { days: number }) {
   const [todayTotal, setTodayTotal] = useState(0);
   const [todayByBundle, setTodayByBundle] = useState<Array<{ label: string; count: number }>>([]);
   const [byDay, setByDay] = useState<Array<{ date: string; count: number }>>([]);
+  const [last7Days, setLast7Days] = useState<Array<{ date: string; label: string; count: number }>>([]);
+  const [last7Total, setLast7Total] = useState(0);
   const [byBundle, setByBundle] = useState<Array<{ label: string; count: number }>>([]);
   const [bySource, setBySource] = useState<Array<{ source: string; count: number }>>([]);
   const [todayBySource, setTodayBySource] = useState<Array<{ source: string; count: number }>>([]);
@@ -191,10 +193,15 @@ function CartEventsTab({ days }: { days: number }) {
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
 
+    // For 7-day rolling window we always query at least 7 days back
+    const sinceFor7 = new Date();
+    sinceFor7.setDate(sinceFor7.getDate() - 7);
+    const queryStart = sinceFor7 < since ? sinceFor7 : since;
+
     const { data, error } = await supabase
       .from('cart_events')
       .select('created_at, bundle_label, quantity, source')
-      .gte('created_at', since.toISOString())
+      .gte('created_at', queryStart.toISOString())
       .order('created_at', { ascending: true });
 
     if (error || !data) {
@@ -204,14 +211,13 @@ function CartEventsTab({ days }: { days: number }) {
       return;
     }
 
-    setTotal(data.length);
-
     const dayMap: Record<string, number> = {};
     const bundleMap: Record<string, number> = {};
     const todayBundleMap: Record<string, number> = {};
     const sourceMap: Record<string, number> = {};
     const todaySourceMap: Record<string, number> = {};
     let todayCount = 0;
+    let periodCount = 0;
 
     const sourceLabel = (s: string | null) => {
       if (s === 'landing') return 'Landing page';
@@ -220,8 +226,18 @@ function CartEventsTab({ days }: { days: number }) {
       return 'Inconnu (avant tracking)';
     };
 
+    // Build a per-day count map indexed by ISO date (YYYY-MM-DD) for the 7-day rolling view
+    const dayIsoMap: Record<string, number> = {};
+
     data.forEach((row: { created_at: string; bundle_label: string | null; quantity: number; source: string | null }) => {
       const createdAt = new Date(row.created_at);
+      const isoDay = createdAt.toISOString().slice(0, 10);
+      dayIsoMap[isoDay] = (dayIsoMap[isoDay] || 0) + 1;
+
+      // Only aggregate into period stats if within selected `days` window
+      if (createdAt < since) return;
+      periodCount += 1;
+
       const day = createdAt.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
       dayMap[day] = (dayMap[day] || 0) + 1;
       const label = row.bundle_label || 'unknown';
@@ -235,6 +251,26 @@ function CartEventsTab({ days }: { days: number }) {
         todaySourceMap[src] = (todaySourceMap[src] || 0) + 1;
       }
     });
+
+    setTotal(periodCount);
+
+    // Build last 7 days array (rolling), filling zeros for missing days
+    const rolling: Array<{ date: string; label: string; count: number }> = [];
+    let rollingTotal = 0;
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      d.setDate(d.getDate() - i);
+      const iso = d.toISOString().slice(0, 10);
+      const count = dayIsoMap[iso] || 0;
+      rollingTotal += count;
+      const label = i === 0
+        ? "Aujourd'hui"
+        : d.toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: '2-digit' });
+      rolling.push({ date: iso, label, count });
+    }
+    setLast7Days(rolling);
+    setLast7Total(rollingTotal);
 
     setTodayTotal(todayCount);
     setTodayByBundle(
@@ -327,6 +363,46 @@ function CartEventsTab({ days }: { days: number }) {
                 ))}
               </div>
             )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 7 jours glissants */}
+      <Card className="bg-white">
+        <CardHeader>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <CardTitle className="text-base">📅 Ajouts panier — 7 derniers jours glissants</CardTitle>
+              <p className="text-xs text-gray-500 mt-1">Vue jour par jour incluant aujourd'hui</p>
+            </div>
+            <div className="text-right">
+              <p className="text-[10px] uppercase tracking-wider text-gray-400">Total 7j</p>
+              <p className="text-2xl font-bold text-blue-600">{last7Total}</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={last7Days}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                <Tooltip
+                  formatter={(value: number) => [value, "Ajouts"]}
+                  labelFormatter={(label: string) => label}
+                />
+                <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Ajouts" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="mt-4 grid grid-cols-7 gap-1 text-center">
+            {last7Days.map((d) => (
+              <div key={d.date} className={`rounded-md p-2 ${d.count > 0 ? 'bg-blue-50' : 'bg-gray-50'}`}>
+                <p className="text-[10px] text-gray-500 truncate">{d.label}</p>
+                <p className={`text-sm font-bold ${d.count > 0 ? 'text-blue-700' : 'text-gray-400'}`}>{d.count}</p>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
