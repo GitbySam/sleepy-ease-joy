@@ -367,6 +367,46 @@ function CartEventsTab({ days }: { days: number }) {
         </CardContent>
       </Card>
 
+      {/* 7 jours glissants */}
+      <Card className="bg-white">
+        <CardHeader>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <CardTitle className="text-base">📅 Ajouts panier — 7 derniers jours glissants</CardTitle>
+              <p className="text-xs text-gray-500 mt-1">Vue jour par jour incluant aujourd'hui</p>
+            </div>
+            <div className="text-right">
+              <p className="text-[10px] uppercase tracking-wider text-gray-400">Total 7j</p>
+              <p className="text-2xl font-bold text-blue-600">{last7Total}</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={last7Days}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                <Tooltip
+                  formatter={(value: number) => [value, "Ajouts"]}
+                  labelFormatter={(label: string) => label}
+                />
+                <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Ajouts" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="mt-4 grid grid-cols-7 gap-1 text-center">
+            {last7Days.map((d) => (
+              <div key={d.date} className={`rounded-md p-2 ${d.count > 0 ? 'bg-blue-50' : 'bg-gray-50'}`}>
+                <p className="text-[10px] text-gray-500 truncate">{d.label}</p>
+                <p className={`text-sm font-bold ${d.count > 0 ? 'text-blue-700' : 'text-gray-400'}`}>{d.count}</p>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <Card className="bg-white shadow-sm border">
           <CardContent className="p-4">
