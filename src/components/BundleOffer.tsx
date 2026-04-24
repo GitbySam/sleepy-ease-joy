@@ -64,8 +64,8 @@ const BundleOffer = () => {
 
   const bundles = [
     { qty: 1, label: "1 Sleep&zy", price: `${currencySymbol}24.95`, oldPrice: `${currencySymbol}49.90`, perUnit: `${currencySymbol}24.95${t("bundle.perUnit")}`, tag: null, packValue: "Single", priceNum: 24.95 },
-    { qty: 2, label: "2 Sleep&zy", price: `${currencySymbol}49.90`, oldPrice: `${currencySymbol}99.80`, perUnit: `${currencySymbol}24.95${t("bundle.perUnit")}`, tag: "BEST SELLER", packValue: "Duo Pack", priceNum: 49.90 },
-    { qty: 3, label: "3 Sleep&zy", price: `${currencySymbol}53.90`, oldPrice: `${currencySymbol}149.70`, perUnit: `${currencySymbol}17.97${t("bundle.perUnit")}`, tag: "BEST VALUE", packValue: "Family Pack", priceNum: 53.90 },
+    { qty: 2, label: "2 Sleep&zy", price: `${currencySymbol}49.90`, oldPrice: `${currencySymbol}99.80`, perUnit: `${currencySymbol}24.95${t("bundle.perUnit")}`, tag: "DUO PACK", packValue: "Duo Pack", priceNum: 49.90 },
+    { qty: 3, label: "3 Sleep&zy", price: `${currencySymbol}53.90`, oldPrice: `${currencySymbol}149.70`, perUnit: `${currencySymbol}17.97${t("bundle.perUnit")}`, tag: "FAMILY PACK", packValue: "Family Pack", priceNum: 53.90 },
   ];
 
   const titleParts = t("bundle.title").split(/<gold>|<\/gold>/);
