@@ -19,12 +19,6 @@ const COLOR_IMAGES: Record<string, string> = {
   Red: pillowRed,
 };
 
-const COLOR_SWATCHES: Record<string, string> = {
-  Grey: "#9CA3AF",
-  Gray: "#9CA3AF",
-  Black: "#1F2937",
-  Red: "#DC2626",
-};
 
 const TESTIMONIAL_KEYS = ["cart.testimonial1", "cart.testimonial2", "cart.testimonial3"] as const;
 
@@ -141,21 +135,12 @@ export const ShopifyCartDrawer = () => {
                       {(() => {
                         const colorOption = item.selectedOptions.find(o => o.name?.toLowerCase() === "color")?.value;
                         const colorImage = colorOption ? COLOR_IMAGES[colorOption] : undefined;
-                        const swatch = colorOption ? COLOR_SWATCHES[colorOption] : undefined;
                         const fallback = item.product.node.images?.edges?.[0]?.node?.url;
                         const imgSrc = colorImage || fallback;
                         return (
-                          <div className="relative w-16 h-16 bg-background rounded-md overflow-hidden flex-shrink-0 border border-border">
+                          <div className="w-16 h-16 bg-background rounded-md overflow-hidden flex-shrink-0 border border-border">
                             {imgSrc && (
                               <img src={imgSrc} alt={`${item.product.node.title}${colorOption ? ` - ${colorOption}` : ''}`} className="w-full h-full object-cover" />
-                            )}
-                            {swatch && (
-                              <span
-                                aria-label={colorOption}
-                                title={colorOption}
-                                className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full border-2 border-background shadow-sm"
-                                style={{ backgroundColor: swatch }}
-                              />
                             )}
                           </div>
                         );
