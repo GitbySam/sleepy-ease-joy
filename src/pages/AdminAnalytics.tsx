@@ -226,13 +226,20 @@ function CartEventsTab({ days }: { days: number }) {
       return 'Inconnu (avant tracking)';
     };
 
-    // Build a per-day count map indexed by ISO date (YYYY-MM-DD) for the 7-day rolling view
-    const dayIsoMap: Record<string, number> = {};
+    // Build a per-day count map indexed by LOCAL date (YYYY-MM-DD) so it matches
+    // "today" computed from new Date() in the user's browser timezone.
+    const dayLocalMap: Record<string, number> = {};
+    const localDayKey = (d: Date) => {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    };
 
     data.forEach((row: { created_at: string; bundle_label: string | null; quantity: number; source: string | null }) => {
       const createdAt = new Date(row.created_at);
-      const isoDay = createdAt.toISOString().slice(0, 10);
-      dayIsoMap[isoDay] = (dayIsoMap[isoDay] || 0) + 1;
+      const localDay = localDayKey(createdAt);
+      dayLocalMap[localDay] = (dayLocalMap[localDay] || 0) + 1;
 
       // Only aggregate into period stats if within selected `days` window
       if (createdAt < since) return;
@@ -261,13 +268,13 @@ function CartEventsTab({ days }: { days: number }) {
       const d = new Date();
       d.setHours(0, 0, 0, 0);
       d.setDate(d.getDate() - i);
-      const iso = d.toISOString().slice(0, 10);
-      const count = dayIsoMap[iso] || 0;
+      const key = localDayKey(d);
+      const count = dayLocalMap[key] || 0;
       rollingTotal += count;
       const label = i === 0
         ? "Aujourd'hui"
         : d.toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: '2-digit' });
-      rolling.push({ date: iso, label, count });
+      rolling.push({ date: key, label, count });
     }
     setLast7Days(rolling);
     setLast7Total(rollingTotal);
