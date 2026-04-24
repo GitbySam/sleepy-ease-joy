@@ -310,6 +310,14 @@ function CartEventsTab({ days }: { days: number }) {
     fetchCartEvents();
   }, [fetchCartEvents]);
 
+  // Auto-refresh every 30 seconds (silent, no spinner)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchCartEvents(true);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [fetchCartEvents]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -647,6 +655,14 @@ function FunnelTab({ days }: { days: number }) {
 
   useEffect(() => {
     fetchData();
+  }, [fetchData]);
+
+  // Auto-refresh every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchData(true);
+    }, 30000);
+    return () => clearInterval(interval);
   }, [fetchData]);
 
   if (loading) {
