@@ -7,6 +7,7 @@ import { ShoppingCart, Trash2, Loader2, ShieldCheck, Truck, RotateCcw, Lock, Sta
 import { useCartStore } from "@/stores/cartStore";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
+import { supabase } from "@/integrations/supabase/client";
 
 const TESTIMONIAL_KEYS = ["cart.testimonial1", "cart.testimonial2", "cart.testimonial3"] as const;
 
@@ -40,6 +41,26 @@ export const ShopifyCartDrawer = () => {
         value: totalPrice,
         numItems: totalItems,
       });
+      // Track checkout initiation in Supabase (fire-and-forget)
+      try {
+        const url = new URL(checkoutUrl);
+        const discountCode = url.searchParams.get('discount') || null;
+        const path = typeof window !== 'undefined' ? window.location.pathname : '';
+        const source = path.startsWith('/product') ? 'product' : path === '/' || path === '' ? 'landing' : 'other';
+        supabase.from('checkout_events').insert([{
+          total_items: items.reduce((sum, i) => sum + i.quantity, 0),
+          total_price: Math.round(totalPrice * 100) / 100,
+          currency: items[0]?.price?.currencyCode || 'USD',
+          bundle_labels: items.map(i => i.bundleLabel || 'single'),
+          variant_ids: items.map(i => i.variantId),
+          discount_code: discountCode,
+          source,
+          user_agent: navigator.userAgent,
+          referrer: document.referrer || null,
+        }]).then();
+      } catch (e) {
+        console.error('Failed to log checkout event', e);
+      }
       window.open(checkoutUrl, '_blank');
       setDrawerOpen(false);
     }
