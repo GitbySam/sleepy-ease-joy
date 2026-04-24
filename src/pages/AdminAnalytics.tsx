@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Eye, ShoppingCart, FileText, Loader2, RefreshCw, Calendar, CreditCard, TrendingDown } from "lucide-react";
+import { Eye, ShoppingCart, FileText, Loader2, RefreshCw, Calendar, CreditCard } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
