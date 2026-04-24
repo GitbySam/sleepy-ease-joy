@@ -36,9 +36,9 @@ export const translations = {
     es: "Boca abierta. Cabeza en el hombro de un desconocido. Baba en la camisa. Todos hemos pasado por eso. Sleep&zy mantiene tu cabeza en su lugar para dormir con dignidad.",
   },
   "hero.cta": {
-    en: "See how it works →",
-    fr: "Découvrir →",
-    es: "Ver cómo funciona →",
+    en: "Discover Sleep&zy →",
+    fr: "Découvrir Sleep&zy →",
+    es: "Descubre Sleep&zy →",
   },
   "hero.reviews": {
     en: "4.8/5 — 2,400+ reviews",
