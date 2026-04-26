@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Eye, ShoppingCart, FileText, Loader2, RefreshCw, Calendar, DollarSign, AlertCircle, Mail } from "lucide-react";
+import { Eye, ShoppingCart, FileText, Loader2, RefreshCw, Calendar, DollarSign, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -968,12 +968,6 @@ function SalesTab({ days }: { days: number }) {
     else setLoading(true);
     setError(null);
 
-    const { data: result, error: fnError } = await supabase.functions.invoke('shopify-analytics', {
-      method: 'GET',
-      // pass days via query string by appending to body workaround — invoke supports queryParams via headers
-    });
-
-    // Fallback: hit endpoint via fetch to pass query string properly
     try {
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/shopify-analytics?days=${days}`;
       const res = await fetch(url, {
@@ -991,10 +985,6 @@ function SalesTab({ days }: { days: number }) {
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Erreur réseau');
     }
-
-    // Suppress unused-variable warnings from initial invoke probe
-    void result;
-    void fnError;
 
     setLastUpdate(new Date());
     setLoading(false);
