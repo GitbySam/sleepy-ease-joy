@@ -564,6 +564,10 @@ function FunnelTab({ days }: { days: number }) {
   const [todayCheckoutValue, setTodayCheckoutValue] = useState(0);
   const [withDiscount, setWithDiscount] = useState(0);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const [uniqueCartVisitors, setUniqueCartVisitors] = useState(0);
+  const [uniqueCheckoutVisitors, setUniqueCheckoutVisitors] = useState(0);
+  const [trackedCartRows, setTrackedCartRows] = useState(0);
+  const [trackedCheckoutRows, setTrackedCheckoutRows] = useState(0);
 
   const fetchData = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -575,7 +579,7 @@ function FunnelTab({ days }: { days: number }) {
     startOfToday.setHours(0, 0, 0, 0);
 
     const [cartRes, checkoutRes] = await Promise.all([
-      supabase.from('cart_events').select('created_at').gte('created_at', since.toISOString()),
+      supabase.from('cart_events').select('created_at, visitor_id').gte('created_at', since.toISOString()),
       supabase.from('checkout_events').select('*').gte('created_at', since.toISOString()),
     ]);
 
@@ -600,12 +604,20 @@ function FunnelTab({ days }: { days: number }) {
     const dayCart: Record<string, number> = {};
     const dayCheckout: Record<string, number> = {};
     const bundleMap: Record<string, number> = {};
+    const cartVisitorSet = new Set<string>();
+    const checkoutVisitorSet = new Set<string>();
+    let cartTracked = 0;
+    let checkoutTracked = 0;
 
-    cartData.forEach((row: { created_at: string }) => {
+    cartData.forEach((row: { created_at: string; visitor_id: string | null }) => {
       const d = new Date(row.created_at);
       const day = d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
       dayCart[day] = (dayCart[day] || 0) + 1;
       if (d >= startOfToday) tCart += 1;
+      if (row.visitor_id) {
+        cartVisitorSet.add(row.visitor_id);
+        cartTracked += 1;
+      }
     });
 
     checkoutData.forEach((row: {
@@ -613,6 +625,7 @@ function FunnelTab({ days }: { days: number }) {
       total_price: number | null;
       bundle_labels: string[] | null;
       discount_code: string | null;
+      visitor_id?: string | null;
     }) => {
       const d = new Date(row.created_at);
       const day = d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
@@ -627,6 +640,10 @@ function FunnelTab({ days }: { days: number }) {
       (row.bundle_labels || []).forEach((label) => {
         bundleMap[label] = (bundleMap[label] || 0) + 1;
       });
+      if (row.visitor_id) {
+        checkoutVisitorSet.add(row.visitor_id);
+        checkoutTracked += 1;
+      }
     });
 
     setTodayCart(tCart);
@@ -634,6 +651,10 @@ function FunnelTab({ days }: { days: number }) {
     setCheckoutValue(Math.round(totalValue * 100) / 100);
     setTodayCheckoutValue(Math.round(todayValue * 100) / 100);
     setWithDiscount(discountCount);
+    setUniqueCartVisitors(cartVisitorSet.size);
+    setUniqueCheckoutVisitors(checkoutVisitorSet.size);
+    setTrackedCartRows(cartTracked);
+    setTrackedCheckoutRows(checkoutTracked);
 
     const allDays = Array.from(new Set([...Object.keys(dayCart), ...Object.keys(dayCheckout)])).sort();
     setCheckoutByDay(allDays.map(date => ({
@@ -678,6 +699,15 @@ function FunnelTab({ days }: { days: number }) {
   const todayConversionRate = todayCart > 0 ? Math.round((todayCheckout / todayCart) * 1000) / 10 : 0;
   const abandonRate = cartCount > 0 ? Math.round(((cartCount - checkoutCount) / cartCount) * 1000) / 10 : 0;
   const aov = checkoutCount > 0 ? Math.round((checkoutValue / checkoutCount) * 100) / 100 : 0;
+  const uniqueConversionRate = uniqueCartVisitors > 0
+    ? Math.round((uniqueCheckoutVisitors / uniqueCartVisitors) * 1000) / 10
+    : 0;
+  const uniqueAbandonRate = uniqueCartVisitors > 0
+    ? Math.round(((uniqueCartVisitors - uniqueCheckoutVisitors) / uniqueCartVisitors) * 1000) / 10
+    : 0;
+  const trackingCoverage = cartCount > 0
+    ? Math.round((trackedCartRows / cartCount) * 100)
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -757,6 +787,62 @@ function FunnelTab({ days }: { days: number }) {
               <p className="text-2xl font-bold text-amber-600">{withDiscount}</p>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Funnel par visiteur unique */}
+      <Card className="bg-white border-2 border-emerald-200">
+        <CardHeader>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <CardTitle className="text-base">👤 Entonnoir par visiteur unique ({days}j)</CardTitle>
+            <span className="text-[10px] uppercase tracking-wider bg-emerald-100 text-emerald-700 px-2 py-1 rounded">
+              Nouveau
+            </span>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            Déduplique les events : un visiteur qui ajoute 5 fois au panier ne compte qu'une fois.
+            C'est le vrai taux de conversion à optimiser.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <FunnelStep
+              label="👥 Visiteurs ayant ajouté au panier"
+              value={uniqueCartVisitors}
+              maxValue={uniqueCartVisitors}
+              color="bg-blue-500"
+            />
+            <FunnelStep
+              label="💳 Visiteurs ayant cliqué Checkout"
+              value={uniqueCheckoutVisitors}
+              maxValue={uniqueCartVisitors}
+              color="bg-emerald-500"
+              sublabel={`${uniqueConversionRate}% des visiteurs`}
+            />
+          </div>
+          <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4 border-t">
+            <div>
+              <p className="text-xs text-gray-500">Conversion (uniques)</p>
+              <p className="text-2xl font-bold text-emerald-600">{uniqueConversionRate}%</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Abandon (uniques)</p>
+              <p className="text-2xl font-bold text-red-500">{uniqueAbandonRate}%</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Visiteurs perdus</p>
+              <p className="text-2xl font-bold text-gray-700">
+                {Math.max(uniqueCartVisitors - uniqueCheckoutVisitors, 0)}
+              </p>
+            </div>
+          </div>
+          {trackingCoverage < 100 && cartCount > 0 && (
+            <p className="mt-4 text-[11px] text-gray-400">
+              Couverture tracking : {trackingCoverage}% des events ont un visitor_id
+              ({trackedCartRows}/{cartCount} panier · {trackedCheckoutRows}/{checkoutCount} checkout).
+              Les events plus anciens n'en ont pas — la précision augmentera avec le temps.
+            </p>
+          )}
         </CardContent>
       </Card>
 

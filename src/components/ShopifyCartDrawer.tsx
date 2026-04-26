@@ -8,6 +8,7 @@ import { useCartStore } from "@/stores/cartStore";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
 import { supabase } from "@/integrations/supabase/client";
+import { getVisitorId } from "@/lib/visitorId";
 import pillowGrey from "@/assets/product-pillow-grey-new.webp";
 import pillowBlack from "@/assets/product-pillow-black.webp";
 import pillowRed from "@/assets/product-pillow-red.webp";
@@ -68,6 +69,7 @@ export const ShopifyCartDrawer = () => {
           source,
           user_agent: navigator.userAgent,
           referrer: document.referrer || null,
+          visitor_id: getVisitorId(),
         }]).then();
       } catch (e) {
         console.error('Failed to log checkout event', e);
