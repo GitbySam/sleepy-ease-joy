@@ -921,3 +921,342 @@ function FunnelStep({ label, value, maxValue, color, sublabel }: { label: string
     </div>
   );
 }
+
+/* ─────────── SALES TAB (Shopify Admin API) ─────────── */
+interface ShopifySummary {
+  totalOrders: number;
+  totalRevenue: number;
+  averageOrderValue: number;
+  paidOrders: number;
+  refundedOrders: number;
+  cancelledOrders: number;
+  newCustomers: number;
+  currency: string;
+  realRevenue: number;
+  realAOV: number;
+  abandonedCount: number;
+  abandonedValue: number;
+  abandonedWithEmail: number;
+  abandonedScopeMissing: boolean;
+}
+interface AbandonedRow {
+  id: number;
+  email: string | null;
+  total_price: string;
+  currency: string;
+  created_at: string;
+  abandoned_checkout_url: string;
+  line_items_count: number;
+}
+interface ShopifyResult {
+  summary: ShopifySummary;
+  ordersByDay: Record<string, { orders: number; revenue: number }>;
+  topProducts: Array<{ title: string; quantity: number; revenue: number }>;
+  topCountries: Array<{ code: string; count: number }>;
+  abandonedCheckouts: AbandonedRow[];
+}
+
+function SalesTab({ days }: { days: number }) {
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [data, setData] = useState<ShopifyResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+
+  const fetchData = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    else setLoading(true);
+    setError(null);
+
+    const { data: result, error: fnError } = await supabase.functions.invoke('shopify-analytics', {
+      method: 'GET',
+      // pass days via query string by appending to body workaround — invoke supports queryParams via headers
+    });
+
+    // Fallback: hit endpoint via fetch to pass query string properly
+    try {
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/shopify-analytics?days=${days}`;
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        setError(json.error || `HTTP ${res.status}`);
+      } else {
+        setData(json);
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erreur réseau');
+    }
+
+    // Suppress unused-variable warnings from initial invoke probe
+    void result;
+    void fnError;
+
+    setLastUpdate(new Date());
+    setLoading(false);
+    setRefreshing(false);
+  }, [days]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <span className="ml-3 text-gray-500">Chargement des ventes Shopify…</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="bg-white border-2 border-red-200">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
+            <div className="flex-1">
+              <h3 className="font-semibold text-red-900 mb-1">Impossible de charger les ventes Shopify</h3>
+              <p className="text-sm text-red-700 mb-3">{error}</p>
+              {error.includes('401') && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-900">
+                  <p className="font-semibold mb-1">🔑 Token Shopify invalide ou expiré</p>
+                  <p className="text-xs mb-2">
+                    Le token <code className="bg-amber-100 px-1 rounded">SHOPIFY_ACCESS_TOKEN</code> doit être régénéré
+                    dans Shopify Admin → Apps → Custom apps → ton app → API credentials → Reveal token once.
+                  </p>
+                  <p className="text-xs">
+                    Scopes requis : <code className="bg-amber-100 px-1 rounded">read_orders</code>,{' '}
+                    <code className="bg-amber-100 px-1 rounded">read_checkouts</code>,{' '}
+                    <code className="bg-amber-100 px-1 rounded">read_customers</code>
+                  </p>
+                </div>
+              )}
+              <button
+                onClick={() => fetchData(true)}
+                className="mt-3 inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700"
+              >
+                <RefreshCw className="h-3.5 w-3.5" /> Réessayer
+              </button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!data) return null;
+
+  const s = data.summary;
+  const currencySymbol = s.currency === 'USD' ? '$' : s.currency === 'EUR' ? '€' : s.currency;
+  // Conversion finale : commandes payées / checkouts initiés (basé sur Shopify uniquement)
+  // Note : on ne croise pas avec checkout_events ici car ce sont des univers de tracking différents
+  const checkoutToOrderRate = s.abandonedCount + s.paidOrders > 0
+    ? Math.round((s.paidOrders / (s.abandonedCount + s.paidOrders)) * 1000) / 10
+    : 0;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <p className="text-xs text-gray-500">
+          {lastUpdate ? `Mis à jour à ${lastUpdate.toLocaleTimeString('fr-FR')}` : '—'}
+          <span className="ml-2 text-emerald-600">● Données Shopify Admin API</span>
+        </p>
+        <button
+          onClick={() => fetchData(true)}
+          disabled={refreshing}
+          className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white shadow hover:bg-emerald-700 transition disabled:opacity-60"
+        >
+          <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+          {refreshing ? 'Rafraîchissement…' : 'Rafraîchir'}
+        </button>
+      </div>
+
+      {/* Hero card : Revenus réels */}
+      <Card className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md border-0">
+        <CardContent className="p-5">
+          <div className="flex items-center gap-1.5 text-xs text-emerald-100 mb-3">
+            <DollarSign className="h-3.5 w-3.5" />
+            Revenus réels — {days} derniers jours (commandes payées uniquement)
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-emerald-200">CA réel</p>
+              <p className="text-3xl font-bold">{currencySymbol}{s.realRevenue.toFixed(2)}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-emerald-200">Commandes payées</p>
+              <p className="text-3xl font-bold">{s.paidOrders}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-emerald-200">Panier moyen réel</p>
+              <p className="text-3xl font-bold">{currencySymbol}{s.realAOV.toFixed(2)}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-emerald-200">Nouveaux clients</p>
+              <p className="text-3xl font-bold">{s.newCustomers}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Stats secondaires */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <Card className="bg-white border">
+          <CardContent className="p-4">
+            <p className="text-xs text-gray-500 mb-1">Total commandes</p>
+            <p className="text-2xl font-bold text-gray-900">{s.totalOrders}</p>
+            <p className="text-[10px] text-gray-400 mt-1">payées + en attente + remboursées</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-white border">
+          <CardContent className="p-4">
+            <p className="text-xs text-gray-500 mb-1">Remboursées</p>
+            <p className="text-2xl font-bold text-orange-600">{s.refundedOrders}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-white border">
+          <CardContent className="p-4">
+            <p className="text-xs text-gray-500 mb-1">Annulées</p>
+            <p className="text-2xl font-bold text-red-600">{s.cancelledOrders}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-white border">
+          <CardContent className="p-4">
+            <p className="text-xs text-gray-500 mb-1">Conversion finale</p>
+            <p className="text-2xl font-bold text-violet-600">{checkoutToOrderRate}%</p>
+            <p className="text-[10px] text-gray-400 mt-1">payées / (payées + abandonnées)</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Abandoned checkouts */}
+      <Card className="bg-white border-2 border-amber-200">
+        <CardHeader>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <CardTitle className="text-base flex items-center gap-2">
+                ⚠️ Checkouts abandonnés ({days}j)
+              </CardTitle>
+              <p className="text-xs text-gray-500 mt-1">
+                Visiteurs arrivés sur la page Shopify mais qui n'ont pas payé. C'est ici que tu perds le plus.
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-3xl font-bold text-amber-600">{s.abandonedCount}</p>
+              <p className="text-xs text-gray-500">CA perdu : {currencySymbol}{s.abandonedValue.toFixed(2)}</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {s.abandonedScopeMissing ? (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-900">
+              <p className="font-semibold mb-1">🔒 Scope manquant</p>
+              <p className="text-xs">
+                Le token Shopify n'a pas la permission <code className="bg-amber-100 px-1 rounded">read_checkouts</code>.
+                Va dans Shopify Admin → Apps → ta Custom App → Configuration → coche cette permission, puis régénère le token.
+              </p>
+            </div>
+          ) : data.abandonedCheckouts.length === 0 ? (
+            <p className="text-gray-400 text-sm py-8 text-center">Aucun checkout abandonné sur la période 🎉</p>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 gap-3 mb-4 pb-4 border-b">
+                <div className="bg-amber-50 rounded-lg p-3">
+                  <p className="text-xs text-amber-700">Avec email récupéré</p>
+                  <p className="text-2xl font-bold text-amber-900">{s.abandonedWithEmail}</p>
+                  <p className="text-[10px] text-amber-600 mt-1">→ relançables par email automatique</p>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <p className="text-xs text-gray-600">Sans email</p>
+                  <p className="text-2xl font-bold text-gray-700">{s.abandonedCount - s.abandonedWithEmail}</p>
+                  <p className="text-[10px] text-gray-500 mt-1">→ perdus définitivement</p>
+                </div>
+              </div>
+              <p className="text-xs font-semibold text-gray-700 mb-2">25 plus récents :</p>
+              <div className="space-y-1 max-h-96 overflow-y-auto">
+                {data.abandonedCheckouts.map((c) => (
+                  <div key={c.id} className="flex items-center justify-between text-xs border-b border-gray-50 py-2 gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 truncate">
+                        {c.email || <span className="text-gray-400 italic">Pas d'email</span>}
+                      </p>
+                      <p className="text-gray-500 text-[10px]">
+                        {new Date(c.created_at).toLocaleString('fr-FR')} · {c.line_items_count} article{c.line_items_count > 1 ? 's' : ''}
+                      </p>
+                    </div>
+                    <span className="font-semibold text-amber-700 whitespace-nowrap">
+                      {currencySymbol}{parseFloat(c.total_price).toFixed(2)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Top products */}
+      <Card className="bg-white">
+        <CardHeader>
+          <CardTitle className="text-base">🏆 Top produits vendus ({days}j)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {data.topProducts.length === 0 ? (
+            <p className="text-gray-400 text-sm py-8 text-center">Aucune vente</p>
+          ) : (
+            <div className="space-y-2">
+              {data.topProducts.map((p, i) => (
+                <div key={p.title} className="flex items-center justify-between text-sm border-b border-gray-50 py-2">
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <span className="text-gray-400 text-xs w-5">#{i + 1}</span>
+                    <span className="text-gray-700 truncate">{p.title}</span>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-gray-900">{currencySymbol}{p.revenue.toFixed(2)}</p>
+                    <p className="text-[10px] text-gray-500">{p.quantity} unité{p.quantity > 1 ? 's' : ''}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Top countries */}
+      <Card className="bg-white">
+        <CardHeader>
+          <CardTitle className="text-base">🌍 Pays</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {data.topCountries.length === 0 ? (
+            <p className="text-gray-400 text-sm py-8 text-center">Aucune donnée</p>
+          ) : (
+            <div className="space-y-2">
+              {data.topCountries.map((c) => (
+                <div key={c.code} className="flex justify-between text-sm border-b border-gray-50 py-1">
+                  <span className="text-gray-600">{c.code}</span>
+                  <span className="font-semibold">{c.count} commande{c.count > 1 ? 's' : ''}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="rounded-lg bg-blue-50 border border-blue-200 p-4 text-sm text-blue-900">
+        <p className="font-semibold mb-1">💡 Comment lire ces chiffres :</p>
+        <ul className="text-xs space-y-1 list-disc pl-5">
+          <li><strong>Revenus réels</strong> = uniquement les commandes payées. C'est ton vrai CA.</li>
+          <li><strong>Conversion finale</strong> = parmi tous ceux qui ont commencé un checkout Shopify, % qui ont payé. Si bas (&lt;30%), problème de friction au paiement (frais port, méthode CB, confiance).</li>
+          <li><strong>Avec email récupéré</strong> = Shopify peut envoyer des emails de relance automatiques (à activer dans Shopify Admin → Marketing → Automations).</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
