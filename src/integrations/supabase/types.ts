@@ -25,6 +25,7 @@ export type Database = {
           source: string | null
           user_agent: string | null
           variant_id: string
+          visitor_id: string | null
         }
         Insert: {
           bundle_label?: string | null
@@ -36,6 +37,7 @@ export type Database = {
           source?: string | null
           user_agent?: string | null
           variant_id: string
+          visitor_id?: string | null
         }
         Update: {
           bundle_label?: string | null
@@ -47,6 +49,7 @@ export type Database = {
           source?: string | null
           user_agent?: string | null
           variant_id?: string
+          visitor_id?: string | null
         }
         Relationships: []
       }
@@ -63,6 +66,7 @@ export type Database = {
           total_price: number | null
           user_agent: string | null
           variant_ids: string[] | null
+          visitor_id: string | null
         }
         Insert: {
           bundle_labels?: string[] | null
@@ -76,6 +80,7 @@ export type Database = {
           total_price?: number | null
           user_agent?: string | null
           variant_ids?: string[] | null
+          visitor_id?: string | null
         }
         Update: {
           bundle_labels?: string[] | null
@@ -89,6 +94,7 @@ export type Database = {
           total_price?: number | null
           user_agent?: string | null
           variant_ids?: string[] | null
+          visitor_id?: string | null
         }
         Relationships: []
       }
