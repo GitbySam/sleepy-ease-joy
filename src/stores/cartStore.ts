@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { supabase } from '@/integrations/supabase/client';
+import { getVisitorId } from '@/lib/visitorId';
 import {
   type CartItemData,
   type ShopifyProduct,
@@ -59,6 +60,7 @@ export const useCartStore = create<CartStore>()(
             user_agent: navigator.userAgent,
             referrer: document.referrer || null,
             source,
+            visitor_id: getVisitorId(),
           }]).then(); // fire-and-forget
 
           if (!cartId) {
