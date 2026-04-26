@@ -62,12 +62,49 @@ Deno.serve(async (req) => {
       newCustomers = customersData.count || 0;
     }
 
+    // Fetch abandoned checkouts (Admin API)
+    // These are checkouts where the user reached the Shopify checkout page,
+    // entered some info (often email) but did NOT complete payment.
+    const abandonedRes = await fetch(
+      `https://${SHOPIFY_STORE_DOMAIN}/admin/api/${SHOPIFY_API_VERSION}/checkouts.json?created_at_min=${sinceISO}&limit=250`,
+      {
+        headers: {
+          'X-Shopify-Access-Token': SHOPIFY_ACCESS_TOKEN,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    let abandonedCheckouts: any[] = [];
+    let abandonedScopeMissing = false;
+    if (abandonedRes.ok) {
+      const abandonedData = await abandonedRes.json();
+      abandonedCheckouts = abandonedData.checkouts || [];
+    } else if (abandonedRes.status === 401 || abandonedRes.status === 403) {
+      abandonedScopeMissing = true;
+      console.warn('Abandoned checkouts scope missing (read_checkouts).');
+    }
+
+    const abandonedCount = abandonedCheckouts.length;
+    const abandonedValue = abandonedCheckouts.reduce(
+      (sum: number, c: any) => sum + parseFloat(c.total_price || '0'),
+      0,
+    );
+    const abandonedWithEmail = abandonedCheckouts.filter((c: any) => !!c.email).length;
+
     // Process orders
     const totalRevenue = orders.reduce((sum: number, o: any) => sum + parseFloat(o.total_price || '0'), 0);
     const totalOrders = orders.length;
     const paidOrders = orders.filter((o: any) => o.financial_status === 'paid' || o.financial_status === 'partially_paid');
     const refundedOrders = orders.filter((o: any) => o.financial_status === 'refunded');
     const cancelledOrders = orders.filter((o: any) => o.cancelled_at !== null);
+
+    // Real revenue = paid orders only (not pending/refunded/cancelled)
+    const realRevenue = paidOrders.reduce(
+      (sum: number, o: any) => sum + parseFloat(o.total_price || '0'),
+      0,
+    );
+    const realAOV = paidOrders.length > 0 ? realRevenue / paidOrders.length : 0;
 
     // Average order value
     const aov = totalOrders > 0 ? totalRevenue / totalOrders : 0;
@@ -124,10 +161,27 @@ Deno.serve(async (req) => {
         cancelledOrders: cancelledOrders.length,
         newCustomers,
         currency,
+        // Real (paid only) figures — what the user actually banked
+        realRevenue: Math.round(realRevenue * 100) / 100,
+        realAOV: Math.round(realAOV * 100) / 100,
+        // Abandoned checkout metrics
+        abandonedCount,
+        abandonedValue: Math.round(abandonedValue * 100) / 100,
+        abandonedWithEmail,
+        abandonedScopeMissing,
       },
       ordersByDay,
       topProducts,
       topCountries,
+      abandonedCheckouts: abandonedCheckouts.slice(0, 25).map((c: any) => ({
+        id: c.id,
+        email: c.email,
+        total_price: c.total_price,
+        currency: c.currency,
+        created_at: c.created_at,
+        abandoned_checkout_url: c.abandoned_checkout_url,
+        line_items_count: (c.line_items || []).length,
+      })),
     };
 
     return new Response(JSON.stringify(result), {
