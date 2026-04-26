@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Eye, ShoppingCart, FileText, Loader2, RefreshCw, Calendar } from "lucide-react";
+import { Eye, ShoppingCart, FileText, Loader2, RefreshCw, Calendar, DollarSign, AlertCircle, Mail } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -22,6 +22,7 @@ const pixelEvents = [
 const TABS = [
   { id: "cart", label: "🛒 Ajouts panier" },
   { id: "funnel", label: "🎯 Funnel" },
+  { id: "sales", label: "💰 Ventes Shopify" },
   { id: "traffic", label: "📈 Trafic" },
   { id: "sources", label: "🔗 Sources" },
   { id: "meta", label: "📱 Meta Ads" },
@@ -86,6 +87,7 @@ export default function AdminAnalytics() {
         {/* Tab content */}
         {activeTab === "cart" && <CartEventsTab days={days} />}
         {activeTab === "funnel" && <FunnelTab days={days} />}
+        {activeTab === "sales" && <SalesTab days={days} />}
         {activeTab === "traffic" && <TrafficTab />}
         {activeTab === "sources" && <SourcesTab />}
         {activeTab === "meta" && <MetaTab />}
