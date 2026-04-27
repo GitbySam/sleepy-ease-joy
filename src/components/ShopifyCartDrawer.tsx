@@ -74,7 +74,15 @@ export const ShopifyCartDrawer = () => {
       } catch (e) {
         console.error('Failed to log checkout event', e);
       }
-      window.open(checkoutUrl, '_blank');
+      let finalUrl = checkoutUrl;
+      try {
+        const u = new URL(checkoutUrl);
+        if (u.hostname.endsWith('.myshopify.com')) {
+          u.hostname = 'checkout.sleepenzy.com';
+          finalUrl = u.toString();
+        }
+      } catch {}
+      window.open(finalUrl, '_blank');
       setDrawerOpen(false);
     }
   };
