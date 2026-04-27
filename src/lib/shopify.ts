@@ -215,10 +215,6 @@ function formatCheckoutUrl(checkoutUrl: string): string {
   try {
     const url = new URL(checkoutUrl);
     url.searchParams.set('channel', 'online_store');
-    // Custom checkout subdomain (must be configured in Shopify + DNS pointing to shops.myshopify.com)
-    if (url.hostname.endsWith('.myshopify.com')) {
-      url.hostname = 'checkout.sleepenzy.com';
-    }
     return url.toString();
   } catch {
     return checkoutUrl;
