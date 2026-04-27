@@ -215,6 +215,9 @@ function formatCheckoutUrl(checkoutUrl: string): string {
   try {
     const url = new URL(checkoutUrl);
     url.searchParams.set('channel', 'online_store');
+    if (url.hostname.endsWith('.myshopify.com')) {
+      url.hostname = 'checkout.sleepenzy.com';
+    }
     return url.toString();
   } catch {
     return checkoutUrl;
