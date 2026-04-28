@@ -570,6 +570,9 @@ function FunnelTab({ days }: { days: number }) {
   const [uniqueCheckoutVisitors, setUniqueCheckoutVisitors] = useState(0);
   const [trackedCartRows, setTrackedCartRows] = useState(0);
   const [trackedCheckoutRows, setTrackedCheckoutRows] = useState(0);
+  const [latencyP50, setLatencyP50] = useState<number | null>(null);
+  const [latencyP95, setLatencyP95] = useState<number | null>(null);
+  const [clickCount, setClickCount] = useState(0); // checkouts cliqués (toutes lignes)
 
   const fetchData = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -593,10 +596,13 @@ function FunnelTab({ days }: { days: number }) {
     }
 
     const cartData = cartRes.data || [];
-    const checkoutData = checkoutRes.data || [];
+    const allCheckoutData = checkoutRes.data || [];
+    // Only count rows where the Shopify checkout actually displayed
+    const checkoutData = allCheckoutData.filter((r: { displayed?: boolean }) => r.displayed === true);
 
     setCartCount(cartData.length);
     setCheckoutCount(checkoutData.length);
+    setClickCount(allCheckoutData.length);
 
     let tCart = 0;
     let tCheckout = 0;
@@ -647,6 +653,20 @@ function FunnelTab({ days }: { days: number }) {
         checkoutTracked += 1;
       }
     });
+
+    // Compute display latency percentiles across all rows that have a value
+    const latencies = allCheckoutData
+      .map((r: { display_latency_ms?: number | null }) => r.display_latency_ms)
+      .filter((v): v is number => typeof v === 'number' && v >= 0)
+      .sort((a, b) => a - b);
+    if (latencies.length > 0) {
+      const pick = (p: number) => latencies[Math.min(latencies.length - 1, Math.floor(p * latencies.length))];
+      setLatencyP50(pick(0.5));
+      setLatencyP95(pick(0.95));
+    } else {
+      setLatencyP50(null);
+      setLatencyP95(null);
+    }
 
     setTodayCart(tCart);
     setTodayCheckout(tCheckout);
@@ -764,11 +784,11 @@ function FunnelTab({ days }: { days: number }) {
           <div className="space-y-3">
             <FunnelStep label="🛒 Ajouts au panier" value={cartCount} maxValue={cartCount} color="bg-blue-500" />
             <FunnelStep
-              label="💳 Checkouts initiés (clic sur Checkout)"
+              label="💳 Checkouts affichés (page Shopify chargée)"
               value={checkoutCount}
               maxValue={cartCount}
               color="bg-violet-500"
-              sublabel={`${conversionRate}% des ajouts`}
+              sublabel={`${conversionRate}% des ajouts · ${clickCount} clics au total`}
             />
           </div>
           <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t">
@@ -789,6 +809,27 @@ function FunnelTab({ days }: { days: number }) {
               <p className="text-2xl font-bold text-amber-600">{withDiscount}</p>
             </div>
           </div>
+          {/* Display latency block */}
+          <div className="mt-4 grid grid-cols-2 gap-3 pt-4 border-t">
+            <div>
+              <p className="text-xs text-gray-500">Latence affichage (p50)</p>
+              <p className="text-2xl font-bold text-violet-600">
+                {latencyP50 !== null ? `${(latencyP50 / 1000).toFixed(1)}s` : '—'}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Latence affichage (p95)</p>
+              <p className={`text-2xl font-bold ${latencyP95 !== null && latencyP95 > 5000 ? 'text-red-500' : 'text-violet-600'}`}>
+                {latencyP95 !== null ? `${(latencyP95 / 1000).toFixed(1)}s` : '—'}
+              </p>
+            </div>
+          </div>
+          {clickCount > checkoutCount && (
+            <p className="mt-3 text-[11px] text-gray-500">
+              {clickCount - checkoutCount} clics sur Checkout n'ont pas abouti à un affichage détecté
+              (popup bloquée, abandon avant chargement, ou page lente).
+            </p>
+          )}
         </CardContent>
       </Card>
 
@@ -815,7 +856,7 @@ function FunnelTab({ days }: { days: number }) {
               color="bg-blue-500"
             />
             <FunnelStep
-              label="💳 Visiteurs ayant cliqué Checkout"
+              label="💳 Visiteurs ayant vu le checkout"
               value={uniqueCheckoutVisitors}
               maxValue={uniqueCartVisitors}
               color="bg-emerald-500"
@@ -851,7 +892,7 @@ function FunnelTab({ days }: { days: number }) {
       {/* Daily comparison chart */}
       <Card className="bg-white">
         <CardHeader>
-          <CardTitle className="text-base">Ajouts vs Checkouts par jour</CardTitle>
+          <CardTitle className="text-base">Ajouts vs Checkouts affichés par jour</CardTitle>
         </CardHeader>
         <CardContent>
           {checkoutByDay.length === 0 ? (
@@ -865,7 +906,7 @@ function FunnelTab({ days }: { days: number }) {
                   <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
                   <Tooltip />
                   <Bar dataKey="cart" fill="#3b82f6" name="Ajouts panier" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="checkout" fill="#8b5cf6" name="Checkouts initiés" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="checkout" fill="#8b5cf6" name="Checkouts affichés" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
