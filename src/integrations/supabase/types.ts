@@ -59,6 +59,8 @@ export type Database = {
           created_at: string
           currency: string | null
           discount_code: string | null
+          display_latency_ms: number | null
+          displayed: boolean
           id: string
           referrer: string | null
           source: string | null
@@ -73,6 +75,8 @@ export type Database = {
           created_at?: string
           currency?: string | null
           discount_code?: string | null
+          display_latency_ms?: number | null
+          displayed?: boolean
           id?: string
           referrer?: string | null
           source?: string | null
@@ -87,6 +91,8 @@ export type Database = {
           created_at?: string
           currency?: string | null
           discount_code?: string | null
+          display_latency_ms?: number | null
+          displayed?: boolean
           id?: string
           referrer?: string | null
           source?: string | null
