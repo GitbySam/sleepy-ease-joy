@@ -56,7 +56,7 @@ export const translations = {
     es: "Más vendido 🏆",
   },
   "hero.priceOld": {
-    en: "$49.90",
+    en: "$39.90",
     fr: "39,90$",
     es: "$39.90",
   },
