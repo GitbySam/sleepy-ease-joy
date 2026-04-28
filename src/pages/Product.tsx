@@ -120,7 +120,7 @@ const Product = () => {
   // Fixed retail pricing — overrides Shopify variant price for display & cart
   const singlePrice = 19.95;
   const duoPrice = 39.90;
-  const familyPrice = 43.09;
+  const familyPrice = 43.10;
   const currencySymbol = lang === "en" ? "$" : "€";
   const oldPricePerUnit = 39.90; // Reference "public" price before site-wide discount
 

@@ -65,7 +65,7 @@ const BundleOffer = () => {
   const bundles = [
     { qty: 1, label: "1 Sleep&zy", price: `${currencySymbol}19.95`, oldPrice: `${currencySymbol}39.90`, perUnit: `${currencySymbol}19.95${t("bundle.perUnit")}`, tag: null, packValue: "Single", priceNum: 19.95 },
     { qty: 2, label: "2 Sleep&zy", price: `${currencySymbol}39.90`, oldPrice: `${currencySymbol}79.80`, perUnit: `${currencySymbol}19.95${t("bundle.perUnit")}`, tag: "DUO PACK", packValue: "Duo Pack", priceNum: 39.90 },
-    { qty: 3, label: "3 Sleep&zy", price: `${currencySymbol}43.09`, oldPrice: `${currencySymbol}119.70`, perUnit: `${currencySymbol}14.36${t("bundle.perUnit")}`, tag: "FAMILY PACK", packValue: "Family Pack", priceNum: 43.09 },
+    { qty: 3, label: "3 Sleep&zy", price: `${currencySymbol}43.10`, oldPrice: `${currencySymbol}119.70`, perUnit: `${currencySymbol}14.37${t("bundle.perUnit")}`, tag: "FAMILY PACK", packValue: "Family Pack", priceNum: 43.10 },
   ];
 
   const titleParts = t("bundle.title").split(/<gold>|<\/gold>/);
