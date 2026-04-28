@@ -53,13 +53,16 @@ export const ShopifyCartDrawer = () => {
         value: totalPrice,
         numItems: totalItems,
       });
-      // Track checkout initiation in Supabase (fire-and-forget)
+      // Build the event payload but DO NOT log yet.
+      // We log only when the Shopify checkout page is actually displayed
+      // (detected by the user's tab going hidden → visible after the click,
+      // which happens when the new tab takes focus, then they return).
       try {
         const url = new URL(checkoutUrl);
         const discountCode = url.searchParams.get('discount') || null;
         const path = typeof window !== 'undefined' ? window.location.pathname : '';
         const source = path.startsWith('/product') ? 'product' : path === '/' || path === '' ? 'landing' : 'other';
-        supabase.from('checkout_events').insert([{
+        const payload = {
           total_items: items.reduce((sum, i) => sum + i.quantity, 0),
           total_price: Math.round(totalPrice * 100) / 100,
           currency: items[0]?.price?.currencyCode || 'USD',
@@ -70,9 +73,13 @@ export const ShopifyCartDrawer = () => {
           user_agent: navigator.userAgent,
           referrer: document.referrer || null,
           visitor_id: getVisitorId(),
-        }]).then();
+        };
+        sessionStorage.setItem('pending_checkout_event', JSON.stringify({
+          payload,
+          clickedAt: Date.now(),
+        }));
       } catch (e) {
-        console.error('Failed to log checkout event', e);
+        console.error('Failed to prepare checkout event', e);
       }
       let finalUrl = checkoutUrl;
       try {
@@ -86,6 +93,69 @@ export const ShopifyCartDrawer = () => {
       setDrawerOpen(false);
     }
   };
+
+  // Detect when the Shopify checkout tab actually takes focus (page hidden),
+  // then log the event with display latency once the user returns.
+  // Fallback: if the tab never hides within 8s, log as not-displayed.
+  useEffect(() => {
+    let wentHiddenAt: number | null = null;
+    let fallbackTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const flush = (displayed: boolean, latencyMs: number | null) => {
+      const raw = sessionStorage.getItem('pending_checkout_event');
+      if (!raw) return;
+      sessionStorage.removeItem('pending_checkout_event');
+      try {
+        const { payload } = JSON.parse(raw) as { payload: Record<string, unknown>; clickedAt: number };
+        supabase.from('checkout_events').insert([{
+          ...payload,
+          displayed,
+          display_latency_ms: latencyMs,
+        }]).then();
+      } catch (e) {
+        console.error('Failed to log checkout event', e);
+      }
+    };
+
+    const onVisibility = () => {
+      const raw = sessionStorage.getItem('pending_checkout_event');
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as { clickedAt: number };
+
+      if (document.visibilityState === 'hidden') {
+        wentHiddenAt = Date.now();
+        if (fallbackTimer) { clearTimeout(fallbackTimer); fallbackTimer = null; }
+      } else if (document.visibilityState === 'visible' && wentHiddenAt) {
+        const latency = wentHiddenAt - parsed.clickedAt;
+        flush(true, Math.max(0, latency));
+        wentHiddenAt = null;
+      }
+    };
+
+    // Set up an 8s fallback whenever a pending event exists and tab is still visible
+    const armFallback = () => {
+      if (fallbackTimer) clearTimeout(fallbackTimer);
+      fallbackTimer = setTimeout(() => {
+        if (sessionStorage.getItem('pending_checkout_event')) {
+          flush(false, null);
+        }
+      }, 8000);
+    };
+
+    // Watch for new pending events appearing (after handleCheckout)
+    const pollInterval = setInterval(() => {
+      if (sessionStorage.getItem('pending_checkout_event') && !fallbackTimer) {
+        armFallback();
+      }
+    }, 500);
+
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      if (fallbackTimer) clearTimeout(fallbackTimer);
+      clearInterval(pollInterval);
+    };
+  }, []);
 
   return (
     <Sheet open={isDrawerOpen} onOpenChange={setDrawerOpen}>
