@@ -118,11 +118,11 @@ const Product = () => {
   const familyVariant = coloredVariants.find(v => v.node.selectedOptions?.some(o => o.value === 'Family Pack'))?.node;
 
   // Fixed retail pricing — overrides Shopify variant price for display & cart
-  const singlePrice = 24.95;
-  const duoPrice = 49.90;
-  const familyPrice = 53.90;
+  const singlePrice = 19.95;
+  const duoPrice = 39.90;
+  const familyPrice = 21.55;
   const currencySymbol = lang === "en" ? "$" : "€";
-  const oldPricePerUnit = 49.90; // Reference "public" price before site-wide discount
+  const oldPricePerUnit = 39.90; // Reference "public" price before site-wide discount
 
   const badges = [
     t("product.badge360"),
@@ -137,8 +137,8 @@ const Product = () => {
   ];
 
   const bundlePrices: Record<number, number> = { 1: singlePrice * promoMultiplier, 2: duoPrice * promoMultiplier, 3: familyPrice * promoMultiplier };
-  const bundleOldPrices: Record<number, number> = { 1: oldPricePerUnit, 2: oldPricePerUnit * 2, 3: oldPricePerUnit * 3 };
-  // Old prices: Single $49.90 / Duo $99.80 / Family $149.70
+  const bundleOldPrices: Record<number, number> = { 1: oldPricePerUnit, 2: oldPricePerUnit * 2, 3: 59.85 };
+  // Old prices: Single $39.90 / Duo $79.80 / Family $59.85 (3 × $19.95). Family discount = -64%
 
   const handleAddToCart = async () => {
     if (!product) return;
