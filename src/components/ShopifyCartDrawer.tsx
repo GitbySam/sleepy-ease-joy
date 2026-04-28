@@ -3,7 +3,7 @@ import cartTrustBadges from "@/assets/cart-trust-badges.jpg";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Trash2, Loader2, ShieldCheck, Truck, RotateCcw, Lock, Star, CheckCircle } from "lucide-react";
+import { ShoppingCart, Trash2, Loader2, ShieldCheck, Truck, RotateCcw, Lock, Star, CheckCircle, Minus, Plus } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
@@ -182,6 +182,33 @@ export const ShopifyCartDrawer = () => {
                         <button onClick={() => removeItem(item.variantId, item.bundleLabel)} className="text-muted-foreground hover:text-destructive transition-colors">
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
+                        {(() => {
+                          const step = item.bundleUnitSize && item.bundleUnitSize > 0 ? item.bundleUnitSize : 1;
+                          const packs = Math.max(1, Math.round(item.quantity / step));
+                          const decrease = () => updateQuantity(item.variantId, Math.max(step, item.quantity - step), item.bundleLabel);
+                          const increase = () => updateQuantity(item.variantId, item.quantity + step, item.bundleLabel);
+                          return (
+                            <div className="flex items-center gap-1 border border-border rounded-md bg-background">
+                              <button
+                                onClick={decrease}
+                                disabled={isLoading || packs <= 1}
+                                aria-label="Decrease quantity"
+                                className="p-1.5 hover:bg-muted transition-colors rounded-l-md disabled:opacity-40 disabled:cursor-not-allowed"
+                              >
+                                <Minus className="h-3 w-3" />
+                              </button>
+                              <span className="text-xs font-semibold w-5 text-center text-foreground">{packs}</span>
+                              <button
+                                onClick={increase}
+                                disabled={isLoading}
+                                aria-label="Increase quantity"
+                                className="p-1.5 hover:bg-muted transition-colors rounded-r-md disabled:opacity-40 disabled:cursor-not-allowed"
+                              >
+                                <Plus className="h-3 w-3" />
+                              </button>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   ))}
