@@ -207,9 +207,9 @@ export const translations = {
     es: "Protege tu <gold>reputación</gold>",
   },
   "bundle.socialProof": {
-    en: "<bold>7 out of 10 customers</bold> save a friend from embarrassment too",
-    fr: "<bold>7 clients sur 10</bold> sauvent aussi un ami de la gêne",
-    es: "<bold>7 de cada 10 clientes</bold> salvan a un amigo de la vergüenza también",
+    en: "<bold>7 out of 10 customers</bold> save a friend or family from embarrassment too",
+    fr: "<bold>7 clients sur 10</bold> sauvent aussi un(e) ami(e) ou un proche de la gêne",
+    es: "<bold>7 de cada 10 clientes</bold> salvan a un amigo o familiar de la vergüenza también",
   },
   "bundle.perUnit": { en: "/unit", fr: "/unité", es: "/unidad" },
   "bundle.lowStock": {
