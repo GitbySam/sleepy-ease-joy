@@ -80,7 +80,7 @@ const UpsellPopup = ({ open, onClose, onAccept }: UpsellPopupProps) => {
                       <h3 className="font-bold text-foreground text-sm">{t("upsell.productName")}</h3>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-lg font-bold text-gold">$19.90</span>
-                        <span className="text-sm text-muted-foreground line-through">$59.95</span>
+                        <span className="text-sm text-muted-foreground line-through">$59.95 CAD</span>
                       </div>
                       <div className="flex items-center gap-1 mt-1">
                         <Flame size={12} className="text-destructive" />

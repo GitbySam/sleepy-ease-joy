@@ -62,8 +62,8 @@ const CartDrawer = ({ open, onClose, items, onUpdateQty, onRemove }: CartDrawerP
                     <p className="font-semibold text-foreground text-sm">Sleep&zy™ — {item.label}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">Ergonomic Cervical Pillow</p>
                     <div className="flex items-center gap-2 mt-2">
-                      <span className="text-base font-bold text-foreground">${(item.unitPrice * item.qty).toFixed(2)}</span>
-                      <span className="text-xs text-muted-foreground line-through">${(item.unitOldPrice * item.qty).toFixed(2)}</span>
+                      <span className="text-base font-bold text-foreground">${(item.unitPrice * item.qty).toFixed(2)} CAD</span>
+                      <span className="text-xs text-muted-foreground line-through">${(item.unitOldPrice * item.qty).toFixed(2)} CAD</span>
                     </div>
                   </div>
                   <div className="flex flex-col items-end justify-between">
@@ -97,14 +97,14 @@ const CartDrawer = ({ open, onClose, items, onUpdateQty, onRemove }: CartDrawerP
               {savings > 0 && (
                 <div className="bg-gold/10 border border-gold/30 text-center py-2 rounded-lg">
                   <span className="text-sm font-bold text-foreground">
-                    🌸 Spring Savings: <span className="text-gold">${savings.toFixed(2)}</span>!
+                    🌸 Spring Savings: <span className="text-gold">${savings.toFixed(2)} CAD</span>!
                   </span>
                 </div>
               )}
 
               <div className="flex items-center justify-between">
                 <span className="text-base font-bold text-foreground">Total</span>
-                <span className="text-xl font-bold text-foreground">${totalPrice.toFixed(2)}</span>
+                <span className="text-xl font-bold text-foreground">${totalPrice.toFixed(2)} CAD</span>
               </div>
 
               <motion.button

@@ -221,7 +221,7 @@ export const ShopifyCartDrawer = () => {
                           + {item.quantity}× {t("cart.transportBag")}
                         </p>
                         <p className="font-semibold text-foreground mt-1">
-                          ${item.bundlePrice ? item.bundlePrice.toFixed(2) : (parseFloat(item.price.amount) * item.quantity).toFixed(2)}
+                          ${item.bundlePrice ? item.bundlePrice.toFixed(2) : (parseFloat(item.price.amount) * item.quantity).toFixed(2)} CAD
                         </p>
                       </div>
                       <div className="flex flex-col items-end gap-2 flex-shrink-0">
@@ -280,7 +280,7 @@ export const ShopifyCartDrawer = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold text-foreground">{t("cart.total")}</span>
                   <span className="text-xl font-bold text-foreground">
-                    ${totalPrice.toFixed(2)}
+                    ${totalPrice.toFixed(2)} CAD
                   </span>
                 </div>
                 <Button onClick={handleCheckout} className="w-full bg-gold hover:bg-gold/90 text-primary-foreground shadow-gold-glow" size="lg" disabled={items.length === 0 || isLoading || isSyncing}>
