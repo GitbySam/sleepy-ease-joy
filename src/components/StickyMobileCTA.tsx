@@ -94,8 +94,8 @@ const StickyMobileCTA = () => {
               <ShoppingBag size={18} />
               <span className="text-sm uppercase tracking-wider">{t("sticky.cta")}</span>
               <span className="text-sm font-normal ml-1">
-                <span className="line-through opacity-60">{currencySymbol}39.90</span>{" "}
-                <span className="font-bold">{currencySymbol}19.95</span>
+                <span className="line-through opacity-60">{currencySymbol}59.95</span>{" "}
+                <span className="font-bold">{currencySymbol}29.95</span>
               </span>
             </motion.div>
           </div>

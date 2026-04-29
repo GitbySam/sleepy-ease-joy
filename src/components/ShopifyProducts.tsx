@@ -32,7 +32,7 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, selectedColor, t }: ProductCardProps) => {
   // Fixed retail price — overrides Shopify price for display
-  const displayPrice = 19.95;
+  const displayPrice = 29.95;
   const productUrl = `/product/${product.node.handle}?color=${selectedColor}`;
   const { addItem, setDrawerOpen } = useCartStore();
 
