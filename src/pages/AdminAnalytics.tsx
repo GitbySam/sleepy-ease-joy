@@ -785,11 +785,11 @@ function FunnelTab({ days }: { days: number }) {
           <div className="space-y-3">
             <FunnelStep label="🛒 Ajouts au panier" value={cartCount} maxValue={cartCount} color="bg-blue-500" />
             <FunnelStep
-              label="💳 Checkouts affichés (page Shopify chargée)"
+              label="💳 Checkouts initiés"
               value={checkoutCount}
               maxValue={cartCount}
               color="bg-violet-500"
-              sublabel={`${conversionRate}% des ajouts · ${clickCount} clics au total`}
+              sublabel={`${conversionRate}% des ajouts panier`}
             />
           </div>
           <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t">
@@ -813,24 +813,22 @@ function FunnelTab({ days }: { days: number }) {
           {/* Display latency block */}
           <div className="mt-4 grid grid-cols-2 gap-3 pt-4 border-t">
             <div>
-              <p className="text-xs text-gray-500">Latence affichage (p50)</p>
+              <p className="text-xs text-gray-500">Latence affichage (p50) <span className="text-gray-400">— desktop</span></p>
               <p className="text-2xl font-bold text-violet-600">
-                {latencyP50 !== null ? `${(latencyP50 / 1000).toFixed(1)}s` : '—'}
+                {latencyP50 !== null ? `${(latencyP50 / 1000).toFixed(1)}s` : <span className="text-sm text-gray-400 font-normal">Données insuffisantes</span>}
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Latence affichage (p95)</p>
+              <p className="text-xs text-gray-500">Latence affichage (p95) <span className="text-gray-400">— desktop</span></p>
               <p className={`text-2xl font-bold ${latencyP95 !== null && latencyP95 > 5000 ? 'text-red-500' : 'text-violet-600'}`}>
-                {latencyP95 !== null ? `${(latencyP95 / 1000).toFixed(1)}s` : '—'}
+                {latencyP95 !== null ? `${(latencyP95 / 1000).toFixed(1)}s` : <span className="text-sm text-gray-400 font-normal">Données insuffisantes</span>}
               </p>
             </div>
           </div>
-          {clickCount > checkoutCount && (
-            <p className="mt-3 text-[11px] text-gray-500">
-              {clickCount - checkoutCount} clics sur Checkout n'ont pas abouti à un affichage détecté
-              (popup bloquée, abandon avant chargement, ou page lente).
-            </p>
-          )}
+          <p className="mt-3 text-[11px] text-gray-400">
+            La latence d'affichage est mesurée en best-effort uniquement quand le navigateur signale le passage à l'onglet Shopify
+            (essentiellement desktop). Le nombre de checkouts ci-dessus reflète bien 100% des clics enregistrés.
+          </p>
         </CardContent>
       </Card>
 
@@ -893,7 +891,7 @@ function FunnelTab({ days }: { days: number }) {
       {/* Daily comparison chart */}
       <Card className="bg-white">
         <CardHeader>
-          <CardTitle className="text-base">Ajouts vs Checkouts affichés par jour</CardTitle>
+          <CardTitle className="text-base">Ajouts vs Checkouts initiés par jour</CardTitle>
         </CardHeader>
         <CardContent>
           {checkoutByDay.length === 0 ? (
@@ -907,7 +905,7 @@ function FunnelTab({ days }: { days: number }) {
                   <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
                   <Tooltip />
                   <Bar dataKey="cart" fill="#3b82f6" name="Ajouts panier" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="checkout" fill="#8b5cf6" name="Checkouts affichés" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="checkout" fill="#8b5cf6" name="Checkouts initiés" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
