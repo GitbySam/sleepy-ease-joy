@@ -572,7 +572,6 @@ function FunnelTab({ days }: { days: number }) {
   const [trackedCheckoutRows, setTrackedCheckoutRows] = useState(0);
   const [latencyP50, setLatencyP50] = useState<number | null>(null);
   const [latencyP95, setLatencyP95] = useState<number | null>(null);
-  const [clickCount, setClickCount] = useState(0); // checkouts cliqués (toutes lignes)
 
   const fetchData = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -596,13 +595,12 @@ function FunnelTab({ days }: { days: number }) {
     }
 
     const cartData = cartRes.data || [];
-    const allCheckoutData = checkoutRes.data || [];
-    // Only count rows where the Shopify checkout actually displayed
-    const checkoutData = allCheckoutData.filter((r: { displayed?: boolean }) => r.displayed === true);
+    // Source of truth = every recorded checkout click. `displayed` is an
+    // opportunistic desktop-only signal kept ONLY for latency stats below.
+    const checkoutData = checkoutRes.data || [];
 
     setCartCount(cartData.length);
     setCheckoutCount(checkoutData.length);
-    setClickCount(allCheckoutData.length);
 
     let tCart = 0;
     let tCheckout = 0;
@@ -654,8 +652,9 @@ function FunnelTab({ days }: { days: number }) {
       }
     });
 
-    // Compute display latency percentiles across all rows that have a value
-    const latencies = allCheckoutData
+    // Compute display latency percentiles across rows that captured a value
+    // (desktop / opportunistic). It's normal for this to be a subset.
+    const latencies = checkoutData
       .map((r: { display_latency_ms?: number | null }) => r.display_latency_ms)
       .filter((v): v is number => typeof v === 'number' && v >= 0)
       .sort((a, b) => a - b);
@@ -784,11 +783,11 @@ function FunnelTab({ days }: { days: number }) {
           <div className="space-y-3">
             <FunnelStep label="🛒 Ajouts au panier" value={cartCount} maxValue={cartCount} color="bg-blue-500" />
             <FunnelStep
-              label="💳 Checkouts affichés (page Shopify chargée)"
+              label="💳 Checkouts initiés"
               value={checkoutCount}
               maxValue={cartCount}
               color="bg-violet-500"
-              sublabel={`${conversionRate}% des ajouts · ${clickCount} clics au total`}
+              sublabel={`${conversionRate}% des ajouts panier`}
             />
           </div>
           <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t">
@@ -812,24 +811,22 @@ function FunnelTab({ days }: { days: number }) {
           {/* Display latency block */}
           <div className="mt-4 grid grid-cols-2 gap-3 pt-4 border-t">
             <div>
-              <p className="text-xs text-gray-500">Latence affichage (p50)</p>
+              <p className="text-xs text-gray-500">Latence affichage (p50) <span className="text-gray-400">— desktop</span></p>
               <p className="text-2xl font-bold text-violet-600">
-                {latencyP50 !== null ? `${(latencyP50 / 1000).toFixed(1)}s` : '—'}
+                {latencyP50 !== null ? `${(latencyP50 / 1000).toFixed(1)}s` : <span className="text-sm text-gray-400 font-normal">Données insuffisantes</span>}
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Latence affichage (p95)</p>
+              <p className="text-xs text-gray-500">Latence affichage (p95) <span className="text-gray-400">— desktop</span></p>
               <p className={`text-2xl font-bold ${latencyP95 !== null && latencyP95 > 5000 ? 'text-red-500' : 'text-violet-600'}`}>
-                {latencyP95 !== null ? `${(latencyP95 / 1000).toFixed(1)}s` : '—'}
+                {latencyP95 !== null ? `${(latencyP95 / 1000).toFixed(1)}s` : <span className="text-sm text-gray-400 font-normal">Données insuffisantes</span>}
               </p>
             </div>
           </div>
-          {clickCount > checkoutCount && (
-            <p className="mt-3 text-[11px] text-gray-500">
-              {clickCount - checkoutCount} clics sur Checkout n'ont pas abouti à un affichage détecté
-              (popup bloquée, abandon avant chargement, ou page lente).
-            </p>
-          )}
+          <p className="mt-3 text-[11px] text-gray-400">
+            La latence d'affichage est mesurée en best-effort uniquement quand le navigateur signale le passage à l'onglet Shopify
+            (essentiellement desktop). Le nombre de checkouts ci-dessus reflète bien 100% des clics enregistrés.
+          </p>
         </CardContent>
       </Card>
 
@@ -892,7 +889,7 @@ function FunnelTab({ days }: { days: number }) {
       {/* Daily comparison chart */}
       <Card className="bg-white">
         <CardHeader>
-          <CardTitle className="text-base">Ajouts vs Checkouts affichés par jour</CardTitle>
+          <CardTitle className="text-base">Ajouts vs Checkouts initiés par jour</CardTitle>
         </CardHeader>
         <CardContent>
           {checkoutByDay.length === 0 ? (
@@ -906,7 +903,7 @@ function FunnelTab({ days }: { days: number }) {
                   <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
                   <Tooltip />
                   <Bar dataKey="cart" fill="#3b82f6" name="Ajouts panier" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="checkout" fill="#8b5cf6" name="Checkouts affichés" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="checkout" fill="#8b5cf6" name="Checkouts initiés" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
