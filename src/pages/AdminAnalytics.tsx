@@ -572,7 +572,6 @@ function FunnelTab({ days }: { days: number }) {
   const [trackedCheckoutRows, setTrackedCheckoutRows] = useState(0);
   const [latencyP50, setLatencyP50] = useState<number | null>(null);
   const [latencyP95, setLatencyP95] = useState<number | null>(null);
-  const [clickCount, setClickCount] = useState(0); // checkouts cliqués (toutes lignes)
 
   const fetchData = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -602,7 +601,6 @@ function FunnelTab({ days }: { days: number }) {
 
     setCartCount(cartData.length);
     setCheckoutCount(checkoutData.length);
-    setClickCount(checkoutData.length);
 
     let tCart = 0;
     let tCheckout = 0;
