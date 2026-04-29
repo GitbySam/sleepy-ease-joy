@@ -596,13 +596,13 @@ function FunnelTab({ days }: { days: number }) {
     }
 
     const cartData = cartRes.data || [];
-    const allCheckoutData = checkoutRes.data || [];
-    // Only count rows where the Shopify checkout actually displayed
-    const checkoutData = allCheckoutData.filter((r: { displayed?: boolean }) => r.displayed === true);
+    // Source of truth = every recorded checkout click. `displayed` is an
+    // opportunistic desktop-only signal kept ONLY for latency stats below.
+    const checkoutData = checkoutRes.data || [];
 
     setCartCount(cartData.length);
     setCheckoutCount(checkoutData.length);
-    setClickCount(allCheckoutData.length);
+    setClickCount(checkoutData.length);
 
     let tCart = 0;
     let tCheckout = 0;
@@ -654,8 +654,9 @@ function FunnelTab({ days }: { days: number }) {
       }
     });
 
-    // Compute display latency percentiles across all rows that have a value
-    const latencies = allCheckoutData
+    // Compute display latency percentiles across rows that captured a value
+    // (desktop / opportunistic). It's normal for this to be a subset.
+    const latencies = checkoutData
       .map((r: { display_latency_ms?: number | null }) => r.display_latency_ms)
       .filter((v): v is number => typeof v === 'number' && v >= 0)
       .sort((a, b) => a - b);
