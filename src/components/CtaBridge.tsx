@@ -36,8 +36,8 @@ const CtaBridge = () => {
             </Link>
           </motion.span>
           <p className="text-xs text-muted-foreground">
-            <span className="line-through">{currencySymbol}39.90</span>{" "}
-            <span className="text-gold font-bold">{currencySymbol}19.95</span>{" "}
+            <span className="line-through">{currencySymbol}59.95</span>{" "}
+            <span className="text-gold font-bold">{currencySymbol}29.95</span>{" "}
             — {t("ctaBridge.savings")}
           </p>
         </motion.div>
