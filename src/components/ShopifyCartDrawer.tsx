@@ -53,10 +53,11 @@ export const ShopifyCartDrawer = () => {
         value: totalPrice,
         numItems: totalItems,
       });
-      // Build the event payload but DO NOT log yet.
-      // We log only when the Shopify checkout page is actually displayed
-      // (detected by the user's tab going hidden → visible after the click,
-      // which happens when the new tab takes focus, then they return).
+      // Log the checkout event immediately on click. This is the source of
+      // truth for "checkouts initiated". Display latency is captured
+      // opportunistically below (desktop-only, best-effort) via a separate
+      // UPDATE — it must NEVER block or replace this insert.
+      let pendingId: string | null = null;
       try {
         const url = new URL(checkoutUrl);
         const discountCode = url.searchParams.get('discount') || null;
@@ -74,10 +75,19 @@ export const ShopifyCartDrawer = () => {
           referrer: document.referrer || null,
           visitor_id: getVisitorId(),
         };
-        sessionStorage.setItem('pending_checkout_event', JSON.stringify({
-          payload,
-          clickedAt: Date.now(),
-        }));
+        supabase.from('checkout_events').insert([payload]).select('id').single().then(({ data, error }) => {
+          if (error) {
+            console.error('Failed to log checkout event', error);
+            return;
+          }
+          if (data?.id) {
+            pendingId = data.id;
+            sessionStorage.setItem('pending_checkout_id', JSON.stringify({
+              id: data.id,
+              clickedAt: Date.now(),
+            }));
+          }
+        });
       } catch (e) {
         console.error('Failed to prepare checkout event', e);
       }
@@ -94,66 +104,32 @@ export const ShopifyCartDrawer = () => {
     }
   };
 
-  // Detect when the Shopify checkout tab actually takes focus (page hidden),
-  // then log the event with display latency once the user returns.
-  // Fallback: if the tab never hides within 8s, log as not-displayed.
+  // OPPORTUNISTIC: when the Shopify checkout tab takes focus (this tab goes
+  // hidden), update the just-inserted row with displayed=true and the latency.
+  // Best-effort only — works mostly on desktop. We never mark displayed=false
+  // (that would pollute data on mobile where this listener rarely fires).
   useEffect(() => {
-    let wentHiddenAt: number | null = null;
-    let fallbackTimer: ReturnType<typeof setTimeout> | null = null;
-
-    const flush = (displayed: boolean, latencyMs: number | null) => {
-      const raw = sessionStorage.getItem('pending_checkout_event');
-      if (!raw) return;
-      sessionStorage.removeItem('pending_checkout_event');
-      try {
-        const { payload } = JSON.parse(raw) as { payload: Record<string, unknown>; clickedAt: number };
-        supabase.from('checkout_events').insert([{
-          ...payload,
-          displayed,
-          display_latency_ms: latencyMs,
-        }]).then();
-      } catch (e) {
-        console.error('Failed to log checkout event', e);
-      }
-    };
-
     const onVisibility = () => {
-      const raw = sessionStorage.getItem('pending_checkout_event');
+      if (document.visibilityState !== 'hidden') return;
+      const raw = sessionStorage.getItem('pending_checkout_id');
       if (!raw) return;
-      const parsed = JSON.parse(raw) as { clickedAt: number };
-
-      if (document.visibilityState === 'hidden') {
-        wentHiddenAt = Date.now();
-        if (fallbackTimer) { clearTimeout(fallbackTimer); fallbackTimer = null; }
-      } else if (document.visibilityState === 'visible' && wentHiddenAt) {
-        const latency = wentHiddenAt - parsed.clickedAt;
-        flush(true, Math.max(0, latency));
-        wentHiddenAt = null;
+      try {
+        const { id, clickedAt } = JSON.parse(raw) as { id: string; clickedAt: number };
+        const latency = Math.max(0, Date.now() - clickedAt);
+        sessionStorage.removeItem('pending_checkout_id');
+        // Fire-and-forget update; page may unload before it completes (that's fine).
+        supabase.from('checkout_events')
+          .update({ displayed: true, display_latency_ms: latency })
+          .eq('id', id)
+          .then();
+      } catch (e) {
+        console.error('Failed to record checkout display latency', e);
       }
     };
-
-    // Set up an 8s fallback whenever a pending event exists and tab is still visible
-    const armFallback = () => {
-      if (fallbackTimer) clearTimeout(fallbackTimer);
-      fallbackTimer = setTimeout(() => {
-        if (sessionStorage.getItem('pending_checkout_event')) {
-          flush(false, null);
-        }
-      }, 8000);
-    };
-
-    // Watch for new pending events appearing (after handleCheckout)
-    const pollInterval = setInterval(() => {
-      if (sessionStorage.getItem('pending_checkout_event') && !fallbackTimer) {
-        armFallback();
-      }
-    }, 500);
 
     document.addEventListener('visibilitychange', onVisibility);
     return () => {
       document.removeEventListener('visibilitychange', onVisibility);
-      if (fallbackTimer) clearTimeout(fallbackTimer);
-      clearInterval(pollInterval);
     };
   }, []);
 
