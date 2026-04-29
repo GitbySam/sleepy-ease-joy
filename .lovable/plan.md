@@ -1,69 +1,63 @@
-# Renommer "Checkout initié" → mesurer "Checkout affiché"
+# Réparation du dashboard /admin/analytics
 
-## Contexte
+## Problème constaté
 
-Aujourd'hui dans `ShopifyCartDrawer.tsx`, dès le clic sur "Secure Checkout" :
-- on insère une ligne dans `checkout_events` (Supabase)
-- on track `InitiateCheckout` (Meta Pixel)
-- puis on fait `window.open(finalUrl, '_blank')`
+Les données sont bien en base (181 checkouts sur 30j, 35 aujourd'hui, paniers cohérents jusqu'à $161) mais le dashboard affiche **0 checkouts initiés**, **0% conversion**, **100% abandon**.
 
-→ C'est un **clic d'intention**, pas une preuve que la page Shopify s'est affichée. Si la page met 5s à charger ou si l'onglet est bloqué par le navigateur, on compte quand même.
+**Cause** : lors du dernier tour, j'ai changé la définition de "checkout" pour ne compter que les lignes avec `displayed = true`. Or le mécanisme de détection d'affichage (basé sur `visibilitychange` + setTimeout de 8s) ne se déclenche presque jamais en production :
+- Sur mobile/Shopify, le navigateur décharge souvent la page d'origine avant que le code de "flush" ne s'exécute
+- Aucune des 181 lignes en base n'a `displayed = true`
 
-## Problème de fond
+**Conséquence** : KPIs faux et anxiogènes alors que les ventes ont bien lieu.
 
-On ne peut pas savoir de manière fiable, depuis notre app, si la page checkout Shopify s'est **réellement affichée** chez l'utilisateur :
-- l'onglet checkout est sur un autre domaine (`checkout.sleepenzy.com` / `*.myshopify.com`) → pas d'accès cross-origin
-- `window.open()` retourne une référence mais on ne peut pas lire `readyState` cross-origin
-- Shopify ne nous notifie pas du chargement
+## Décision
 
-## Solutions possibles (à choisir)
+Revenir à la sémantique simple et fiable : **un checkout = un clic enregistré côté serveur**. C'est ce qui correspond à la réalité business (intent réel d'achat) et c'est ce que mesurent Shopify Analytics et Meta Pixel.
 
-### Option A — Mesure de latence côté Storefront API (recommandé, sans dev Shopify)
-Renommer la métrique en **"Checkout prêt"** et la logger seulement quand l'URL checkout est **disponible et ouverte**. Aujourd'hui, `getCheckoutUrl()` est déjà mis en cache au moment de l'`addItem`, donc l'URL est instantanée. Le vrai goulot, c'est le **temps de chargement** de la page Shopify côté navigateur.
+La latence reste utile mais devient une **métrique bonus** non bloquante, affichée seulement si on a des données.
 
-On ajoute un **timing** :
-1. Au clic : enregistrer `clickedAt = performance.now()`, ouvrir l'onglet, **ne pas** logger encore
-2. Surveiller `document.visibilitychange` : quand l'utilisateur **revient** sur notre onglet, on sait que le checkout s'est affiché (l'onglet est passé en arrière-plan ≥ X ms)
-3. Logger alors `checkout_events` avec un champ `display_latency_ms` = temps entre clic et changement de visibilité
-4. Si l'utilisateur ne revient jamais → log après timeout (ex. 8s) avec un flag `displayed: false/unknown`
+## Changements
 
-Renommer dans le dashboard `AdminAnalytics.tsx` :
-- "Checkouts initiés" → **"Checkouts affichés"**
-- "Bar dataKey checkout" garde le nom interne, label change
-- Ajouter une carte **"Latence médiane d'affichage"** (p50/p95)
+### 1. `src/pages/AdminAnalytics.tsx` — Onglet Funnel
 
-### Option B — Renommage simple uniquement
-Juste renommer "initié" → "affiché" dans l'UI Admin sans changer la logique. Honnête seulement si on accepte que c'est une approximation. **Pas recommandé** si tu suspectes vraiment de la lenteur — ça masquerait le problème.
+- **Renommer** "Checkouts affichés (page Shopify chargée)" → **"Checkouts initiés"** (compte tous les events `checkout_events`, peu importe `displayed`)
+- **KPI principal "CHECKOUTS INITIÉS"** dans la bannière violette : utiliser `total_checkouts` (= COUNT(*)) au lieu de `COUNT(*) WHERE displayed=true`
+- **Taux de conversion** : recalculer sur tous les checkouts (pas seulement ceux affichés)
+- **Abandon panier** : recalculer pareil
+- **Latence p50/p95** : garder la section mais
+  - Ne calculer que sur les lignes où `display_latency_ms IS NOT NULL`
+  - Si 0 ligne avec latence : afficher "Données insuffisantes" au lieu d'un tiret cassé
+  - Retirer la phrase culpabilisante "X clics sur Checkout n'ont pas abouti à un affichage détecté" (elle est trompeuse car c'est le tracking qui est limité, pas les utilisateurs qui abandonnent)
+- **Funnel par visiteur unique** : pareil, dédoublonner sur tous les checkouts, pas seulement displayed
 
-### Option C — Ajout d'un `Script Tag` Shopify (le plus précis, mais demande accès Admin)
-Installer un petit script JS sur le thème checkout Shopify qui ping un endpoint Supabase (`checkout_displayed`) au `DOMContentLoaded`. Nécessite :
-- token Admin avec scope `write_script_tags`
-- une edge function Supabase publique pour recevoir les pings
+### 2. `src/components/ShopifyCartDrawer.tsx` — Simplifier le tracking
 
-## Changements de code (Option A)
+- **Garder** : insertion immédiate du `checkout_event` au clic (c'est ce qui marche)
+- **Garder mais rendre best-effort** : la mesure de latence via `visibilitychange` (utile sur desktop quand ça marche, pas grave quand ça marche pas)
+- **Retirer** : le fallback `setTimeout(8000)` qui marque artificiellement `displayed=false` (il pollue les données)
+- **Logique** : `displayed` reste à `false` par défaut. Il passe à `true` UNIQUEMENT si on capture vraiment l'événement `visibilitychange → hidden`. Sinon on ne touche pas la ligne.
 
-### `src/components/ShopifyCartDrawer.tsx`
-- Ajouter `const clickedAtRef = useRef<number | null>(null)`
-- Dans `handleCheckout` : stocker `performance.now()`, ne plus insérer dans `checkout_events` immédiatement
-- Ajouter un `useEffect` qui écoute `visibilitychange` :
-  - quand `document.hidden === true` puis `false` après le clic, on calcule la latence et on insère le row avec `displayed: true, display_latency_ms: ...`
-- Garder `trackInitiateCheckout` (Meta) au clic — c'est ce que Meta attend de toute façon
+### 3. Note mémoire
 
-### Migration Supabase
-Ajouter colonnes à `checkout_events` :
-- `displayed boolean default false`
-- `display_latency_ms integer null`
+Mettre à jour `mem://features/admin-dashboard` pour documenter :
+- "Checkouts initiés" = tous les clics enregistrés (source de vérité business)
+- `displayed` / `display_latency_ms` = métriques opportunistes desktop uniquement, à ne JAMAIS utiliser comme dénominateur principal
 
-### `src/pages/AdminAnalytics.tsx`
-- Filtrer `checkout_events` sur `displayed = true` pour le KPI principal
-- Renommer label : "Checkouts initiés" → **"Checkouts affichés"**
-- Bar chart : `name="Checkouts affichés"`
-- Nouvelle carte KPI : **"Latence médiane d'affichage"** (p50) + p95
-- Le taux de conversion `conversionRate` utilise désormais checkouts affichés / paniers (plus honnête)
+## Détails techniques
 
-### `mem://features/admin-dashboard`
-Mettre à jour pour refléter la nouvelle métrique et la mesure de latence.
+```text
+Avant (cassé) :
+  KPI Checkouts = COUNT(*) WHERE displayed=true   →  toujours 0
+  Conversion    = displayed / cart_adds           →  toujours 0%
 
-## Question pour toi
+Après (correct) :
+  KPI Checkouts = COUNT(*) sur checkout_events    →  35 aujourd'hui
+  Conversion    = checkouts / cart_adds           →  ~chiffre réaliste
+  Latence p50   = percentile sur display_latency_ms WHERE NOT NULL (info bonus)
+```
 
-Confirme l'option (A, B ou C) avant que je passe en mode build.
+Pas de migration SQL nécessaire — les colonnes `displayed` et `display_latency_ms` existent déjà et restent utilisables pour la latence opportuniste.
+
+## Résultat attendu
+
+Vous rouvrez `/admin/analytics` → onglet Funnel → vous voyez immédiatement vos **35 checkouts initiés aujourd'hui** et un taux de conversion cohérent avec la réalité de vos ventes Shopify de ce matin.
