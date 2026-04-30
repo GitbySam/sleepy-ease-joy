@@ -160,7 +160,7 @@ export const useCartStore = create<CartStore>()(
         }
       },
 
-      clearCart: () => set({ items: [], cartId: null, checkoutUrl: null }),
+      clearCart: () => set({ items: [], cartId: null, checkoutUrl: null, cartCountry: null }),
       getCheckoutUrl: () => get().checkoutUrl,
 
       syncCart: async () => {
