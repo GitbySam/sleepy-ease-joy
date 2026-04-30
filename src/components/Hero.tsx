@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 const heroBanner = "/hero-banner.webp";
 const demoVideo = "/demo-video.mp4";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useMarket } from "@/i18n/MarketContext";
 import { useViewerCount } from "@/hooks/useViewerCount";
 
 /**
