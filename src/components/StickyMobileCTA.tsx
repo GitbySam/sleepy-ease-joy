@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useMarket } from "@/i18n/MarketContext";
 import { useViewerCount } from "@/hooks/useViewerCount";
 
 const StickyMobileCTA = () => {
   const [visible, setVisible] = useState(false);
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
+  const { prices, formatPrice } = useMarket();
   const viewerCount = useViewerCount();
 
   useEffect(() => {
@@ -67,8 +69,6 @@ const StickyMobileCTA = () => {
     };
   }, []);
 
-  const currencySymbol = lang === "en" ? "$" : "€";
-
   return (
     <AnimatePresence>
       {visible && (
@@ -94,8 +94,8 @@ const StickyMobileCTA = () => {
               <ShoppingBag size={18} />
               <span className="text-sm uppercase tracking-wider">{t("sticky.cta")}</span>
               <span className="text-sm font-normal ml-1">
-                <span className="line-through opacity-60">{currencySymbol}59.90 CAD</span>{" "}
-                <span className="font-bold">{currencySymbol}29.95 CAD</span>
+                <span className="line-through opacity-60">{formatPrice(prices.oldSingle)}</span>{" "}
+                <span className="font-bold">{formatPrice(prices.single)}</span>
               </span>
             </motion.div>
           </div>

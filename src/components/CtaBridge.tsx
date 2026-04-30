@@ -2,10 +2,11 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useMarket } from "@/i18n/MarketContext";
 
 const CtaBridge = () => {
-  const { t, lang } = useLanguage();
-  const currencySymbol = lang === "en" ? "$" : "€";
+  const { t } = useLanguage();
+  const { prices, formatPrice } = useMarket();
 
   return (
     <section className="py-10 md:py-16 bg-background">
@@ -36,8 +37,8 @@ const CtaBridge = () => {
             </Link>
           </motion.span>
           <p className="text-xs text-muted-foreground">
-            <span className="line-through">{currencySymbol}59.90 CAD</span>{" "}
-            <span className="text-gold font-bold">{currencySymbol}29.95 CAD</span>{" "}
+            <span className="line-through">{formatPrice(prices.oldSingle)}</span>{" "}
+            <span className="text-gold font-bold">{formatPrice(prices.single)}</span>{" "}
             — {t("ctaBridge.savings")}
           </p>
         </motion.div>

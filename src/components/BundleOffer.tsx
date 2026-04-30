@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Clock } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useMarket } from "@/i18n/MarketContext";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 
@@ -46,26 +47,43 @@ const BundleOffer = () => {
   const [selected, setSelected] = useState(2);
   const [selectedColor, setSelectedColor] = useState("Grey");
   const [product, setProduct] = useState<ShopifyProduct | null>(null);
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
+  const { country, prices, formatPrice } = useMarket();
   const countdown = useCountdown(15);
   const addItem = useCartStore((s) => s.addItem);
   const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
   const isLoading = useCartStore((s) => s.isLoading);
 
   useEffect(() => {
-    fetchProducts(20)
+    fetchProducts(20, undefined, country)
       .then((products) => {
         if (products.length > 0) setProduct(products[0]);
       })
       .catch(console.error);
-  }, []);
-
-  const currencySymbol = lang === "en" ? "$" : "€";
+  }, [country]);
 
   const bundles = [
-    { qty: 1, label: "1 Sleep&zy", price: `${currencySymbol}29.95 CAD`, oldPrice: `${currencySymbol}59.90 CAD`, perUnit: `${currencySymbol}29.95 CAD${t("bundle.perUnit")}`, tag: null, packValue: "Single", priceNum: 29.95 },
-    { qty: 2, label: "2 Sleep&zy", price: `${currencySymbol}59.95 CAD`, oldPrice: `${currencySymbol}119.80 CAD`, perUnit: `${currencySymbol}29.95 CAD${t("bundle.perUnit")}`, tag: "DUO PACK", packValue: "Duo Pack", priceNum: 59.95 },
-    { qty: 3, label: "3 Sleep&zy", price: `${currencySymbol}64.95 CAD`, oldPrice: `${currencySymbol}179.70 CAD`, perUnit: `${currencySymbol}21.65 CAD${t("bundle.perUnit")}`, tag: "FAMILY PACK", packValue: "Family Pack", priceNum: 64.95 },
+    {
+      qty: 1, label: "1 Sleep&zy",
+      price: formatPrice(prices.single),
+      oldPrice: formatPrice(prices.oldSingle),
+      perUnit: `${formatPrice(prices.single)}${t("bundle.perUnit")}`,
+      tag: null, packValue: "Single", priceNum: prices.single,
+    },
+    {
+      qty: 2, label: "2 Sleep&zy",
+      price: formatPrice(prices.duo),
+      oldPrice: formatPrice(prices.oldDuo),
+      perUnit: `${formatPrice(prices.duo / 2)}${t("bundle.perUnit")}`,
+      tag: "DUO PACK", packValue: "Duo Pack", priceNum: prices.duo,
+    },
+    {
+      qty: 3, label: "3 Sleep&zy",
+      price: formatPrice(prices.family),
+      oldPrice: formatPrice(prices.oldFamily),
+      perUnit: `${formatPrice(prices.family / 3)}${t("bundle.perUnit")}`,
+      tag: "FAMILY PACK", packValue: "Family Pack", priceNum: prices.family,
+    },
   ];
 
   const titleParts = t("bundle.title").split(/<gold>|<\/gold>/);
@@ -100,7 +118,7 @@ const BundleOffer = () => {
       bundleLabel,
       bundlePrice: selectedBundle.priceNum,
       bundleUnitSize: 1,
-    });
+    }, country);
 
     setTimeout(() => setDrawerOpen(true), 500);
   };
