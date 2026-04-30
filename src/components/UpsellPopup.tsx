@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, Clock, Flame } from "lucide-react";
 import sleepMask from "@/assets/sleep-mask.png";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useMarket } from "@/i18n/MarketContext";
 
 interface UpsellPopupProps {
   open: boolean;
@@ -11,6 +12,15 @@ interface UpsellPopupProps {
 
 const UpsellPopup = ({ open, onClose, onAccept }: UpsellPopupProps) => {
   const { t } = useLanguage();
+  const { country, formatPrice } = useMarket();
+
+  // Headband upsell pricing per market (kept consistent with site -50% logic)
+  const headbandPriceMap: Record<typeof country, { now: number; old: number }> = {
+    CA: { now: 19.90, old: 39.90 },
+    US: { now: 19.90, old: 39.90 },
+    FR: { now: 16.90, old: 33.90 },
+  };
+  const { now: headbandNow, old: headbandOld } = headbandPriceMap[country];
 
   const tipParts = t("upsell.tip").split(/<bold>|<\/bold>/);
   const benefits = [
@@ -79,8 +89,8 @@ const UpsellPopup = ({ open, onClose, onAccept }: UpsellPopupProps) => {
                     <div>
                       <h3 className="font-bold text-foreground text-sm">{t("upsell.productName")}</h3>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-lg font-bold text-gold">$19.90</span>
-                        <span className="text-sm text-muted-foreground line-through">$59.90 CAD</span>
+                        <span className="text-lg font-bold text-gold">{formatPrice(headbandNow, { showCode: false })}</span>
+                        <span className="text-sm text-muted-foreground line-through">{formatPrice(headbandOld)}</span>
                       </div>
                       <div className="flex items-center gap-1 mt-1">
                         <Flame size={12} className="text-destructive" />
