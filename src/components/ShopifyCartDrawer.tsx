@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Trash2, Loader2, ShieldCheck, Truck, RotateCcw, Lock, Star, CheckCircle, Minus, Plus } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useMarket } from "@/i18n/MarketContext";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
 import { supabase } from "@/integrations/supabase/client";
 import { getVisitorId } from "@/lib/visitorId";
@@ -26,6 +27,7 @@ const TESTIMONIAL_KEYS = ["cart.testimonial1", "cart.testimonial2", "cart.testim
 export const ShopifyCartDrawer = () => {
   const { items, isLoading, isSyncing, isDrawerOpen, setDrawerOpen, updateQuantity, removeItem, getCheckoutUrl, syncCart } = useCartStore();
   const { t } = useLanguage();
+  const { currency, formatPrice } = useMarket();
   const totalItems = items.length;
   const totalPrice = items.reduce((sum, item) => sum + (item.bundlePrice ? item.bundlePrice : parseFloat(item.price.amount) * item.quantity), 0);
 
@@ -66,7 +68,7 @@ export const ShopifyCartDrawer = () => {
         const payload = {
           total_items: items.reduce((sum, i) => sum + i.quantity, 0),
           total_price: Math.round(totalPrice * 100) / 100,
-          currency: items[0]?.price?.currencyCode || 'USD',
+          currency,
           bundle_labels: items.map(i => i.bundleLabel || 'single'),
           variant_ids: items.map(i => i.variantId),
           discount_code: discountCode,
@@ -221,7 +223,7 @@ export const ShopifyCartDrawer = () => {
                           + {item.quantity}× {t("cart.transportBag")}
                         </p>
                         <p className="font-semibold text-foreground mt-1">
-                          ${item.bundlePrice ? item.bundlePrice.toFixed(2) : (parseFloat(item.price.amount) * item.quantity).toFixed(2)} CAD
+                          {formatPrice(item.bundlePrice ? item.bundlePrice : parseFloat(item.price.amount) * item.quantity)}
                         </p>
                       </div>
                       <div className="flex flex-col items-end gap-2 flex-shrink-0">
@@ -280,7 +282,7 @@ export const ShopifyCartDrawer = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold text-foreground">{t("cart.total")}</span>
                   <span className="text-xl font-bold text-foreground">
-                    ${totalPrice.toFixed(2)} CAD
+                    {formatPrice(totalPrice)}
                   </span>
                 </div>
                 <Button onClick={handleCheckout} className="w-full bg-gold hover:bg-gold/90 text-primary-foreground shadow-gold-glow" size="lg" disabled={items.length === 0 || isLoading || isSyncing}>
