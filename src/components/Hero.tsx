@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 const heroBanner = "/hero-banner.webp";
 const demoVideo = "/demo-video.mp4";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useMarket } from "@/i18n/MarketContext";
 import { useViewerCount } from "@/hooks/useViewerCount";
 
 /**
@@ -86,6 +87,7 @@ const StarRating = ({ size = "small" }: { size?: "small" | "large" }) => {
 
 const Hero = () => {
   const { t } = useLanguage();
+  const { prices, formatPrice } = useMarket();
   const viewerCount = useViewerCount();
 
   return (
@@ -138,8 +140,8 @@ const Hero = () => {
 
           {/* Price */}
           <div className="flex items-center justify-center gap-2">
-            <span className="text-base font-bold text-foreground font-sans-body">{t("hero.priceNew")}</span>
-            <span className="text-sm text-muted-foreground line-through font-sans-body">{t("hero.priceOld")}</span>
+            <span className="text-base font-bold text-foreground font-sans-body">{formatPrice(prices.single)}</span>
+            <span className="text-sm text-muted-foreground line-through font-sans-body">{formatPrice(prices.oldSingle)}</span>
             <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-50%</span>
           </div>
 
@@ -214,8 +216,8 @@ const Hero = () => {
 
             {/* Price anchor */}
             <motion.div variants={fadeUp} className="flex items-baseline gap-3">
-              <span className="text-xl font-bold text-foreground font-sans-body">{t("hero.priceNew")}</span>
-              <span className="text-base text-muted-foreground line-through font-sans-body">{t("hero.priceOld")}</span>
+              <span className="text-xl font-bold text-foreground font-sans-body">{formatPrice(prices.single)}</span>
+              <span className="text-base text-muted-foreground line-through font-sans-body">{formatPrice(prices.oldSingle)}</span>
               <span className="bg-red-500/10 text-red-500 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase">-50%</span>
             </motion.div>
 

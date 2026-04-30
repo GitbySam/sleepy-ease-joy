@@ -80,7 +80,7 @@ export async function storefrontApiRequest(query: string, variables: Record<stri
 }
 
 const STOREFRONT_QUERY = `
-  query GetProducts($first: Int!, $query: String) {
+  query GetProducts($first: Int!, $query: String, $country: CountryCode!) @inContext(country: $country) {
     products(first: $first, query: $query) {
       edges {
         node {
@@ -129,8 +129,10 @@ const STOREFRONT_QUERY = `
   }
 `;
 
-export async function fetchProducts(first: number = 20, query?: string): Promise<ShopifyProduct[]> {
-  const data = await storefrontApiRequest(STOREFRONT_QUERY, { first, query: query || null });
+export type CountryCode = 'CA' | 'US' | 'FR';
+
+export async function fetchProducts(first: number = 20, query?: string, country: CountryCode = 'CA'): Promise<ShopifyProduct[]> {
+  const data = await storefrontApiRequest(STOREFRONT_QUERY, { first, query: query || null, country });
   return data?.data?.products?.edges || [];
 }
 
@@ -142,7 +144,7 @@ const CART_QUERY = `
 `;
 
 const CART_CREATE_MUTATION = `
-  mutation cartCreate($input: CartInput!) {
+  mutation cartCreate($input: CartInput!, $country: CountryCode!) @inContext(country: $country) {
     cartCreate(input: $input) {
       cart {
         id
@@ -243,9 +245,13 @@ export interface CartItemData {
   bundleUnitSize?: number;
 }
 
-export async function createShopifyCart(item: CartItemData): Promise<{ cartId: string; checkoutUrl: string; lineId: string } | null> {
+export async function createShopifyCart(item: CartItemData, country: CountryCode = 'CA'): Promise<{ cartId: string; checkoutUrl: string; lineId: string } | null> {
   const data = await storefrontApiRequest(CART_CREATE_MUTATION, {
-    input: { lines: [{ quantity: item.quantity, merchandiseId: item.variantId }] },
+    input: {
+      lines: [{ quantity: item.quantity, merchandiseId: item.variantId }],
+      buyerIdentity: { countryCode: country },
+    },
+    country,
   });
 
   if (data?.data?.cartCreate?.userErrors?.length > 0) {

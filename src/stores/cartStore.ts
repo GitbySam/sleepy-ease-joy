@@ -5,6 +5,7 @@ import { getVisitorId } from '@/lib/visitorId';
 import {
   type CartItemData,
   type ShopifyProduct,
+  type CountryCode,
   createShopifyCart,
   addLineToShopifyCart,
   updateShopifyCartLine,
@@ -19,11 +20,12 @@ interface CartStore {
   items: CartItemData[];
   cartId: string | null;
   checkoutUrl: string | null;
+  cartCountry: CountryCode | null;
   isLoading: boolean;
   isSyncing: boolean;
   isDrawerOpen: boolean;
   setDrawerOpen: (open: boolean) => void;
-  addItem: (item: Omit<CartItemData, 'lineId'>) => Promise<void>;
+  addItem: (item: Omit<CartItemData, 'lineId'>, country?: CountryCode) => Promise<void>;
   updateQuantity: (variantId: string, quantity: number, bundleLabel?: string) => Promise<void>;
   removeItem: (variantId: string, bundleLabel?: string) => Promise<void>;
   clearCart: () => void;
@@ -37,12 +39,13 @@ export const useCartStore = create<CartStore>()(
       items: [],
       cartId: null,
       checkoutUrl: null,
+      cartCountry: null,
       isLoading: false,
       isSyncing: false,
       isDrawerOpen: false,
       setDrawerOpen: (open) => set({ isDrawerOpen: open }),
 
-      addItem: async (item) => {
+      addItem: async (item, country) => {
         const { items, cartId, clearCart } = get();
         const itemKey = `${item.variantId}__${item.bundleLabel || 'single'}`;
         const existingItem = items.find(i => `${i.variantId}__${i.bundleLabel || 'single'}` === itemKey);
@@ -64,11 +67,12 @@ export const useCartStore = create<CartStore>()(
           }]).then(); // fire-and-forget
 
           if (!cartId) {
-            const result = await createShopifyCart({ ...item, lineId: null });
+            const result = await createShopifyCart({ ...item, lineId: null }, country ?? 'CA');
             if (result) {
               set({
                 cartId: result.cartId,
                 checkoutUrl: result.checkoutUrl,
+                cartCountry: country ?? 'CA',
                 items: [{ ...item, lineId: result.lineId }],
               });
             }
@@ -156,7 +160,7 @@ export const useCartStore = create<CartStore>()(
         }
       },
 
-      clearCart: () => set({ items: [], cartId: null, checkoutUrl: null }),
+      clearCart: () => set({ items: [], cartId: null, checkoutUrl: null, cartCountry: null }),
       getCheckoutUrl: () => get().checkoutUrl,
 
       syncCart: async () => {
@@ -179,7 +183,7 @@ export const useCartStore = create<CartStore>()(
     {
       name: 'shopify-cart',
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ items: state.items, cartId: state.cartId, checkoutUrl: state.checkoutUrl }),
+      partialize: (state) => ({ items: state.items, cartId: state.cartId, checkoutUrl: state.checkoutUrl, cartCountry: state.cartCountry }),
     }
   )
 );

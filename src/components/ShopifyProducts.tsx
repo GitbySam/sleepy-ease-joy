@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useMarket } from "@/i18n/MarketContext";
 import { useCartStore } from "@/stores/cartStore";
 import { trackAddToCart } from "@/lib/metaPixel";
 import { toast } from "sonner";
@@ -31,8 +32,8 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product, selectedColor, t }: ProductCardProps) => {
-  // Fixed retail price — overrides Shopify price for display
-  const displayPrice = 29.95;
+  const { country, currency, prices, formatPrice } = useMarket();
+  const displayPrice = prices.single;
   const productUrl = `/product/${product.node.handle}?color=${selectedColor}`;
   const { addItem, setDrawerOpen } = useCartStore();
 
@@ -63,13 +64,13 @@ const ProductCard = ({ product, selectedColor, t }: ProductCardProps) => {
       bundleLabel: "1 Sleep&zy",
       bundlePrice: displayPrice,
       bundleUnitSize: 1,
-    });
+    }, country);
 
     trackAddToCart({
       contentName: `1 Sleep&zy (${selectedColor})`,
       contentId: singleVariant.id,
       value: displayPrice,
-      currency: "USD",
+      currency,
       quantity: 1,
     });
 
@@ -115,7 +116,7 @@ const ProductCard = ({ product, selectedColor, t }: ProductCardProps) => {
 
         <div className="flex items-center justify-between pt-2">
           <span className="text-xl font-bold text-foreground">
-            ${displayPrice.toFixed(2)} CAD
+            {formatPrice(displayPrice)}
           </span>
           <motion.button
             type="button"
@@ -135,16 +136,17 @@ const ProductCard = ({ product, selectedColor, t }: ProductCardProps) => {
 
 const ShopifyProducts = () => {
   const { t } = useLanguage();
+  const { country } = useMarket();
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedColor, setSelectedColor] = useState("Grey");
 
   useEffect(() => {
-    fetchProducts(20)
+    fetchProducts(20, undefined, country)
       .then(setProducts)
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [country]);
 
   if (loading) {
     return (
