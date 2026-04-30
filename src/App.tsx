@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { trackPageView } from "./lib/metaPixel";
 import { LanguageProvider } from "@/i18n/LanguageContext";
+import { MarketProvider } from "@/i18n/MarketContext";
 import { lazy, Suspense } from "react";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -35,6 +36,7 @@ const CartSyncWrapper = () => {
 const AppRoutes = () => {
   return (
     <LanguageProvider>
+      <MarketProvider>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
@@ -57,6 +59,7 @@ const AppRoutes = () => {
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>
+      </MarketProvider>
     </LanguageProvider>
   );
 };

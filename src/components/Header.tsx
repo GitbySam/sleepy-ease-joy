@@ -4,6 +4,7 @@ import { ShoppingBag, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 const ShopifyCartDrawer = lazy(() => import("./ShopifyCartDrawer"));
 import { useLanguage } from "@/i18n/LanguageContext";
+import CountrySelector from "./CountrySelector";
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -68,6 +69,7 @@ const Header = () => {
 
           <div className="flex items-center gap-3">
             {/* LanguageSwitcher hidden but system still active */}
+            <CountrySelector />
             <Link to="/product" className="hidden md:block">
               <motion.span
                 whileHover={{ scale: 1.05 }}
@@ -126,6 +128,8 @@ const Header = () => {
               )}
 
               {/* LanguageSwitcher hidden but system still active */}
+
+              <div className="mt-2"><CountrySelector /></div>
 
               <Link to="/product" onClick={() => setMenuOpen(false)} className="mt-4">
                 <motion.span
