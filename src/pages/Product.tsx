@@ -26,6 +26,7 @@ import { fetchProducts, type ShopifyProduct, applyDiscountToCart } from "@/lib/s
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useMarket } from "@/i18n/MarketContext";
 import { trackViewContent, trackAddToCart } from "@/lib/metaPixel";
 
 const COLOR_MAP: Record<string, string> = {
@@ -79,14 +80,15 @@ const Product = () => {
   const [selectedColor, setSelectedColor] = useState(initialColor);
   const [galleryOffset, setGalleryOffset] = useState(0);
   const countdown = useCountdown(15);
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
+  const { country, currency, prices, formatPrice } = useMarket();
 
   const addItem = useCartStore((s) => s.addItem);
   const isLoading = useCartStore((s) => s.isLoading);
   const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
 
   useEffect(() => {
-    fetchProducts(1)
+    fetchProducts(1, undefined, country)
       .then((products) => {
         if (products.length > 0) {
           setProduct(products[0]);
@@ -103,7 +105,7 @@ const Product = () => {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [country]);
 
   const colorOption = product?.node.options?.find(o => o.name === "Color");
   const availableColors = colorOption?.values || ["Grey"];
@@ -117,12 +119,10 @@ const Product = () => {
   const duoVariant = coloredVariants.find(v => v.node.selectedOptions?.some(o => o.value === 'Duo Pack'))?.node;
   const familyVariant = coloredVariants.find(v => v.node.selectedOptions?.some(o => o.value === 'Family Pack'))?.node;
 
-  // Fixed retail pricing — overrides Shopify variant price for display & cart
-  const singlePrice = 29.95;
-  const duoPrice = 59.95;
-  const familyPrice = 64.95;
-  const currencySymbol = lang === "en" ? "$" : "€";
-  const oldPricePerUnit = 59.90; // Reference "public" price before site-wide discount
+  // Pricing comes from MarketContext (CA/US/FR)
+  const singlePrice = prices.single;
+  const duoPrice = prices.duo;
+  const familyPrice = prices.family;
 
   const badges = [
     t("product.badge360"),
@@ -137,8 +137,7 @@ const Product = () => {
   ];
 
   const bundlePrices: Record<number, number> = { 1: singlePrice * promoMultiplier, 2: duoPrice * promoMultiplier, 3: familyPrice * promoMultiplier };
-  const bundleOldPrices: Record<number, number> = { 1: 59.90, 2: 119.80, 3: 179.70 };
-  // Old prices: Single $59.90 / Duo $119.80 / Family $179.70. Family discount = -64%
+  const bundleOldPrices: Record<number, number> = { 1: prices.oldSingle, 2: prices.oldDuo, 3: prices.oldFamily };
 
   const handleAddToCart = async () => {
     if (!product) return;
@@ -158,14 +157,14 @@ const Product = () => {
       bundleLabel,
       bundlePrice: bundleTotal,
       bundleUnitSize: 1,
-    });
+    }, country);
 
     // Track AddToCart with Meta Pixel
     trackAddToCart({
       contentName: `${selectedBundle.label} (${selectedColor})`,
       contentId: selectedVariant.id,
       value: bundleTotal,
-      currency: lang === 'en' ? 'USD' : 'EUR',
+      currency,
       quantity: selectedQty,
     });
 
@@ -420,8 +419,8 @@ const Product = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-lg font-bold text-foreground">{currencySymbol}{bundlePrices[b.qty].toFixed(2)} CAD</p>
-                      <p className="text-xs text-muted-foreground line-through">{currencySymbol}{bundleOldPrices[b.qty].toFixed(2)} CAD</p>
+                      <p className="text-lg font-bold text-foreground">{formatPrice(bundlePrices[b.qty])}</p>
+                      <p className="text-xs text-muted-foreground line-through">{formatPrice(bundleOldPrices[b.qty])}</p>
                     </div>
                   </div>
                 </button>
@@ -431,13 +430,11 @@ const Product = () => {
             {/* Price summary */}
             <div className="flex items-center gap-3 bg-muted/30 rounded-lg px-4 py-3">
               <span className="text-sm text-muted-foreground font-sans-body">{t("product.yourPrice")}</span>
-              <span className="text-2xl font-bold text-foreground">{currencySymbol}{currentPrice.toFixed(2)} CAD</span>
+              <span className="text-2xl font-bold text-foreground">{formatPrice(currentPrice)}</span>
               {hasPromo && (
-                <span className="text-sm text-muted-foreground line-through">
-                  {currencySymbol}{(currentPrice / promoMultiplier).toFixed(2)} CAD
-                </span>
+                <span className="text-sm text-muted-foreground line-through">{formatPrice(currentPrice / promoMultiplier)}</span>
               )}
-              <span className="text-sm text-muted-foreground line-through">{currencySymbol}{currentOldPrice.toFixed(2)} CAD</span>
+              <span className="text-sm text-muted-foreground line-through">{formatPrice(currentOldPrice)}</span>
               <span className="bg-gold text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">{selectedBundle.discount}</span>
               {hasPromo && (
                 <span className="bg-destructive text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">-10% EXTRA</span>
