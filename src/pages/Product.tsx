@@ -28,6 +28,7 @@ import Header from "@/components/Header";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useMarket } from "@/i18n/MarketContext";
 import { trackViewContent, trackAddToCart } from "@/lib/metaPixel";
+import { trackFunnelStep, trackFriction } from "@/lib/funnelTracking";
 
 const COLOR_MAP: Record<string, string> = {
   Grey: "#9CA3AF",
@@ -101,9 +102,25 @@ const Product = () => {
             value: parseFloat(price.amount),
             currency: price.currencyCode,
           });
+          trackFunnelStep('view_product', {
+            step_value: p.node.handle,
+            value: parseFloat(price.amount),
+            currency: price.currencyCode,
+          });
+        } else {
+          trackFriction('product_load_error', {
+            severity: 'error',
+            message: 'No products returned from Shopify',
+          });
         }
       })
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        trackFriction('product_load_error', {
+          severity: 'error',
+          message: err instanceof Error ? err.message : 'fetchProducts failed',
+        });
+      })
       .finally(() => setLoading(false));
   }, [country]);
 
