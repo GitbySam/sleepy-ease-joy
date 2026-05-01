@@ -128,6 +128,7 @@ export const ShopifyCartDrawer = () => {
         }
       } catch {}
       window.open(finalUrl, '_blank');
+      try { sessionStorage.setItem('sleepzy_checked_out_at', String(Date.now())); } catch {}
       setDrawerOpen(false);
     }
   };
