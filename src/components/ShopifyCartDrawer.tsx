@@ -155,9 +155,24 @@ export const ShopifyCartDrawer = () => {
       }
     };
 
+    // Track when the user comes BACK to our tab after checkout — strong
+    // signal of "abandoned checkout if no purchase happened on Shopify side"
+    const onReturn = () => {
+      if (document.visibilityState !== 'visible') return;
+      const checkedOut = sessionStorage.getItem('sleepzy_checked_out_at');
+      if (!checkedOut) return;
+      const elapsed = Date.now() - Number(checkedOut);
+      sessionStorage.removeItem('sleepzy_checked_out_at');
+      trackFunnelStep('return_from_checkout', {
+        metadata: { elapsedMs: elapsed },
+      });
+    };
+
     document.addEventListener('visibilitychange', onVisibility);
+    document.addEventListener('visibilitychange', onReturn);
     return () => {
       document.removeEventListener('visibilitychange', onVisibility);
+      document.removeEventListener('visibilitychange', onReturn);
     };
   }, []);
 
