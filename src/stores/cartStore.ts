@@ -206,3 +206,10 @@ export const useCartStore = create<CartStore>()(
     }
   )
 );
+
+// Reset in-memory cart when the market (country) changes
+if (typeof window !== "undefined") {
+  window.addEventListener("sleepzy:cart-reset", () => {
+    useCartStore.getState().clearCart();
+  });
+}
