@@ -160,7 +160,14 @@ const Product = () => {
     if (!product) return;
     const selectedBundle = bundles.find(b => b.qty === selectedQty)!;
     const selectedVariant = selectedBundle.variantNode;
-    if (!selectedVariant) return;
+    if (!selectedVariant) {
+      trackFriction('checkout_error', {
+        severity: 'error',
+        message: 'No variant matched selected bundle/color',
+        metadata: { bundle: selectedBundle.label, color: selectedColor },
+      });
+      return;
+    }
     const bundleLabel = selectedBundle.tag || selectedBundle.label;
     const bundleTotal = bundlePrices[selectedQty];
 
@@ -183,6 +190,12 @@ const Product = () => {
       value: bundleTotal,
       currency,
       quantity: selectedQty,
+    });
+    trackFunnelStep('add_to_cart', {
+      step_value: bundleLabel,
+      value: bundleTotal,
+      currency,
+      metadata: { color: selectedColor, qty: selectedQty },
     });
 
     toast.success(`${selectedBundle.label} (${selectedColor}) ${t("product.addedToCart")}`, {
