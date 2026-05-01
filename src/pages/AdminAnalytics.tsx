@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Eye, ShoppingCart, FileText, Loader2, RefreshCw, Calendar, DollarSign, AlertCircle } from "lucide-react";
+import { Eye, ShoppingCart, FileText, Loader2, RefreshCw, Calendar, DollarSign, AlertCircle, AlertTriangle, MousePointerClick, Bug, Zap, TrendingDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -22,6 +22,7 @@ const pixelEvents = [
 const TABS = [
   { id: "cart", label: "🛒 Ajouts panier" },
   { id: "funnel", label: "🎯 Funnel" },
+  { id: "frictions", label: "⚠️ Frictions" },
   { id: "sales", label: "💰 Ventes Shopify" },
   { id: "traffic", label: "📈 Trafic" },
   { id: "sources", label: "🔗 Sources" },
