@@ -132,7 +132,13 @@ export const useCartStore = create<CartStore>()(
           const result = await updateShopifyCartLine(cartId, item.lineId, quantity);
           if (result.success) {
             const currentItems = get().items;
-            set({ items: currentItems.map(i => `${i.variantId}__${i.bundleLabel || 'single'}` === itemKey ? { ...i, quantity } : i) });
+            set({ items: currentItems.map(i => {
+              if (`${i.variantId}__${i.bundleLabel || 'single'}` !== itemKey) return i;
+              const newBundlePrice = i.bundlePrice && i.quantity > 0
+                ? (i.bundlePrice / i.quantity) * quantity
+                : undefined;
+              return { ...i, quantity, ...(newBundlePrice !== undefined ? { bundlePrice: newBundlePrice } : {}) };
+            }) });
           } else if (result.cartNotFound) {
             clearCart();
           }
