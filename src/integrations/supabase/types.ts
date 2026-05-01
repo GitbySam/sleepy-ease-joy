@@ -104,6 +104,105 @@ export type Database = {
         }
         Relationships: []
       }
+      friction_events: {
+        Row: {
+          created_at: string
+          device: string | null
+          element: string | null
+          id: string
+          language: string | null
+          market: string | null
+          message: string | null
+          metadata: Json | null
+          page_path: string | null
+          severity: string
+          type: string
+          user_agent: string | null
+          visitor_id: string
+        }
+        Insert: {
+          created_at?: string
+          device?: string | null
+          element?: string | null
+          id?: string
+          language?: string | null
+          market?: string | null
+          message?: string | null
+          metadata?: Json | null
+          page_path?: string | null
+          severity?: string
+          type: string
+          user_agent?: string | null
+          visitor_id: string
+        }
+        Update: {
+          created_at?: string
+          device?: string | null
+          element?: string | null
+          id?: string
+          language?: string | null
+          market?: string | null
+          message?: string | null
+          metadata?: Json | null
+          page_path?: string | null
+          severity?: string
+          type?: string
+          user_agent?: string | null
+          visitor_id?: string
+        }
+        Relationships: []
+      }
+      funnel_events: {
+        Row: {
+          created_at: string
+          currency: string | null
+          device: string | null
+          id: string
+          language: string | null
+          market: string | null
+          metadata: Json | null
+          page_path: string | null
+          referrer: string | null
+          step: string
+          step_value: string | null
+          user_agent: string | null
+          value: number | null
+          visitor_id: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          device?: string | null
+          id?: string
+          language?: string | null
+          market?: string | null
+          metadata?: Json | null
+          page_path?: string | null
+          referrer?: string | null
+          step: string
+          step_value?: string | null
+          user_agent?: string | null
+          value?: number | null
+          visitor_id: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          device?: string | null
+          id?: string
+          language?: string | null
+          market?: string | null
+          metadata?: Json | null
+          page_path?: string | null
+          referrer?: string | null
+          step?: string
+          step_value?: string | null
+          user_agent?: string | null
+          value?: number | null
+          visitor_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
