@@ -42,7 +42,15 @@ function getDevice(): string {
 
 function getCommonContext() {
   if (typeof window === 'undefined') {
-    return { visitor_id: 'ssr', page_path: '', user_agent: '', device: 'unknown' };
+    return {
+      visitor_id: 'ssr',
+      page_path: '',
+      referrer: null as string | null,
+      market: null as string | null,
+      language: null as string | null,
+      device: 'unknown',
+      user_agent: '',
+    };
   }
   let market: string | null = null;
   let language: string | null = null;
