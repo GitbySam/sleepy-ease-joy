@@ -117,7 +117,8 @@ export function trackFriction(
   if (window.location.pathname.startsWith('/admin')) return;
 
   try {
-    const ctx = getCommonContext();
+    const { referrer: _r, ...ctx } = getCommonContext();
+    void _r;
     supabase
       .from('friction_events')
       .insert([{
