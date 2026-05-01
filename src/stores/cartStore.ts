@@ -47,6 +47,13 @@ export const useCartStore = create<CartStore>()(
       setDrawerOpen: (open) => set({ isDrawerOpen: open }),
 
       addItem: async (item, country) => {
+        const requestedCountry: CountryCode = country ?? 'CA';
+        // If the active market changed since the cart was created, reset the cart
+        // so Shopify creates a new checkout in the correct currency/country.
+        const prevCountry = get().cartCountry;
+        if (prevCountry && prevCountry !== requestedCountry) {
+          get().clearCart();
+        }
         const { items, cartId, clearCart } = get();
         const itemKey = `${item.variantId}__${item.bundleLabel || 'single'}`;
         const existingItem = items.find(i => `${i.variantId}__${i.bundleLabel || 'single'}` === itemKey);
@@ -68,12 +75,12 @@ export const useCartStore = create<CartStore>()(
           }]).then(); // fire-and-forget
 
           if (!cartId) {
-            const result = await createShopifyCart({ ...item, lineId: null }, country ?? 'CA');
+            const result = await createShopifyCart({ ...item, lineId: null }, requestedCountry);
             if (result) {
               set({
                 cartId: result.cartId,
                 checkoutUrl: result.checkoutUrl,
-                cartCountry: country ?? 'CA',
+                cartCountry: requestedCountry,
                 items: [{ ...item, lineId: result.lineId }],
               });
             }
@@ -199,3 +206,10 @@ export const useCartStore = create<CartStore>()(
     }
   )
 );
+
+// Reset in-memory cart when the market (country) changes
+if (typeof window !== "undefined") {
+  window.addEventListener("sleepzy:cart-reset", () => {
+    useCartStore.getState().clearCart();
+  });
+}
