@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Eye, ShoppingCart, FileText, Loader2, RefreshCw, Calendar, DollarSign, AlertCircle } from "lucide-react";
+import { Eye, ShoppingCart, FileText, Loader2, RefreshCw, Calendar, DollarSign, AlertCircle, AlertTriangle, MousePointerClick, Bug, Zap, TrendingDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -22,6 +22,7 @@ const pixelEvents = [
 const TABS = [
   { id: "cart", label: "🛒 Ajouts panier" },
   { id: "funnel", label: "🎯 Funnel" },
+  { id: "frictions", label: "⚠️ Frictions" },
   { id: "sales", label: "💰 Ventes Shopify" },
   { id: "traffic", label: "📈 Trafic" },
   { id: "sources", label: "🔗 Sources" },
@@ -87,6 +88,7 @@ export default function AdminAnalytics() {
         {/* Tab content */}
         {activeTab === "cart" && <CartEventsTab days={days} />}
         {activeTab === "funnel" && <FunnelTab days={days} />}
+        {activeTab === "frictions" && <FrictionsTab days={days} />}
         {activeTab === "sales" && <SalesTab days={days} />}
         {activeTab === "traffic" && <TrafficTab />}
         {activeTab === "sources" && <SourcesTab />}
@@ -1283,6 +1285,343 @@ function SalesTab({ days }: { days: number }) {
           <li><strong>Revenus réels</strong> = uniquement les commandes payées. C'est ton vrai CA.</li>
           <li><strong>Conversion finale</strong> = parmi tous ceux qui ont commencé un checkout Shopify, % qui ont payé. Si bas (&lt;30%), problème de friction au paiement (frais port, méthode CB, confiance).</li>
           <li><strong>Avec email récupéré</strong> = Shopify peut envoyer des emails de relance automatiques (à activer dans Shopify Admin → Marketing → Automations).</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────── FRICTIONS TAB — drop-offs & frustration signals ─────────── */
+
+const FUNNEL_STEPS_ORDER = [
+  { key: 'session_landing', label: 'Arrivée site' },
+  { key: 'view_product', label: 'Vue produit' },
+  { key: 'select_color', label: 'Choix couleur' },
+  { key: 'select_bundle', label: 'Choix pack' },
+  { key: 'add_to_cart', label: 'Ajout panier' },
+  { key: 'open_cart', label: 'Ouverture panier' },
+  { key: 'click_checkout', label: 'Clic checkout' },
+  { key: 'return_from_checkout', label: 'Retour (abandon)' },
+] as const;
+
+const FRICTION_LABELS: Record<string, { label: string; icon: typeof AlertTriangle; color: string }> = {
+  rage_click: { label: 'Rage click', icon: MousePointerClick, color: 'bg-red-100 text-red-700 border-red-200' },
+  dead_click: { label: 'Dead click', icon: MousePointerClick, color: 'bg-orange-100 text-orange-700 border-orange-200' },
+  js_error: { label: 'Erreur JavaScript', icon: Bug, color: 'bg-red-100 text-red-700 border-red-200' },
+  shopify_error: { label: 'Erreur Shopify', icon: AlertTriangle, color: 'bg-red-100 text-red-700 border-red-200' },
+  product_load_error: { label: 'Échec chargement produit', icon: AlertTriangle, color: 'bg-red-100 text-red-700 border-red-200' },
+  checkout_error: { label: 'Erreur checkout', icon: AlertTriangle, color: 'bg-red-100 text-red-700 border-red-200' },
+  slow_response: { label: 'Lenteur API', icon: Zap, color: 'bg-amber-100 text-amber-700 border-amber-200' },
+  hesitation_abandon: { label: 'Hésitation', icon: TrendingDown, color: 'bg-blue-100 text-blue-700 border-blue-200' },
+};
+
+function FrictionsTab({ days }: { days: number }) {
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [funnelCounts, setFunnelCounts] = useState<Record<string, number>>({});
+  const [frictionCounts, setFrictionCounts] = useState<Array<{ type: string; count: number }>>([]);
+  const [topElements, setTopElements] = useState<Array<{ element: string; type: string; count: number }>>([]);
+  const [recentErrors, setRecentErrors] = useState<Array<{ id: string; type: string; message: string | null; element: string | null; page_path: string | null; device: string | null; created_at: string }>>([]);
+  const [byDevice, setByDevice] = useState<Record<string, Record<string, number>>>({});
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+
+  const fetchData = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    else setLoading(true);
+
+    const since = new Date();
+    since.setDate(since.getDate() - days);
+
+    const [funnelRes, frictionRes] = await Promise.all([
+      supabase.from('funnel_events').select('step, visitor_id, created_at').gte('created_at', since.toISOString()),
+      supabase.from('friction_events').select('id, type, severity, message, element, page_path, device, created_at').gte('created_at', since.toISOString()).order('created_at', { ascending: false }),
+    ]);
+
+    if (funnelRes.error || frictionRes.error) {
+      console.error('Frictions fetch error:', funnelRes.error || frictionRes.error);
+      setLoading(false);
+      setRefreshing(false);
+      return;
+    }
+
+    /* ── Funnel: unique visitors per step ── */
+    const stepVisitors: Record<string, Set<string>> = {};
+    (funnelRes.data || []).forEach((row: { step: string; visitor_id: string | null }) => {
+      if (!stepVisitors[row.step]) stepVisitors[row.step] = new Set();
+      if (row.visitor_id) stepVisitors[row.step].add(row.visitor_id);
+    });
+    const counts: Record<string, number> = {};
+    FUNNEL_STEPS_ORDER.forEach(s => { counts[s.key] = stepVisitors[s.key]?.size || 0; });
+    setFunnelCounts(counts);
+
+    /* ── Friction: aggregate ── */
+    const typeMap: Record<string, number> = {};
+    const elementMap: Record<string, { type: string; count: number }> = {};
+    const deviceMap: Record<string, Record<string, number>> = {};
+
+    (frictionRes.data || []).forEach((row: { type: string; element: string | null; device: string | null }) => {
+      typeMap[row.type] = (typeMap[row.type] || 0) + 1;
+      if (row.element) {
+        const key = `${row.type}::${row.element}`;
+        elementMap[key] = { type: row.type, count: (elementMap[key]?.count || 0) + 1 };
+      }
+      if (row.device) {
+        if (!deviceMap[row.device]) deviceMap[row.device] = {};
+        deviceMap[row.device][row.type] = (deviceMap[row.device][row.type] || 0) + 1;
+      }
+    });
+
+    setFrictionCounts(
+      Object.entries(typeMap)
+        .map(([type, count]) => ({ type, count }))
+        .sort((a, b) => b.count - a.count)
+    );
+    setTopElements(
+      Object.entries(elementMap)
+        .map(([key, v]) => ({ element: key.split('::')[1], type: v.type, count: v.count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 12)
+    );
+    setRecentErrors((frictionRes.data || []).slice(0, 30) as never);
+    setByDevice(deviceMap);
+    setLastUpdate(new Date());
+    setLoading(false);
+    setRefreshing(false);
+  }, [days]);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    const i = setInterval(() => fetchData(true), 30000);
+    return () => clearInterval(i);
+  }, [fetchData]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-red-600" />
+        <span className="ml-3 text-gray-500">Analyse des frictions…</span>
+      </div>
+    );
+  }
+
+  /* ── Compute drop-offs from funnel ── */
+  const orderedCounts = FUNNEL_STEPS_ORDER.map(s => ({ ...s, count: funnelCounts[s.key] || 0 }));
+  const maxCount = Math.max(1, ...orderedCounts.map(s => s.count));
+  // Find biggest leak (largest absolute drop between consecutive steps)
+  let biggestLeak: { from: string; to: string; loss: number; rate: number } | null = null;
+  for (let i = 0; i < orderedCounts.length - 1; i++) {
+    const a = orderedCounts[i], b = orderedCounts[i + 1];
+    if (a.count > 0) {
+      const loss = a.count - b.count;
+      const rate = (loss / a.count) * 100;
+      if (!biggestLeak || loss > biggestLeak.loss) {
+        biggestLeak = { from: a.label, to: b.label, loss, rate };
+      }
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <p className="text-xs text-gray-500">{lastUpdate ? `Mis à jour à ${lastUpdate.toLocaleTimeString('fr-FR')}` : '—'}</p>
+        <button
+          onClick={() => fetchData(true)}
+          disabled={refreshing}
+          className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white shadow hover:bg-red-700 transition disabled:opacity-60"
+        >
+          <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+          {refreshing ? 'Rafraîchissement…' : 'Rafraîchir'}
+        </button>
+      </div>
+
+      {/* Biggest leak hero */}
+      {biggestLeak && biggestLeak.loss > 0 && (
+        <Card className="bg-gradient-to-r from-red-600 to-orange-600 text-white border-0 shadow-md">
+          <CardContent className="p-5">
+            <div className="flex items-start gap-4 flex-wrap">
+              <div className="flex-1 min-w-[240px]">
+                <div className="flex items-center gap-2 text-xs text-red-100 mb-1">
+                  <TrendingDown className="h-3.5 w-3.5" />
+                  Plus grosse fuite du funnel
+                </div>
+                <p className="text-xl font-bold">{biggestLeak.from} → {biggestLeak.to}</p>
+                <p className="text-sm text-red-100 mt-1">
+                  {biggestLeak.loss} visiteur{biggestLeak.loss > 1 ? 's' : ''} perdu{biggestLeak.loss > 1 ? 's' : ''} ({biggestLeak.rate.toFixed(0)}% d'abandon)
+                </p>
+              </div>
+              <div className="text-xs text-red-50 max-w-sm">
+                💡 Cette étape concentre la plus grosse perte. Regarde les replays Clarity filtrés sur l'event <code className="bg-white/20 px-1 py-0.5 rounded">funnel_{FUNNEL_STEPS_ORDER.find(s => s.label === biggestLeak!.from)?.key}</code> pour comprendre pourquoi.
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Funnel visualization */}
+      <Card className="bg-white">
+        <CardHeader>
+          <CardTitle className="text-base">🎯 Funnel d'achat — visiteurs uniques par étape</CardTitle>
+          <p className="text-xs text-gray-500 mt-1">Sur les {days} derniers jours. Chaque visiteur est compté une fois par étape.</p>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {orderedCounts.map((s, i) => {
+              const prev = i > 0 ? orderedCounts[i - 1].count : 0;
+              const dropRate = i > 0 && prev > 0 ? ((prev - s.count) / prev) * 100 : 0;
+              const widthPct = (s.count / maxCount) * 100;
+              const isLeak = i > 0 && dropRate > 50;
+              return (
+                <div key={s.key} className="space-y-0.5">
+                  <div className="flex justify-between text-xs">
+                    <span className="font-medium text-gray-700">{i + 1}. {s.label}</span>
+                    <span className="font-semibold text-gray-900">
+                      {s.count}
+                      {i > 0 && (
+                        <span className={`ml-2 text-[10px] ${isLeak ? 'text-red-600 font-bold' : 'text-gray-400'}`}>
+                          {dropRate > 0 ? `−${dropRate.toFixed(0)}%` : '—'}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  <div className="h-7 bg-gray-100 rounded overflow-hidden relative">
+                    <div
+                      className={`h-full transition-all ${isLeak ? 'bg-red-500' : 'bg-blue-500'}`}
+                      style={{ width: `${Math.max(2, widthPct)}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Friction summary cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {Object.entries(FRICTION_LABELS).map(([type, meta]) => {
+          const count = frictionCounts.find(f => f.type === type)?.count || 0;
+          const Icon = meta.icon;
+          return (
+            <Card key={type} className={`border ${count > 0 ? meta.color : 'bg-gray-50 border-gray-200 text-gray-400'}`}>
+              <CardContent className="p-3">
+                <div className="flex items-center gap-1.5 text-[11px] mb-1">
+                  <Icon className="h-3.5 w-3.5" />
+                  {meta.label}
+                </div>
+                <p className="text-2xl font-bold">{count}</p>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Top elements causing friction */}
+      <Card className="bg-white">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 text-red-600" />
+            Éléments qui frustrent le plus
+          </CardTitle>
+          <p className="text-xs text-gray-500 mt-1">Tries par fréquence. Ce sont tes priorités pour fixer le parcours.</p>
+        </CardHeader>
+        <CardContent>
+          {topElements.length === 0 ? (
+            <p className="text-sm text-gray-500 text-center py-6">Aucun élément problématique détecté 🎉</p>
+          ) : (
+            <div className="space-y-2">
+              {topElements.map((el, i) => {
+                const meta = FRICTION_LABELS[el.type];
+                return (
+                  <div key={i} className="flex items-center justify-between gap-3 p-2 rounded border border-gray-100 hover:bg-gray-50">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${meta?.color || 'bg-gray-100'}`}>
+                        {meta?.label || el.type}
+                      </span>
+                      <code className="text-xs text-gray-700 truncate">{el.element}</code>
+                    </div>
+                    <span className="text-sm font-bold text-gray-900 flex-shrink-0">{el.count}×</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Frictions by device */}
+      <Card className="bg-white">
+        <CardHeader>
+          <CardTitle className="text-base">📱 Frictions par appareil</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {Object.keys(byDevice).length === 0 ? (
+            <p className="text-sm text-gray-500 text-center py-6">Aucune donnée</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {(['mobile', 'tablet', 'desktop'] as const).map(dev => (
+                <div key={dev} className="rounded-lg border border-gray-200 p-3">
+                  <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">{dev}</p>
+                  <p className="text-2xl font-bold mb-2">
+                    {Object.values(byDevice[dev] || {}).reduce((a, b) => a + b, 0)}
+                  </p>
+                  <div className="space-y-1">
+                    {Object.entries(byDevice[dev] || {})
+                      .sort((a, b) => b[1] - a[1])
+                      .slice(0, 4)
+                      .map(([type, c]) => (
+                        <div key={type} className="flex justify-between text-[11px] border-b border-gray-50 pb-0.5">
+                          <span className="text-gray-600 truncate">{FRICTION_LABELS[type]?.label || type}</span>
+                          <span className="font-semibold text-gray-900">{c}</span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Recent errors timeline */}
+      <Card className="bg-white">
+        <CardHeader>
+          <CardTitle className="text-base">🕒 30 dernières frictions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {recentErrors.length === 0 ? (
+            <p className="text-sm text-gray-500 text-center py-6">Aucune friction enregistrée</p>
+          ) : (
+            <div className="space-y-1.5 max-h-96 overflow-y-auto">
+              {recentErrors.map((e) => {
+                const meta = FRICTION_LABELS[e.type];
+                return (
+                  <div key={e.id} className="flex items-start gap-2 p-2 rounded border border-gray-100 text-xs">
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border flex-shrink-0 ${meta?.color || 'bg-gray-100'}`}>
+                      {meta?.label || e.type}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      {e.message && <p className="text-gray-800 truncate">{e.message}</p>}
+                      {e.element && <code className="text-[10px] text-gray-500 block truncate">{e.element}</code>}
+                      <div className="text-[10px] text-gray-400 mt-0.5">
+                        {e.page_path} · {e.device} · {new Date(e.created_at).toLocaleString('fr-FR')}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm text-amber-900">
+        <p className="font-semibold mb-1">💡 Comment utiliser cette page :</p>
+        <ul className="text-xs space-y-1 list-disc pl-5">
+          <li><strong>Plus grosse fuite</strong> → la priorité numéro 1. Va voir les replays Clarity sur ce moment précis.</li>
+          <li><strong>Rage clicks / Dead clicks</strong> → un élément a l'air cliquable mais ne l'est pas, ou est cassé. Fixe-le.</li>
+          <li><strong>Erreurs Shopify / JS</strong> → bugs techniques. Chaque erreur peut faire perdre une vente.</li>
+          <li><strong>Lenteur API</strong> → si &gt; 3s, le visiteur quitte. Optimise ou cache.</li>
+          <li><strong>Frictions par appareil</strong> → si mobile concentre les frictions, ton UX mobile a un problème.</li>
         </ul>
       </div>
     </div>

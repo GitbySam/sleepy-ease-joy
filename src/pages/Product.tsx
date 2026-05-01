@@ -28,6 +28,7 @@ import Header from "@/components/Header";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useMarket } from "@/i18n/MarketContext";
 import { trackViewContent, trackAddToCart } from "@/lib/metaPixel";
+import { trackFunnelStep, trackFriction } from "@/lib/funnelTracking";
 
 const COLOR_MAP: Record<string, string> = {
   Grey: "#9CA3AF",
@@ -101,9 +102,25 @@ const Product = () => {
             value: parseFloat(price.amount),
             currency: price.currencyCode,
           });
+          trackFunnelStep('view_product', {
+            step_value: p.node.handle,
+            value: parseFloat(price.amount),
+            currency: price.currencyCode,
+          });
+        } else {
+          trackFriction('product_load_error', {
+            severity: 'error',
+            message: 'No products returned from Shopify',
+          });
         }
       })
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        trackFriction('product_load_error', {
+          severity: 'error',
+          message: err instanceof Error ? err.message : 'fetchProducts failed',
+        });
+      })
       .finally(() => setLoading(false));
   }, [country]);
 
@@ -143,7 +160,14 @@ const Product = () => {
     if (!product) return;
     const selectedBundle = bundles.find(b => b.qty === selectedQty)!;
     const selectedVariant = selectedBundle.variantNode;
-    if (!selectedVariant) return;
+    if (!selectedVariant) {
+      trackFriction('checkout_error', {
+        severity: 'error',
+        message: 'No variant matched selected bundle/color',
+        metadata: { bundle: selectedBundle.label, color: selectedColor },
+      });
+      return;
+    }
     const bundleLabel = selectedBundle.tag || selectedBundle.label;
     const bundleTotal = bundlePrices[selectedQty];
 
@@ -166,6 +190,12 @@ const Product = () => {
       value: bundleTotal,
       currency,
       quantity: selectedQty,
+    });
+    trackFunnelStep('add_to_cart', {
+      step_value: bundleLabel,
+      value: bundleTotal,
+      currency,
+      metadata: { color: selectedColor, qty: selectedQty },
     });
 
     toast.success(`${selectedBundle.label} (${selectedColor}) ${t("product.addedToCart")}`, {
@@ -346,7 +376,10 @@ const Product = () => {
                   {availableColors.map((color) => (
                     <button
                       key={color}
-                      onClick={() => setSelectedColor(color)}
+                      onClick={() => {
+                        setSelectedColor(color);
+                        trackFunnelStep('select_color', { step_value: color });
+                      }}
                       className={`relative w-9 h-9 rounded-full transition-all duration-200 ${
                         selectedColor === color
                           ? "ring-2 ring-gold ring-offset-2 ring-offset-background scale-110"
@@ -378,7 +411,14 @@ const Product = () => {
               {bundles.map((b) => (
                 <button
                   key={b.qty}
-                  onClick={() => setSelectedQty(b.qty)}
+                  onClick={() => {
+                    setSelectedQty(b.qty);
+                    trackFunnelStep('select_bundle', {
+                      step_value: b.tag || b.label,
+                      value: bundlePrices[b.qty],
+                      currency,
+                    });
+                  }}
                   className={`w-full rounded-xl p-4 border-2 transition-all text-left relative ${
                     selectedQty === b.qty
                       ? "border-gold bg-gold/5 shadow-md"

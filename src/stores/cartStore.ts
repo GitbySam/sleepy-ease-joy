@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { supabase } from '@/integrations/supabase/client';
 import { getVisitorId } from '@/lib/visitorId';
+import { trackFriction } from '@/lib/funnelTracking';
 import {
   type CartItemData,
   type ShopifyProduct,
@@ -105,6 +106,11 @@ export const useCartStore = create<CartStore>()(
           }
         } catch (error) {
           console.error('Failed to add item:', error);
+          trackFriction('shopify_error', {
+            severity: 'error',
+            message: error instanceof Error ? error.message : 'addItem failed',
+            element: 'cartStore.addItem',
+          });
         } finally {
           set({ isLoading: false });
         }

@@ -8,6 +8,7 @@ import { useCartStore } from "@/stores/cartStore";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useMarket } from "@/i18n/MarketContext";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
+import { trackFunnelStep, trackFriction } from "@/lib/funnelTracking";
 import { supabase } from "@/integrations/supabase/client";
 import { getVisitorId } from "@/lib/visitorId";
 import pillowGrey from "@/assets/product-pillow-grey-new.webp";
@@ -40,6 +41,18 @@ export const ShopifyCartDrawer = () => {
     }
   }, [isDrawerOpen, isLoading, syncCart]);
 
+  // Track when the cart drawer opens (separate effect to avoid double-fire)
+  useEffect(() => {
+    if (isDrawerOpen) {
+      trackFunnelStep('open_cart', {
+        value: totalPrice,
+        currency,
+        metadata: { items: totalItems },
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDrawerOpen]);
+
   useEffect(() => {
     if (!isDrawerOpen || items.length === 0) return;
     const interval = setInterval(() => {
@@ -50,7 +63,20 @@ export const ShopifyCartDrawer = () => {
 
   const handleCheckout = () => {
     const checkoutUrl = getCheckoutUrl();
+    if (!checkoutUrl) {
+      trackFriction('checkout_error', {
+        severity: 'error',
+        message: 'No checkoutUrl available when user clicked checkout',
+        metadata: { totalItems, totalPrice },
+      });
+      return;
+    }
     if (checkoutUrl) {
+      trackFunnelStep('click_checkout', {
+        value: totalPrice,
+        currency,
+        metadata: { items: totalItems },
+      });
       trackInitiateCheckout({
         value: totalPrice,
         numItems: totalItems,
@@ -102,6 +128,7 @@ export const ShopifyCartDrawer = () => {
         }
       } catch {}
       window.open(finalUrl, '_blank');
+      try { sessionStorage.setItem('sleepzy_checked_out_at', String(Date.now())); } catch {}
       setDrawerOpen(false);
     }
   };
@@ -129,9 +156,24 @@ export const ShopifyCartDrawer = () => {
       }
     };
 
+    // Track when the user comes BACK to our tab after checkout — strong
+    // signal of "abandoned checkout if no purchase happened on Shopify side"
+    const onReturn = () => {
+      if (document.visibilityState !== 'visible') return;
+      const checkedOut = sessionStorage.getItem('sleepzy_checked_out_at');
+      if (!checkedOut) return;
+      const elapsed = Date.now() - Number(checkedOut);
+      sessionStorage.removeItem('sleepzy_checked_out_at');
+      trackFunnelStep('return_from_checkout', {
+        metadata: { elapsedMs: elapsed },
+      });
+    };
+
     document.addEventListener('visibilitychange', onVisibility);
+    document.addEventListener('visibilitychange', onReturn);
     return () => {
       document.removeEventListener('visibilitychange', onVisibility);
+      document.removeEventListener('visibilitychange', onReturn);
     };
   }, []);
 
