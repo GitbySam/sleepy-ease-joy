@@ -411,7 +411,14 @@ const Product = () => {
               {bundles.map((b) => (
                 <button
                   key={b.qty}
-                  onClick={() => setSelectedQty(b.qty)}
+                  onClick={() => {
+                    setSelectedQty(b.qty);
+                    trackFunnelStep('select_bundle', {
+                      step_value: b.tag || b.label,
+                      value: bundlePrices[b.qty],
+                      currency,
+                    });
+                  }}
                   className={`w-full rounded-xl p-4 border-2 transition-all text-left relative ${
                     selectedQty === b.qty
                       ? "border-gold bg-gold/5 shadow-md"
