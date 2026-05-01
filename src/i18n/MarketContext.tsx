@@ -154,6 +154,19 @@ export const MarketProvider = ({ children }: { children: ReactNode }) => {
   const setCountry = (c: Country) => {
     setCountryState(c);
     try { localStorage.setItem(STORAGE_KEY, c); } catch {}
+    // Reset any existing Shopify cart so checkout currency matches the new market.
+    try {
+      const raw = localStorage.getItem("shopify-cart");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const prev = parsed?.state?.cartCountry;
+        if (prev && prev !== c) {
+          localStorage.removeItem("shopify-cart");
+          // Force any open store instance to reload from cleared storage
+          if (typeof window !== "undefined") window.dispatchEvent(new Event("sleepzy:cart-reset"));
+        }
+      }
+    } catch {}
   };
 
   const market = MARKETS[country];
