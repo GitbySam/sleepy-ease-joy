@@ -376,7 +376,10 @@ const Product = () => {
                   {availableColors.map((color) => (
                     <button
                       key={color}
-                      onClick={() => setSelectedColor(color)}
+                      onClick={() => {
+                        setSelectedColor(color);
+                        trackFunnelStep('select_color', { step_value: color });
+                      }}
                       className={`relative w-9 h-9 rounded-full transition-all duration-200 ${
                         selectedColor === color
                           ? "ring-2 ring-gold ring-offset-2 ring-offset-background scale-110"
