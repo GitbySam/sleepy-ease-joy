@@ -82,7 +82,7 @@ export function trackFunnelStep(
         step_value: data.step_value ?? null,
         value: data.value ?? null,
         currency: data.currency ?? null,
-        metadata: data.metadata ?? null,
+        metadata: (data.metadata ?? null) as never,
       }])
       .then(({ error }) => {
         if (error) console.warn('[funnel] insert failed', error.message);
@@ -118,7 +118,7 @@ export function trackFriction(
         severity: data.severity ?? 'warn',
         message: data.message ?? null,
         element: data.element ?? null,
-        metadata: data.metadata ?? null,
+        metadata: (data.metadata ?? null) as never,
       }])
       .then(({ error }) => {
         if (error) console.warn('[friction] insert failed', error.message);
