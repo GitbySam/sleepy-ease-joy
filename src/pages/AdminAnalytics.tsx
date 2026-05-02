@@ -22,6 +22,7 @@ const pixelEvents = [
 const TABS = [
   { id: "cart", label: "🛒 Ajouts panier" },
   { id: "funnel", label: "🎯 Funnel" },
+  { id: "checkout", label: "🔍 Funnel Checkout" },
   { id: "frictions", label: "⚠️ Frictions" },
   { id: "sales", label: "💰 Ventes Shopify" },
   { id: "traffic", label: "📈 Trafic" },
@@ -88,6 +89,7 @@ export default function AdminAnalytics() {
         {/* Tab content */}
         {activeTab === "cart" && <CartEventsTab days={days} />}
         {activeTab === "funnel" && <FunnelTab days={days} />}
+        {activeTab === "checkout" && <CheckoutFunnelTab days={days} />}
         {activeTab === "frictions" && <FrictionsTab days={days} />}
         {activeTab === "sales" && <SalesTab days={days} />}
         {activeTab === "traffic" && <TrafficTab />}
