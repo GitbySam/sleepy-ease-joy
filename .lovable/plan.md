@@ -1,201 +1,125 @@
+# Plan — Identifier la cause de l'abandon checkout
 
-# Plan — Multi-marchés Sleep&zy (CA / US / FR)
+## Constat de départ
 
-## Pricing finalisé (Option A)
+L'edge function `shopify-analytics` récupère déjà :
+- Les commandes payées (`paidOrders`)
+- Les **abandoned checkouts** depuis l'API Admin Shopify (visiteurs qui ont atteint la page checkout, parfois rempli leur email, mais n'ont pas payé)
+- Pour chaque abandon : email présent ou non, montant, line items, date
 
-| Marché | Devise | Single | Duo (×2) | Family (×3) |
-|---|---|---|---|---|
-| 🇨🇦 Canada | CAD | $29.95 (barré $59.90) | $59.90 (barré $119.80) | $64.95 (barré $179.70) |
-| 🇺🇸 USA | USD | $29.95 (barré $59.90) | $59.90 (barré $119.80) | $64.95 (barré $179.95) |
-| 🇫🇷 France | EUR (TTC) | 25.95 € (barré 51.90 €) | 51.90 € (barré 103.80 €) | 56.95 € (barré 155.95 €) |
+Donc on n'a PAS besoin de créer une table `shopify_orders` ni un sync job. La donnée existe déjà.
 
-Réductions affichées : Single -50%, Duo -50%, Family -64% (identique sur les 3 marchés).
+**Le vrai trou** : on ne sait pas répondre à la question "parmi les X clics sur 'checkout' depuis le site, combien ont :
+1. Atteint la page Shopify (= abandoned_checkout créé) ?
+2. Rempli leur email (= intention forte) ?
+3. Payé (= conversion) ?
+4. Disparu sans laisser de trace (= bounce immédiat sur Shopify) ?"
 
----
+C'est cette segmentation qui dit où est vraiment la fuite.
 
-## Étape 1 — Configuration Shopify Markets (à faire par toi côté admin)
+## Ce qu'on va construire
 
-Tu fais ces étapes dans ton admin Shopify avant que le code soit utile :
+Un nouvel onglet **"Funnel Checkout"** dans `AdminAnalytics.tsx` qui croise les 3 sources de données déjà disponibles :
 
-1. **Settings → Markets → Add market**
-   - Créer **United States** (USD)
-   - Créer **France** (EUR)
-   - Canada reste le marché principal (CAD)
-2. **Pour chaque marché → Products and pricing :**
-   - Choisir « Set prices manually » (pas de conversion auto)
-   - Définir les prix par variante (9 variantes : 3 packs × 3 couleurs)
-   - Saisir les prix exacts du tableau ci-dessus
-3. **Domains/URLs** : laisser le routing auto (Shopify route via le même domaine, le `@inContext` du Storefront API gère la devise)
-4. **Activer** les 3 marchés
-5. **Shipping** : créer des zones de livraison pour US et FR (Settings → Shipping)
+```text
+                    funnel_events                shopify-analytics
+                    (notre site)                 (Shopify Admin API)
+                         │                              │
+                         ▼                              ▼
+                 click_checkout              abandoned_checkouts + paid_orders
+                         │                              │
+                         └──────────┬───────────────────┘
+                                    ▼
+                       Tableau de segmentation
+```
 
-Une fois fait, le Storefront API renverra automatiquement les bons prix quand on ajoute la directive `@inContext(country: ...)` aux requêtes.
+### Segmentation visée
 
----
+Pour la période choisie (7 / 30 / 90 jours) :
 
-## Étape 2 — Code côté Lovable
+| Étape | Source | Question répondue |
+|-------|--------|-------------------|
+| A. Clic checkout | `funnel_events.step = 'click_checkout'` | Combien d'intentions ? |
+| B. Page Shopify atteinte | `abandonedCount + paidOrders` | Combien ont vraiment ouvert le checkout ? |
+| C. Email saisi | `abandonedWithEmail + paidOrders` | Combien ont commencé à remplir ? |
+| D. Paiement | `paidOrders` | Combien ont converti ? |
 
-### 2.1 Nouveau `MarketContext` (`src/i18n/MarketContext.tsx`)
+**Trois taux de drop-off s'affichent** :
+- A → B : "Bounce avant Shopify" (problème réseau, redirect cassé, fermeture immédiate)
+- B → C : "Bounce sur la landing du checkout" (frais de port shock, devise, méfiance)
+- C → D : "Abandon en cours de paiement" (carte refusée, hésitation, comparaison de prix)
 
-Source de vérité unique pour pays/devise/prix. Provider en haut de l'app.
-
-État exposé :
-- `country: 'CA' | 'US' | 'FR'`
-- `currency: 'CAD' | 'USD' | 'EUR'`
-- `currencySymbol: '$' | '€'`
-- `currencyCode` (suffixe affiché : "CAD", "USD", "" pour EUR)
-- `prices`: table figée par pays (Single/Duo/Family + prix barrés)
-- `setCountry(c)` → persisté dans `localStorage` (`sleepzy-market`)
-- `formatPrice(amount)` → helper unifié
-
-Détection initiale (priorité) :
-1. `localStorage.sleepzy-market` si présent
-2. Détection IP via `https://ipapi.co/country/` (fetch léger, fallback silencieux)
-3. Mapping langue → pays (`fr` → FR, `en` → CA par défaut)
-4. Fallback : `CA`
-
-Lien langue/pays : changer le pays met à jour la langue compatible (FR→fr, CA→en par défaut, US→en) sans forcer ; l'utilisateur peut toujours changer via le sélecteur.
-
-### 2.2 Sélecteur pays dans le Header (`src/components/CountrySelector.tsx`)
-
-- Petit bouton dans le `Header` (desktop + menu mobile) à côté du panier
-- Affiche drapeau + code pays (🇨🇦 CA / 🇺🇸 US / 🇫🇷 FR)
-- Dropdown (Radix `DropdownMenu` déjà dispo) avec les 3 options
-- Au changement : `setCountry()` → MAJ devise + prix + langue suggérée + reset du cart Shopify (le panier est lié à une devise, on ne peut pas mélanger)
-
-### 2.3 Refactor des composants prix
-
-Tous tirent désormais leurs prix du `MarketContext` au lieu de hardcoder :
-
-- **`BundleOffer.tsx`** : remplacer le tableau `bundles` par `prices` du context
-- **`Product.tsx`** : remplacer `singlePrice/duoPrice/familyPrice` et `bundleOldPrices` par le context. `currencySymbol` vient du context. Suffixe "CAD"/"USD" conditionnel.
-- **`CartDrawer.tsx` / `ShopifyCartDrawer.tsx`** : afficher la devise du context, recalculer totaux en local
-- **`UpsellPopup.tsx`** : prix conditionnels via context
-- **`StickyMobileCTA.tsx`** : prix conditionnels via context
-- **`CtaBridge.tsx`** : prix conditionnels via context
-- **`ShopifyProducts.tsx`** : passer `country` aux requêtes Storefront
-
-Helper unique `formatPrice(amount, { showCode })` :
-- CA → `$29.95 CAD`
-- US → `$29.95 USD`
-- FR → `25,95 €` (virgule, suffixe vide)
-
-### 2.4 Storefront API : `@inContext`
-
-Modifier `src/lib/shopify.ts` pour injecter le pays dans toutes les requêtes :
-
-- `fetchProducts(first, query, country)` → ajoute `@inContext(country: $country)`
-- `createShopifyCart(item, country)` → idem sur la mutation `cartCreate` avec `buyerIdentity.countryCode`
-- `addLineToShopifyCart` / updates : Shopify garde le contexte du cart créé, pas de changement
-- Le `cartStore` mémorise le `country` du cart courant ; si l'utilisateur change de pays alors qu'un cart existe → vider le cart avant de recréer
-
-Résultat : Shopify renvoie les prix dans la bonne devise et le checkout s'ouvre dans la devise du marché choisi.
-
-### 2.5 Prix d'affichage vs prix Shopify
-
-Aujourd'hui le code utilise des prix "fictifs" côté frontend (`bundlePrice`) parce que les variantes Shopify ont un seul prix de base. Avec Markets configuré correctement (étape 1), on peut **soit** :
-- (a) Garder l'affichage hardcodé via `MarketContext` (rapide, exact, dépend de la cohérence avec Shopify) ✅ choix recommandé
-- (b) Lire le prix retourné par `@inContext` (source unique de vérité, mais demande un refactor plus large des composants prix)
-
-On part sur **(a)** : `MarketContext` est la source pour l'affichage, Shopify Markets est la source pour le checkout. À toi de bien saisir les mêmes prix dans Shopify Markets.
-
-### 2.6 Persistance & UX
-
-- `localStorage.sleepzy-market` → pays choisi
-- Bandeau discret la première fois : « On dirait que tu es en France 🇫🇷 — voir les prix en euros ? » (acceptable / refuser) — optionnel, peut être ajouté en V2
-- Si pays change pendant qu'un cart existe : toast « Devise mise à jour, panier réinitialisé »
-
-### 2.7 Mises à jour mémoires Lovable
-
-- Mettre à jour `mem://marketing/pricing-strategy` avec les 3 marchés
-- Mettre à jour la Core memory pour refléter "CA/US/FR markets"
-
----
+Le ratio le plus élevé indique la cause dominante de l'abandon.
 
 ## Détails techniques
 
-### Prix figés dans MarketContext
+### 1. Edge function `shopify-analytics` — petit ajout
 
-```text
-PRICES = {
-  CA: { currency: 'CAD', symbol: '$', code: 'CAD',
-        single: 29.95, duo: 59.90, family: 64.95,
-        oldSingle: 59.90, oldDuo: 119.80, oldFamily: 179.70 },
-  US: { currency: 'USD', symbol: '$', code: 'USD',
-        single: 29.95, duo: 59.90, family: 64.95,
-        oldSingle: 59.90, oldDuo: 119.80, oldFamily: 179.95 },
-  FR: { currency: 'EUR', symbol: '€', code: '',
-        single: 25.95, duo: 51.90, family: 56.95,
-        oldSingle: 51.90, oldDuo: 103.80, oldFamily: 155.95 },
+Ajouter dans la réponse :
+```ts
+summary: {
+  ...existing,
+  // Nouveau : count des click_checkout côté funnel_events sur la même période
+  // (calculé côté front car on a déjà l'accès à supabase, plus simple que de faire un appel SQL ici)
 }
 ```
+En réalité, **aucune modif de l'edge function n'est nécessaire**. On va juste lire `funnel_events` directement depuis l'admin.
 
-### GraphQL `@inContext`
+### 2. `AdminAnalytics.tsx` — nouvel onglet "Funnel Checkout"
 
-```text
-query GetProducts($first: Int!, $country: CountryCode!)
-@inContext(country: $country) { products(first: $first) { ... } }
+Ajouter un `TabsTrigger` "Funnel Checkout" à côté des onglets existants. Dans le `TabsContent` :
 
-mutation cartCreate($input: CartInput!, $country: CountryCode!)
-@inContext(country: $country) { cartCreate(input: $input) { ... } }
+**A. Fetch additionnel** (parallèle au fetch shopify-analytics existant) :
+```ts
+const { data: clickEvents } = await supabase
+  .from('funnel_events')
+  .select('id', { count: 'exact', head: true })
+  .eq('step', 'click_checkout')
+  .gte('created_at', sinceISO);
 ```
 
-### Architecture provider
+**B. Calculs** (4 nombres + 3 ratios) :
+```ts
+const clicks = clickEvents.count;
+const reached = abandonedCount + paidOrders;
+const filledEmail = abandonedWithEmail + paidOrders;
+const paid = paidOrders;
 
-```text
-App
- └── LanguageProvider
-      └── MarketProvider   ← nouveau
-           └── Routes
-                ├── Header (CountrySelector)
-                ├── Index (BundleOffer, CtaBridge, etc.)
-                └── Product
+const dropBeforeShopify = clicks > 0 ? (clicks - reached) / clicks : 0;
+const dropOnLanding   = reached > 0 ? (reached - filledEmail) / reached : 0;
+const dropDuringPay   = filledEmail > 0 ? (filledEmail - paid) / filledEmail : 0;
 ```
 
----
+**C. UI** :
+- 4 KPI cards en ligne (clic → page → email → paiement) avec le nombre et le % du précédent
+- 3 cards de drop-off colorées (rouge si > 50 %, ambre si 30-50 %, vert si < 30 %)
+- Un verdict en bas : "Cause dominante de l'abandon : [bounce avant Shopify / landing checkout / paiement]"
+- Liste des 10 abandons les plus récents avec email (déjà disponible dans `data.abandonedCheckouts`)
 
-## Fichiers touchés
+**D. Note explicative** sur chaque drop pour le lecteur non-technique :
+- "Bounce avant Shopify" → "Le client clique mais n'arrive jamais sur la page de paiement. Causes typiques : popup bloquante, problème réseau, fermeture immédiate."
+- "Bounce sur landing checkout" → "Arrivé sur la page Shopify, il repart sans remplir son email. Cause #1 : choc des frais de port, devise inattendue."
+- "Abandon en cours de paiement" → "A rempli son email mais n'a pas payé. Cause #1 : carte refusée, hésitation, comparaison de prix."
 
-**Créés**
-- `src/i18n/MarketContext.tsx`
-- `src/components/CountrySelector.tsx`
+### 3. Aucune migration de base de données nécessaire
 
-**Modifiés**
-- `src/App.tsx` (wrap MarketProvider)
-- `src/components/Header.tsx` (ajout CountrySelector)
-- `src/lib/shopify.ts` (`@inContext` + signature des fonctions)
-- `src/stores/cartStore.ts` (mémoriser country, reset si changement)
-- `src/components/BundleOffer.tsx`
-- `src/components/CtaBridge.tsx`
-- `src/components/StickyMobileCTA.tsx`
-- `src/components/UpsellPopup.tsx`
-- `src/components/CartDrawer.tsx`
-- `src/components/ShopifyCartDrawer.tsx`
-- `src/components/ShopifyProducts.tsx`
-- `src/pages/Product.tsx`
-- `src/i18n/translations.ts` (clés sélecteur pays)
-- `mem://index.md` + `mem://marketing/pricing-strategy`
+On utilise uniquement les tables existantes (`funnel_events`) et l'edge function existante (`shopify-analytics`).
 
----
+## Ce que ce plan ne fait PAS (volontairement)
 
-## Ordre d'implémentation
+- ❌ Pas de sync des commandes dans une table dédiée → inutile, l'API Shopify répond en temps réel
+- ❌ Pas d'attribution visitor_id ↔ commande Shopify → trop fragile (window de 2h, anonyme), pas le bon ROI
+- ❌ Pas de tracking de la page checkout Shopify → impossible (boîte noire, comme tu l'as dit)
 
-1. Créer `MarketContext` + `PRICES`
-2. Brancher `MarketProvider` dans `App.tsx`
-3. Créer `CountrySelector` + l'ajouter au `Header`
-4. Refactor `shopify.ts` avec `@inContext` + signatures
-5. Refactor `cartStore.ts` (gestion changement pays)
-6. Refactor des 7 composants prix un par un (BundleOffer → Product → Cart → autres)
-7. Test manuel : switch CA→US→FR, vérifier prix + checkout
-8. Mettre à jour la mémoire
+## Résultat attendu
 
----
+Après déploiement, tu vas voir un seul onglet qui te dit en 3 chiffres **où est exactement la fuite** :
+- Si `dropBeforeShopify` est élevé → problème dans le code de redirection (à régler)
+- Si `dropOnLanding` est élevé → problème de positionnement prix / frais de port (à régler côté landing)
+- Si `dropDuringPay` est élevé → problème côté Shopify, hors de portée (et tu peux arrêter de t'en faire)
 
-## Ce dont j'ai besoin de toi pour valider
+C'est exactement ce qu'il faut pour décider si l'effort suivant doit aller sur le checkout ou sur la landing (84 % bounce).
 
-1. **Plan OK ?** Je passe à l'implémentation.
-2. **Sélecteur pays visible où exactement ?** Header desktop à côté du panier + dans le menu mobile (recommandé), ou juste menu mobile ?
-3. **Détection IP** : OK pour `ipapi.co` (gratuit, ~1000 req/jour) ou tu préfères pas de détection auto (uniquement choix manuel + langue) ?
-4. **Tu confirmes saisir les prix dans Shopify Markets toi-même** une fois que je t'aurai donné le mémo des prix exacts à saisir ?
+## Estimation
 
-Une fois validé, je code l'ensemble en mode build.
+~1 fichier modifié (`AdminAnalytics.tsx`), ~150 lignes ajoutées, aucune migration, aucune nouvelle table.

@@ -22,6 +22,7 @@ const pixelEvents = [
 const TABS = [
   { id: "cart", label: "🛒 Ajouts panier" },
   { id: "funnel", label: "🎯 Funnel" },
+  { id: "checkout", label: "🔍 Funnel Checkout" },
   { id: "frictions", label: "⚠️ Frictions" },
   { id: "sales", label: "💰 Ventes Shopify" },
   { id: "traffic", label: "📈 Trafic" },
@@ -88,11 +89,314 @@ export default function AdminAnalytics() {
         {/* Tab content */}
         {activeTab === "cart" && <CartEventsTab days={days} />}
         {activeTab === "funnel" && <FunnelTab days={days} />}
+        {activeTab === "checkout" && <CheckoutFunnelTab days={days} />}
         {activeTab === "frictions" && <FrictionsTab days={days} />}
         {activeTab === "sales" && <SalesTab days={days} />}
         {activeTab === "traffic" && <TrafficTab />}
         {activeTab === "sources" && <SourcesTab />}
         {activeTab === "meta" && <MetaTab />}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────── CHECKOUT FUNNEL TAB ───────────
+ * Croise funnel_events.click_checkout (notre site) avec
+ * shopify-analytics (abandoned + paid orders) pour identifier
+ * où exactement les visiteurs abandonnent.
+ */
+function CheckoutFunnelTab({ days }: { days: number }) {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [clicks, setClicks] = useState<number>(0);
+  const [shopify, setShopify] = useState<ShopifyResult | null>(null);
+
+  const fetchAll = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const sinceISO = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+
+      // Fetch Shopify analytics + funnel clicks in parallel
+      const [shopifyRes, clicksRes] = await Promise.all([
+        fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/shopify-analytics?days=${days}`, {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+        }).then((r) => r.json()),
+        supabase
+          .from('funnel_events')
+          .select('id', { count: 'exact', head: true })
+          .eq('step', 'click_checkout')
+          .gte('created_at', sinceISO),
+      ]);
+
+      if (shopifyRes.error) {
+        setError(shopifyRes.error);
+      } else {
+        setShopify(shopifyRes as ShopifyResult);
+      }
+      setClicks(clicksRes.count ?? 0);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erreur réseau');
+    }
+    setLoading(false);
+  }, [days]);
+
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <span className="ml-3 text-gray-500">Analyse du funnel checkout…</span>
+      </div>
+    );
+  }
+
+  if (error || !shopify) {
+    return (
+      <Card className="bg-white border-2 border-red-200">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
+            <div className="flex-1">
+              <h3 className="font-semibold text-red-900 mb-1">Impossible de charger le funnel checkout</h3>
+              <p className="text-sm text-red-700">{error ?? 'Données indisponibles'}</p>
+              <button
+                onClick={fetchAll}
+                className="mt-3 inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700"
+              >
+                <RefreshCw className="h-3.5 w-3.5" /> Réessayer
+              </button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const s = shopify.summary;
+  const currencySymbol = s.currency === 'USD' ? '$' : s.currency === 'EUR' ? '€' : s.currency === 'CAD' ? '$' : s.currency;
+
+  // 4 étapes du funnel
+  const stepClicks = clicks;
+  const stepReached = s.abandonedCount + s.paidOrders; // tous ceux qui ont créé un checkout Shopify
+  const stepEmail = s.abandonedWithEmail + s.paidOrders;
+  const stepPaid = s.paidOrders;
+
+  // Drop-offs (en %)
+  const dropBeforeShopify = stepClicks > 0 ? ((stepClicks - stepReached) / stepClicks) * 100 : 0;
+  const dropOnLanding = stepReached > 0 ? ((stepReached - stepEmail) / stepReached) * 100 : 0;
+  const dropDuringPay = stepEmail > 0 ? ((stepEmail - stepPaid) / stepEmail) * 100 : 0;
+
+  // Pourcentage par rapport au début (clics)
+  const pctReached = stepClicks > 0 ? (stepReached / stepClicks) * 100 : 0;
+  const pctEmail = stepClicks > 0 ? (stepEmail / stepClicks) * 100 : 0;
+  const pctPaid = stepClicks > 0 ? (stepPaid / stepClicks) * 100 : 0;
+
+  // Verdict : la plus grosse fuite
+  const drops = [
+    { key: 'before', label: 'Avant Shopify', value: dropBeforeShopify, count: stepClicks - stepReached },
+    { key: 'landing', label: 'Sur la landing checkout', value: dropOnLanding, count: stepReached - stepEmail },
+    { key: 'pay', label: 'En cours de paiement', value: dropDuringPay, count: stepEmail - stepPaid },
+  ];
+  const dominant = drops.reduce((a, b) => (b.value > a.value ? b : a), drops[0]);
+
+  const dropColor = (v: number) =>
+    v >= 50 ? 'border-red-300 bg-red-50' : v >= 30 ? 'border-amber-300 bg-amber-50' : 'border-emerald-300 bg-emerald-50';
+  const dropTextColor = (v: number) =>
+    v >= 50 ? 'text-red-700' : v >= 30 ? 'text-amber-700' : 'text-emerald-700';
+
+  const verdictText: Record<string, { title: string; desc: string; action: string }> = {
+    before: {
+      title: 'Bounce avant même Shopify',
+      desc: 'La majorité des visiteurs cliquent sur "checkout" mais n\'arrivent jamais sur la page de paiement Shopify.',
+      action: 'Causes probables : popup bloquante (window.open bloqué par le navigateur), redirection cassée, fermeture immédiate de l\'onglet. À investiguer côté code de redirection.',
+    },
+    landing: {
+      title: 'Bounce sur la landing du checkout',
+      desc: 'Les visiteurs arrivent sur Shopify mais repartent sans même remplir leur email.',
+      action: 'Cause #1 universelle : choc des frais de port et de la devise. Solution : afficher clairement les frais et la devise AVANT le clic checkout, sur la page produit / dans le panier.',
+    },
+    pay: {
+      title: 'Abandon en cours de paiement',
+      desc: 'Les visiteurs ont rempli leur email mais n\'ont pas finalisé le paiement.',
+      action: 'Causes : carte refusée, hésitation dernière minute, comparaison de prix. La page checkout Shopify est une boîte noire — active "Abandoned Checkout Recovery" dans Shopify pour récupérer ~10% par email.',
+    },
+  };
+  const verdict = verdictText[dominant.key];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <p className="text-xs text-gray-500">
+          Période : {days} derniers jours
+          <span className="ml-2 text-emerald-600">● Croisement funnel_events × Shopify Admin API</span>
+        </p>
+        <button
+          onClick={fetchAll}
+          className="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-200"
+        >
+          <RefreshCw className="h-3.5 w-3.5" /> Actualiser
+        </button>
+      </div>
+
+      {/* 4 étapes */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <Card className="bg-white">
+          <CardContent className="p-4">
+            <p className="text-xs text-gray-500 uppercase tracking-wide">1. Clics checkout</p>
+            <p className="text-3xl font-bold text-gray-900 mt-1">{stepClicks}</p>
+            <p className="text-xs text-gray-400 mt-1">100 % (référence)</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-white">
+          <CardContent className="p-4">
+            <p className="text-xs text-gray-500 uppercase tracking-wide">2. Page Shopify atteinte</p>
+            <p className="text-3xl font-bold text-gray-900 mt-1">{stepReached}</p>
+            <p className="text-xs text-gray-400 mt-1">{pctReached.toFixed(1)} % des clics</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-white">
+          <CardContent className="p-4">
+            <p className="text-xs text-gray-500 uppercase tracking-wide">3. Email saisi</p>
+            <p className="text-3xl font-bold text-gray-900 mt-1">{stepEmail}</p>
+            <p className="text-xs text-gray-400 mt-1">{pctEmail.toFixed(1)} % des clics</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-white">
+          <CardContent className="p-4">
+            <p className="text-xs text-gray-500 uppercase tracking-wide">4. Paiement réussi</p>
+            <p className="text-3xl font-bold text-emerald-700 mt-1">{stepPaid}</p>
+            <p className="text-xs text-gray-400 mt-1">{pctPaid.toFixed(1)} % des clics</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 3 drops */}
+      <div>
+        <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+          <TrendingDown className="h-4 w-4" /> Où sont les fuites ?
+        </h3>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          <Card className={`border-2 ${dropColor(dropBeforeShopify)}`}>
+            <CardContent className="p-4">
+              <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Drop 1 → 2</p>
+              <p className={`text-3xl font-bold mt-1 ${dropTextColor(dropBeforeShopify)}`}>
+                {dropBeforeShopify.toFixed(1)} %
+              </p>
+              <p className="text-xs text-gray-600 mt-1">
+                {Math.max(0, stepClicks - stepReached)} visiteurs perdus avant Shopify
+              </p>
+              <p className="text-xs text-gray-500 mt-2 leading-snug">
+                Le client clique mais n'arrive jamais sur la page de paiement. Causes typiques : popup bloquée, problème réseau, fermeture immédiate.
+              </p>
+            </CardContent>
+          </Card>
+          <Card className={`border-2 ${dropColor(dropOnLanding)}`}>
+            <CardContent className="p-4">
+              <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Drop 2 → 3</p>
+              <p className={`text-3xl font-bold mt-1 ${dropTextColor(dropOnLanding)}`}>
+                {dropOnLanding.toFixed(1)} %
+              </p>
+              <p className="text-xs text-gray-600 mt-1">
+                {Math.max(0, stepReached - stepEmail)} visiteurs perdus sur la landing
+              </p>
+              <p className="text-xs text-gray-500 mt-2 leading-snug">
+                Arrivé sur Shopify, repart sans remplir son email. Cause #1 : choc des frais de port, devise inattendue.
+              </p>
+            </CardContent>
+          </Card>
+          <Card className={`border-2 ${dropColor(dropDuringPay)}`}>
+            <CardContent className="p-4">
+              <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Drop 3 → 4</p>
+              <p className={`text-3xl font-bold mt-1 ${dropTextColor(dropDuringPay)}`}>
+                {dropDuringPay.toFixed(1)} %
+              </p>
+              <p className="text-xs text-gray-600 mt-1">
+                {Math.max(0, stepEmail - stepPaid)} visiteurs perdus en paiement
+              </p>
+              <p className="text-xs text-gray-500 mt-2 leading-snug">
+                A rempli son email mais n'a pas payé. Causes : carte refusée, hésitation, comparaison de prix.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Verdict */}
+      {stepClicks > 0 && (
+        <Card className="bg-blue-50 border-2 border-blue-200">
+          <CardContent className="p-5">
+            <div className="flex items-start gap-3">
+              <div className="rounded-full bg-blue-600 p-2 flex-shrink-0">
+                <AlertTriangle className="h-4 w-4 text-white" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-1">
+                  Cause dominante de l'abandon
+                </p>
+                <h3 className="text-lg font-bold text-blue-900 mb-2">{verdict.title}</h3>
+                <p className="text-sm text-blue-900 mb-2">{verdict.desc}</p>
+                <p className="text-sm text-blue-800">
+                  <strong>Action recommandée :</strong> {verdict.action}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {stepClicks === 0 && (
+        <Card className="bg-amber-50 border-2 border-amber-200">
+          <CardContent className="p-5 text-sm text-amber-900">
+            Aucun clic checkout enregistré sur la période. Élargis la période ou vérifie que le tracking <code className="bg-amber-100 px-1 rounded">click_checkout</code> est actif.
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Liste des derniers abandons avec email */}
+      {shopify.abandonedCheckouts.length > 0 && (
+        <Card className="bg-white">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              📧 Derniers abandons avec email ({s.abandonedWithEmail})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {shopify.abandonedCheckouts.slice(0, 10).map((c) => (
+                <div key={c.id} className="flex items-center justify-between text-sm border-b border-gray-100 pb-2 last:border-0">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-900 truncate">{c.email ?? '— sans email —'}</p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(c.created_at).toLocaleString('fr-FR')} • {c.line_items_count} article(s)
+                    </p>
+                  </div>
+                  <p className="font-semibold text-amber-700 ml-3">
+                    {currencySymbol}{parseFloat(c.total_price).toFixed(2)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Note méthodo */}
+      <div className="rounded-lg bg-gray-100 border border-gray-200 p-4 text-xs text-gray-600">
+        <p className="font-semibold mb-1 text-gray-700">📐 Méthodologie</p>
+        <ul className="space-y-1 list-disc pl-5">
+          <li><strong>Clics checkout</strong> = événements <code className="bg-white px-1 rounded">funnel_events.step = 'click_checkout'</code> sur le site.</li>
+          <li><strong>Page Shopify atteinte</strong> = abandoned_checkouts + commandes payées (Shopify ne crée un checkout que si la page se charge).</li>
+          <li><strong>Email saisi</strong> = abandons avec email + commandes payées.</li>
+          <li><strong>Paiement réussi</strong> = commandes au statut <code className="bg-white px-1 rounded">paid</code>.</li>
+          <li>Les chiffres ne sont pas attribués individuellement (anonyme), mais agrégés sur la période.</li>
+        </ul>
       </div>
     </div>
   );
