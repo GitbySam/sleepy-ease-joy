@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ShieldCheck, Truck, RotateCcw, Clock, Loader2, ArrowLeft } from "lucide-react";
+import { X } from "lucide-react";
 import { Link } from "react-router-dom";
 import pillowGrey from "@/assets/product-pillow-grey-new.webp";
 import pillowBlack from "@/assets/product-pillow-black.webp";
@@ -80,6 +81,7 @@ const Product = () => {
   const [selectedQty, setSelectedQty] = useState(initialQty);
   const [selectedColor, setSelectedColor] = useState(initialColor);
   const [galleryOffset, setGalleryOffset] = useState(0);
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const countdown = useCountdown(15);
   const { t } = useLanguage();
   const { country, currency, prices, formatPrice } = useMarket();
@@ -254,7 +256,8 @@ const Product = () => {
                   transition={{ duration: 0.3 }}
                   src={COLOR_IMAGES[selectedColor] || pillowGrey}
                   alt={`Sleep&zy Cervical Pillow - ${selectedColor}`}
-                  className="w-full max-w-sm drop-shadow-xl animate-float"
+                  onClick={() => setLightboxSrc(COLOR_IMAGES[selectedColor] || pillowGrey)}
+                  className="w-full max-w-sm drop-shadow-xl animate-float cursor-zoom-in"
                 />
               </AnimatePresence>
             </div>
@@ -273,7 +276,15 @@ const Product = () => {
                     >
                       {allPhotos.map((src, i) => (
                         <div key={i} className="shrink-0 rounded-xl overflow-hidden border border-border aspect-square" style={{ width: `calc((100% - ${(visibleCount - 1) * 8}px) / ${visibleCount})` }}>
-                          <img src={src} alt={`Sleep&zy in use ${i + 1}`} loading="lazy" width={640} height={640} className="w-full h-full object-cover" />
+                          <img
+                            src={src}
+                            alt={`Sleep&zy in use ${i + 1}`}
+                            loading="lazy"
+                            width={640}
+                            height={640}
+                            onClick={() => setLightboxSrc(src)}
+                            className="w-full h-full object-cover cursor-zoom-in hover:scale-105 transition-transform duration-300"
+                          />
                         </div>
                       ))}
                     </div>
@@ -518,6 +529,38 @@ const Product = () => {
           </motion.div>
         </div>
       </div>
+
+      {/* Image lightbox */}
+      <AnimatePresence>
+        {lightboxSrc && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setLightboxSrc(null)}
+            className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 cursor-zoom-out"
+          >
+            <button
+              onClick={() => setLightboxSrc(null)}
+              aria-label="Close"
+              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+            >
+              <X size={22} />
+            </button>
+            <motion.img
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+              transition={{ duration: 0.2 }}
+              src={lightboxSrc}
+              alt="Zoomed product"
+              onClick={(e) => e.stopPropagation()}
+              className="max-w-[95vw] max-h-[90vh] object-contain rounded-lg shadow-2xl"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
