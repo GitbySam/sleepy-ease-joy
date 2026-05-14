@@ -26,8 +26,6 @@ Deno.serve(async (req) => {
       action: 'Add a permanent Shopify Admin API token that starts with shpat_.',
     });
   }
-    });
-  }
 
   try {
     const url = new URL(req.url);
