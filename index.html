@@ -77,5 +77,16 @@
       <!-- ======= END SHELL ======= -->
     </div>
     <script type="module" src="/src/main.tsx"></script>
+    <!-- Warmup checkout subdomain: forces real DNS+TCP+TLS+HTTP roundtrip
+         so resolver caches (ISP, Quad9, 1.1.1.1) stay warm. Silent on failure. -->
+    <script>
+      try {
+        fetch("https://checkout.sleepenzy.com", {
+          mode: "no-cors",
+          credentials: "omit",
+          cache: "no-store"
+        }).catch(() => {});
+      } catch (e) {}
+    </script>
   </body>
 </html>
