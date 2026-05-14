@@ -6,6 +6,13 @@ const corsHeaders = {
 const SHOPIFY_STORE_DOMAIN = 'kdpwn5-0h.myshopify.com';
 const SHOPIFY_API_VERSION = '2025-07';
 
+function jsonResponse(body: Record<string, unknown>, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -13,9 +20,12 @@ Deno.serve(async (req) => {
 
   const SHOPIFY_ACCESS_TOKEN = Deno.env.get('SHOPIFY_ACCESS_TOKEN');
   if (!SHOPIFY_ACCESS_TOKEN) {
-    return new Response(JSON.stringify({ error: 'SHOPIFY_ACCESS_TOKEN not configured' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    return jsonResponse({
+      code: 'shopify_token_missing',
+      error: 'SHOPIFY_ACCESS_TOKEN is not configured.',
+      action: 'Add a permanent Shopify Admin API token that starts with shpat_.',
+    }, 503);
+  }
     });
   }
 
@@ -39,7 +49,20 @@ Deno.serve(async (req) => {
 
     if (!ordersRes.ok) {
       const errorText = await ordersRes.text();
-      throw new Error(`Shopify orders API failed [${ordersRes.status}]: ${errorText}`);
+      if (ordersRes.status === 401 || ordersRes.status === 403) {
+        console.error('Shopify Admin API authentication failed:', errorText);
+        return jsonResponse({
+          code: 'shopify_admin_auth_failed',
+          error: 'Token Shopify Admin invalide ou expiré. Mets à jour SHOPIFY_ACCESS_TOKEN avec un token Admin API permanent commençant par shpat_.',
+          action: 'Scopes requis : read_orders, read_customers, read_checkouts.',
+        }, 401);
+      }
+
+      return jsonResponse({
+        code: 'shopify_orders_api_failed',
+        error: `Shopify orders API failed [${ordersRes.status}]`,
+        details: errorText.slice(0, 500),
+      }, 502);
     }
 
     const ordersData = await ordersRes.json();
@@ -184,15 +207,14 @@ Deno.serve(async (req) => {
       })),
     };
 
-    return new Response(JSON.stringify(result), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return jsonResponse(result);
   } catch (error: unknown) {
     console.error('Error fetching Shopify analytics:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return jsonResponse({
+      code: 'shopify_analytics_unexpected_error',
+      error: 'Erreur inattendue pendant le chargement des analytics Shopify.',
+      details: errorMessage,
+    }, 502);
   }
 });
