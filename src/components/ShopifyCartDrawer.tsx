@@ -71,6 +71,14 @@ export const ShopifyCartDrawer = () => {
       });
       return;
     }
+    // CRITICAL: open the popup SYNCHRONOUSLY at the very top of the click
+    // handler, BEFORE any await/Supabase call. Otherwise mobile Safari /
+    // Chrome will treat it as a programmatic popup and block it silently
+    // (root cause of the "click checkout → nothing happens" abandon).
+    let popup: Window | null = null;
+    try {
+      popup = window.open('about:blank', '_blank');
+    } catch {}
     if (checkoutUrl) {
       trackFunnelStep('click_checkout', {
         value: totalPrice,
@@ -127,7 +135,25 @@ export const ShopifyCartDrawer = () => {
           finalUrl = u.toString();
         }
       } catch {}
-      window.open(finalUrl, '_blank');
+      if (popup && !popup.closed) {
+        // Popup was successfully opened synchronously — just navigate it.
+        try {
+          popup.location.href = finalUrl;
+        } catch {
+          // Cross-origin lockdown shouldn't happen on about:blank, but fall
+          // back to same-tab navigation just in case.
+          window.location.href = finalUrl;
+        }
+      } else {
+        // Popup blocked → log it and fall back to same-tab navigation so
+        // the user is never stuck on a "nothing happened" click.
+        trackFriction('checkout_error', {
+          severity: 'warn',
+          message: 'Popup blocked on checkout — falling back to same-tab navigation',
+          metadata: { totalItems, totalPrice },
+        });
+        window.location.href = finalUrl;
+      }
       try { sessionStorage.setItem('sleepzy_checked_out_at', String(Date.now())); } catch {}
       setDrawerOpen(false);
     }
