@@ -127,17 +127,11 @@ export const ShopifyCartDrawer = () => {
       } catch (e) {
         console.error('Failed to prepare checkout event', e);
       }
-      // Force Shopify's native domain (kdpwn5-0h.myshopify.com) for checkout.
-      // Shopify returns URLs on the configured custom checkout domain
-      // (checkout.sleepenzy.com), but that CNAME is not reliably reachable
-      // for all visitors (DNS prohibited / domain unreachable errors on
-      // some ISPs / VPNs / resolvers), silently killing conversions.
-      // The myshopify.com domain is always reachable and SSL-valid.
       let finalUrl = checkoutUrl;
       try {
         const u = new URL(checkoutUrl);
-        if (u.hostname !== 'kdpwn5-0h.myshopify.com') {
-          u.hostname = 'kdpwn5-0h.myshopify.com';
+        if (u.hostname.endsWith('.myshopify.com')) {
+          u.hostname = 'checkout.sleepenzy.com';
           finalUrl = u.toString();
         }
       } catch {}
