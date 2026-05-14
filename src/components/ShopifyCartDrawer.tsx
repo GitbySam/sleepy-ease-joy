@@ -148,7 +148,7 @@ export const ShopifyCartDrawer = () => {
         // Popup blocked → log it and fall back to same-tab navigation so
         // the user is never stuck on a "nothing happened" click.
         trackFriction('checkout_error', {
-          severity: 'warning',
+          severity: 'warn',
           message: 'Popup blocked on checkout — falling back to same-tab navigation',
           metadata: { totalItems, totalPrice },
         });
