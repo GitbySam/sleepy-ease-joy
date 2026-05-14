@@ -124,7 +124,10 @@ function CheckoutFunnelTab({ days }: { days: number }) {
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
             apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           },
-        }).then((r) => r.json()),
+        }).then(async (r) => {
+          const payload = await r.json().catch(() => ({} as ShopifyAnalyticsError));
+          return r.ok ? payload : { ...payload, error: formatShopifyAnalyticsError(payload, r.status) };
+        }),
         supabase
           .from('funnel_events')
           .select('id', { count: 'exact', head: true })
@@ -133,7 +136,7 @@ function CheckoutFunnelTab({ days }: { days: number }) {
       ]);
 
       if (shopifyRes.error) {
-        setError(shopifyRes.error);
+        setError(formatShopifyAnalyticsError(shopifyRes as ShopifyAnalyticsError));
       } else {
         setShopify(shopifyRes as ShopifyResult);
       }
@@ -1299,6 +1302,17 @@ interface ShopifyResult {
   topCountries: Array<{ code: string; count: number }>;
   abandonedCheckouts: AbandonedRow[];
 }
+interface ShopifyAnalyticsError {
+  code?: string;
+  error?: string;
+  action?: string;
+  details?: string;
+}
+
+function formatShopifyAnalyticsError(payload: ShopifyAnalyticsError, fallbackStatus?: number) {
+  const base = payload.error || (fallbackStatus ? `HTTP ${fallbackStatus}` : 'Erreur Shopify inconnue');
+  return [base, payload.action, payload.details].filter(Boolean).join(' ');
+}
 
 function SalesTab({ days }: { days: number }) {
   const [loading, setLoading] = useState(true);
@@ -1320,11 +1334,11 @@ function SalesTab({ days }: { days: number }) {
           apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
       });
-      const json = await res.json();
+      const json = await res.json().catch(() => ({} as ShopifyAnalyticsError));
       if (!res.ok) {
-        setError(json.error || `HTTP ${res.status}`);
+        setError(formatShopifyAnalyticsError(json, res.status));
       } else {
-        setData(json);
+        setData(json as ShopifyResult);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Erreur réseau');
