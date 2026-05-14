@@ -1299,6 +1299,17 @@ interface ShopifyResult {
   topCountries: Array<{ code: string; count: number }>;
   abandonedCheckouts: AbandonedRow[];
 }
+interface ShopifyAnalyticsError {
+  code?: string;
+  error?: string;
+  action?: string;
+  details?: string;
+}
+
+function formatShopifyAnalyticsError(payload: ShopifyAnalyticsError, fallbackStatus?: number) {
+  const base = payload.error || (fallbackStatus ? `HTTP ${fallbackStatus}` : 'Erreur Shopify inconnue');
+  return [base, payload.action, payload.details].filter(Boolean).join(' ');
+}
 
 function SalesTab({ days }: { days: number }) {
   const [loading, setLoading] = useState(true);
