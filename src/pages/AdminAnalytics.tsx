@@ -1334,11 +1334,11 @@ function SalesTab({ days }: { days: number }) {
           apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
       });
-      const json = await res.json();
+      const json = await res.json().catch(() => ({} as ShopifyAnalyticsError));
       if (!res.ok) {
-        setError(json.error || `HTTP ${res.status}`);
+        setError(formatShopifyAnalyticsError(json, res.status));
       } else {
-        setData(json);
+        setData(json as ShopifyResult);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Erreur réseau');
