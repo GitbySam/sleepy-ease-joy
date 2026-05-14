@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
       code: 'shopify_token_missing',
       error: 'SHOPIFY_ACCESS_TOKEN is not configured.',
       action: 'Add a permanent Shopify Admin API token that starts with shpat_.',
-    }, 503);
+    });
   }
     });
   }
@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
           code: 'shopify_admin_auth_failed',
           error: 'Token Shopify Admin invalide ou expiré. Mets à jour SHOPIFY_ACCESS_TOKEN avec un token Admin API permanent commençant par shpat_.',
           action: 'Scopes requis : read_orders, read_customers, read_checkouts.',
-        }, 401);
+        });
       }
 
       return jsonResponse({
