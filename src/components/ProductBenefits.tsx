@@ -5,7 +5,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 const ProductBenefits = () => {
   const { t } = useLanguage();
 
-  const items = [
+  const items: { icon: typeof ShieldCheck; key: string; highlight?: boolean }[] = [
     { icon: ShieldCheck, key: "jaw" },
     { icon: Heart, key: "neck" },
     { icon: MoveHorizontal, key: "positions", highlight: true },
@@ -13,7 +13,7 @@ const ProductBenefits = () => {
     { icon: Package, key: "compact" },
     { icon: Eye, key: "discreet" },
     { icon: Plane, key: "multimodal" },
-  ] as const;
+  ];
 
   const titleParts = t("product.benefits.title").split(/<gold>|<\/gold>/);
 
