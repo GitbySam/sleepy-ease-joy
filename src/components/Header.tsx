@@ -38,7 +38,7 @@ const Header = () => {
       <div className="bg-dark text-primary-foreground py-2 overflow-hidden">
         <div className="animate-marquee whitespace-nowrap flex">
           {[...Array(2)].map((_, i) => (
-            <span key={i} className="mx-8 text-sm font-sans-body tracking-wider">
+            <span key={i} className="mx-8 text-sm font-sans-body tracking-[0.08em]">
               {marqueeText}{marqueeText}{marqueeText}
             </span>
           ))}
