@@ -146,7 +146,7 @@ const BundleOffer = () => {
           viewport={{ once: true }}
           className="text-center text-sm text-muted-foreground mb-10 italic font-semibold"
         >
-          <span className="font-bold">{socialParts[1]}</span>{socialParts[2]}
+          <span className="font-sans not-italic font-bold text-foreground">{socialParts[1]}</span>{socialParts[2]}
         </motion.p>
 
         {/* Color selector */}
