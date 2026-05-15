@@ -1,22 +1,19 @@
-## Problème observé
+## Problème
 
-Sur la capture Clarity (mobile, langue FR), le bouton sticky en bas affiche « ACHETER —--%  €€€ » au lieu de « Acheter — -50%  ~~51,90 €~~ 25,95 € ».
+L'affichage des chiffres dans la landing page a été corrigé en ajoutant `data-clarity-unmask="true"` sur le wrapper `<div>` de `src/pages/Index.tsx`. Mais le panier (`ShopifyCartDrawer`) est rendu via un **portal Radix Sheet**, donc il sort du DOM de Index.tsx et l'attribut Clarity ne s'y applique pas. Résultat : Clarity continue de masquer les chiffres (prix, quantités, total) dans les enregistrements du panier.
 
-Cause : dans `src/components/StickyMobileCTA.tsx`, le label (`sticky.cta` = « Acheter — -50% »), l'icône, le prix barré et le prix actuel sont tous mis sur **une seule ligne** dans un bouton arrondi. En français le symbole « € » est placé **après** le nombre (ex. « 25,95 € »), donc la chaîne est plus longue qu'en anglais (« $25.95 »). Sur les petits écrans (≤ 360 px), la ligne dépasse et seul le début et la fin (« —--% €€€ ») restent visibles ; le reste est tronqué/écrasé.
+La classe `font-numeric-safe` est déjà appliquée sur les prix du panier — le rendu est OK pour les vrais utilisateurs, c'est uniquement Clarity (et donc tes screenshots de session) qui voit des blocs/tirets à la place des chiffres.
 
-## Correctif proposé (UI uniquement)
+## Correctif
 
-Modifier `src/components/StickyMobileCTA.tsx` :
+Ajouter `data-clarity-unmask="true"` sur le contenu portalé du panier :
 
-1. Empiler verticalement le label et le bloc de prix au lieu de les mettre côte à côte :
-   - Ligne 1 : icône + « Acheter — -50% »
-   - Ligne 2 (plus petite) : prix barré + prix actuel
-2. Ajouter `whitespace-nowrap` sur la ligne des prix pour éviter le retour à la ligne au milieu d'un montant, et `text-xs` pour gagner de la place.
-3. Réduire le `tracking-wider` à `tracking-wide` et passer `text-sm` → `text-[13px]` sur les très petits écrans pour garder le bouton lisible.
-4. Vérifier sur viewport 360 × 800 (Clarity), 375 × 812 (iPhone SE) et 390 × 844.
+1. **`src/components/ShopifyCartDrawer.tsx`** — ajouter `data-clarity-unmask="true"` sur `<SheetContent>` (panier principal utilisé sur landing + page produit).
+2. **`src/components/CartDrawer.tsx`** — ajouter `data-clarity-unmask="true"` sur le `motion.div` du drawer (panier legacy, par sécurité au cas où il est encore monté quelque part).
+3. **`src/components/UpsellPopup.tsx`** (si présent en portal) — vérifier et appliquer le même attribut sur son conteneur racine pour que les prix d'upsell soient aussi visibles dans Clarity.
 
-## Fichiers touchés
+Aucune modification de logique, de prix ou de style — uniquement l'attribut d'unmask Clarity.
 
-- `src/components/StickyMobileCTA.tsx` (présentation uniquement, aucune logique métier modifiée)
+## Vérification
 
-Aucune traduction ni logique de prix n'est changée — la version CA/EN reste identique visuellement, et le contenu FR s'affichera enfin correctement.
+Après publication, contrôler dans un nouvel enregistrement Clarity que les chiffres du panier (prix unitaire, quantité, total) sont lisibles au lieu d'être masqués.
