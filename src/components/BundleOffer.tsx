@@ -68,21 +68,21 @@ const BundleOffer = () => {
       price: formatPrice(prices.single),
       oldPrice: formatPrice(prices.oldSingle),
       perUnit: `${formatPrice(prices.single)}${t("bundle.perUnit")}`,
-      tag: "SOLO TRAVELERS", packValue: "Single", priceNum: prices.single,
+      tag: "SOLO TRAVELERS", tagLabel: t("product.tag.solo"), packValue: "Single", priceNum: prices.single,
     },
     {
       qty: 2, label: "2 Sleep&zy",
       price: formatPrice(prices.duo),
       oldPrice: formatPrice(prices.oldDuo),
       perUnit: `${formatPrice(prices.duo / 2)}${t("bundle.perUnit")}`,
-      tag: "DUO PACK", packValue: "Duo Pack", priceNum: prices.duo,
+      tag: "DUO PACK", tagLabel: t("product.tag.duo"), packValue: "Duo Pack", priceNum: prices.duo,
     },
     {
       qty: 3, label: "3 Sleep&zy",
       price: formatPrice(prices.family),
       oldPrice: formatPrice(prices.oldFamily),
       perUnit: `${formatPrice(prices.family / 3)}${t("bundle.perUnit")}`,
-      tag: "FAMILY PACK", packValue: "Family Pack", priceNum: prices.family,
+      tag: "FAMILY PACK", tagLabel: t("product.tag.family"), packValue: "Family Pack", priceNum: prices.family,
     },
   ];
 
@@ -187,7 +187,7 @@ const BundleOffer = () => {
             >
               {b.tag && (
                 <span className={`absolute -top-3 right-4 ${b.tag === "FAMILY PACK" ? "bg-destructive" : b.tag === "SOLO TRAVELERS" ? "bg-dark-blue" : "bg-gold"} text-primary-foreground text-xs font-bold px-3 py-1 rounded-full`}>
-                  {b.tag}
+                  {b.tagLabel}
                 </span>
               )}
               <div className="flex items-center justify-between">

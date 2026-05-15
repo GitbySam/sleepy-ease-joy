@@ -364,6 +364,10 @@ export const translations = {
     es: "3× Almohada Sleep&zy Anti-Vergüenza + 3× Bolsa de transporte",
   },
 
+  "product.tag.solo": { en: "SOLO TRAVELERS", fr: "VOYAGEURS SOLO", es: "VIAJEROS SOLO" },
+  "product.tag.duo": { en: "DUO PACK", fr: "PACK DUO", es: "PACK DÚO" },
+  "product.tag.family": { en: "FAMILY PACK", fr: "PACK FAMILLE", es: "PACK FAMILIA" },
+
   // Product Benefits section
   "product.benefits.eyebrow": { en: "Designed to actually sleep", fr: "Conçu pour vraiment dormir", es: "Diseñado para dormir de verdad" },
   "product.benefits.title": {

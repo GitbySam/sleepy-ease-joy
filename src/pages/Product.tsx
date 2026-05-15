@@ -152,9 +152,9 @@ const Product = () => {
   ];
 
   const bundles = [
-    { qty: 1, label: "1 Sleep&zy", desc: t("product.desc1"), discount: "-50%", tag: "SOLO TRAVELERS", tagColor: "bg-dark-blue", variantNode: singleVariant },
-    { qty: 2, label: "2 Sleep&zy", desc: t("product.desc2"), discount: "-50%", tag: "DUO PACK", tagColor: "bg-gold", variantNode: duoVariant },
-    { qty: 3, label: "3 Sleep&zy", desc: t("product.desc3"), discount: "-64%", tag: "FAMILY PACK", tagColor: "bg-destructive", variantNode: familyVariant },
+    { qty: 1, label: "1 Sleep&zy", desc: t("product.desc1"), discount: "-50%", tag: "SOLO TRAVELERS", tagLabel: t("product.tag.solo"), tagColor: "bg-dark-blue", variantNode: singleVariant },
+    { qty: 2, label: "2 Sleep&zy", desc: t("product.desc2"), discount: "-50%", tag: "DUO PACK", tagLabel: t("product.tag.duo"), tagColor: "bg-gold", variantNode: duoVariant },
+    { qty: 3, label: "3 Sleep&zy", desc: t("product.desc3"), discount: "-64%", tag: "FAMILY PACK", tagLabel: t("product.tag.family"), tagColor: "bg-destructive", variantNode: familyVariant },
   ];
 
   const bundlePrices: Record<number, number> = { 1: singlePrice * promoMultiplier, 2: duoPrice * promoMultiplier, 3: familyPrice * promoMultiplier };
@@ -445,7 +445,7 @@ const Product = () => {
                   )}
                   {b.tag && (
                     <span className={`absolute -top-2.5 right-4 ${b.tagColor} text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded`}>
-                      {b.tag}
+                      {b.tagLabel}
                     </span>
                   )}
                   <div className="flex items-center justify-between">
