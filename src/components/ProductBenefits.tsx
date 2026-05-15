@@ -66,10 +66,10 @@ const ProductBenefits = () => {
                   <Icon size={22} />
                 </div>
                 <h3 className="font-serif text-lg font-semibold mb-2 text-foreground">
-                  {t(`product.benefits.items.${item.key}.title`)}
+                  {t(`product.benefits.items.${item.key}.title` as Parameters<typeof t>[0])}
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed font-sans-body">
-                  {t(`product.benefits.items.${item.key}.desc`)}
+                  {t(`product.benefits.items.${item.key}.desc` as Parameters<typeof t>[0])}
                 </p>
               </motion.div>
             );
