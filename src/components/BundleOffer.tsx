@@ -230,10 +230,13 @@ const BundleOffer = () => {
           className="mb-8 space-y-3"
         >
           {/* Countdown timer */}
-          <div className="flex items-center justify-center gap-2 bg-destructive/10 rounded-xl py-2.5 px-4">
-            <Clock size={16} className="text-destructive" />
-            <span className="text-sm font-bold text-destructive">
-              {t("bundle.countdown")} {countdown}
+          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 bg-destructive/10 rounded-xl py-2.5 px-3 text-center">
+            <Clock size={16} className="text-destructive shrink-0" />
+            <span className="text-[13px] sm:text-sm font-bold text-destructive">
+              {t("bundle.countdown")}
+            </span>
+            <span className="text-[13px] sm:text-sm font-bold text-destructive tabular-nums whitespace-nowrap">
+              {countdown}
             </span>
           </div>
 
