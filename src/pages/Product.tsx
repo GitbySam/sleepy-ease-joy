@@ -152,7 +152,7 @@ const Product = () => {
   ];
 
   const bundles = [
-    { qty: 1, label: "1 Sleep&zy", desc: t("product.desc1"), discount: "-50%", tag: null, tagColor: "", variantNode: singleVariant },
+    { qty: 1, label: "1 Sleep&zy", desc: t("product.desc1"), discount: "-50%", tag: "SOLO TRAVELERS", tagColor: "bg-dark-blue", variantNode: singleVariant },
     { qty: 2, label: "2 Sleep&zy", desc: t("product.desc2"), discount: "-50%", tag: "DUO PACK", tagColor: "bg-gold", variantNode: duoVariant },
     { qty: 3, label: "3 Sleep&zy", desc: t("product.desc3"), discount: "-64%", tag: "FAMILY PACK", tagColor: "bg-destructive", variantNode: familyVariant },
   ];
