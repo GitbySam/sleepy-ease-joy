@@ -349,7 +349,7 @@ export const ShopifyCartDrawer = () => {
 
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold text-foreground">{t("cart.total")}</span>
-                  <span className="text-xl font-bold text-foreground">
+                  <span className="font-numeric-safe text-xl font-bold text-foreground tracking-normal">
                     {formatPrice(totalPrice)}
                   </span>
                 </div>
@@ -364,7 +364,7 @@ export const ShopifyCartDrawer = () => {
                   )}
                 </Button>
                 <div className="space-y-3 pt-2">
-                  <div className="flex items-center justify-center gap-4 text-[11px] text-muted-foreground">
+                  <div className="font-numeric-safe flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-muted-foreground tracking-normal">
                     <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5" /> {t("product.securePayment")}</span>
                     <span className="flex items-center gap-1"><Truck className="w-3.5 h-3.5" /> {t("product.freeShipping")}</span>
                     <span className="flex items-center gap-1"><RotateCcw className="w-3.5 h-3.5" /> {t("product.guarantee90")}</span>
@@ -376,7 +376,7 @@ export const ShopifyCartDrawer = () => {
                     <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#F5F5F5" stroke="#ddd" strokeWidth="0.5"/><text x="24" y="18" textAnchor="middle" fill="#3C4043" fontSize="7" fontWeight="bold" fontFamily="Arial">G Pay</text></svg>
                     <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#F5F5F5" stroke="#ddd" strokeWidth="0.5"/><text x="24" y="19" textAnchor="middle" fill="#003087" fontSize="7" fontWeight="bold" fontFamily="Arial">PayPal</text></svg>
                   </div>
-                  <p className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground">
+                  <p className="font-numeric-safe flex items-center justify-center gap-1 text-xs text-muted-foreground tracking-normal">
                     <Lock className="w-3 h-3" /> {t("product.sslEncryption")}
                   </p>
                 </div>
