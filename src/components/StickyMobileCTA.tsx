@@ -80,7 +80,7 @@ const StickyMobileCTA = () => {
           className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
         >
           <div className="bg-card/95 backdrop-blur-md border-t border-border px-4 pt-2 pb-4 shadow-[0_-4px_20px_rgba(0,0,0,0.15)]">
-            <p className="text-[11px] text-center text-muted-foreground mb-2">
+            <p className="text-xs text-center text-muted-foreground mb-2 tracking-normal">
               🔥 {t("sticky.viewing").replace("{count}", String(viewerCount))}
             </p>
             <motion.div

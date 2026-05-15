@@ -113,7 +113,7 @@ const Hero = () => {
             </div>
 
             {/* Live viewers — urgence sociale */}
-            <span className="inline-flex max-w-full items-center gap-2 bg-white/10 backdrop-blur-sm text-white text-[11px] font-semibold px-2.5 py-1 rounded-full">
+            <span className="inline-flex max-w-full items-center gap-2 bg-white/10 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full tracking-normal">
               <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse shrink-0" />
               <span className="break-words">🔥 {viewerCount} {t("hero.viewingNow")}</span>
             </span>
@@ -146,7 +146,7 @@ const Hero = () => {
           </div>
 
           {/* Micro-reassurances — below CTA, secondary */}
-          <div className="flex items-center justify-center gap-3 text-[10px] text-muted-foreground font-sans-body">
+          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-muted-foreground font-sans-body tracking-normal">
             <span>{t("hero.freeShipping")}</span>
             <span className="w-px h-3 bg-border" />
             <span>{t("hero.securePayment")}</span>
