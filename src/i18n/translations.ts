@@ -364,6 +364,74 @@ export const translations = {
     es: "3× Almohada Sleep&zy Anti-Vergüenza + 3× Bolsa de transporte",
   },
 
+  // Product Benefits section
+  "product.benefits.eyebrow": { en: "Designed to actually sleep", fr: "Conçu pour vraiment dormir", es: "Diseñado para dormir de verdad" },
+  "product.benefits.title": {
+    en: "Supports your <gold>jaw AND your head</gold>",
+    fr: "Soutient votre <gold>mâchoire ET votre tête</gold>",
+    es: "Sostiene tu <gold>mandíbula Y tu cabeza</gold>",
+  },
+  "product.benefits.intro": {
+    en: "Unlike inflatable U-shaped pillows, Sleep&zy is built like a soft internal scarf that holds your head and chin in a natural position.",
+    fr: "Contrairement aux coussins en U gonflables, Sleep&zy est conçu comme une écharpe interne douce qui maintient votre tête et votre menton dans une position naturelle.",
+    es: "A diferencia de las almohadas hinchables en U, Sleep&zy está diseñado como una bufanda interna suave que mantiene tu cabeza y mentón en posición natural.",
+  },
+  "product.benefits.items.jaw.title": { en: "Active jaw support", fr: "Soutien actif de la mâchoire", es: "Soporte activo de la mandíbula" },
+  "product.benefits.items.jaw.desc": {
+    en: "Holds your chin so your mouth stays closed — no more open-mouth pictures.",
+    fr: "Maintient votre menton pour que la bouche reste fermée — fini les photos bouche ouverte.",
+    es: "Mantiene tu mentón cerrado — se acabaron las fotos con la boca abierta.",
+  },
+  "product.benefits.items.neck.title": { en: "Ergonomic neck & head hold", fr: "Maintien ergonomique du cou et de la tête", es: "Soporte ergonómico de cuello y cabeza" },
+  "product.benefits.items.neck.desc": {
+    en: "Internal structure aligns your cervical spine instead of letting your head fall forward.",
+    fr: "Structure interne qui aligne la colonne cervicale au lieu de laisser la tête tomber.",
+    es: "Estructura interna que alinea la columna cervical en lugar de dejar caer la cabeza.",
+  },
+  "product.benefits.items.positions.title": { en: "3 wear positions", fr: "3 positions au choix", es: "3 posiciones a elegir" },
+  "product.benefits.items.positions.desc": {
+    en: "Wear it on the right, left or front under the chin — adapts to your favorite sleep side.",
+    fr: "Portez-le à droite, à gauche ou de face sous le menton — s'adapte à votre côté préféré.",
+    es: "Llévalo a la derecha, izquierda o de frente bajo el mentón — se adapta a tu lado preferido.",
+  },
+  "product.benefits.items.wakeup.title": { en: "Wake up without stiffness", fr: "Réveil sans raideurs", es: "Despierta sin rigidez" },
+  "product.benefits.items.wakeup.desc": {
+    en: "Natural alignment means no sore neck after a long flight or train ride.",
+    fr: "Alignement naturel : plus de torticolis après un long vol ou trajet en train.",
+    es: "Alineación natural: sin tortícolis tras un vuelo o viaje largo.",
+  },
+  "product.benefits.items.compact.title": { en: "Ultra-compact", fr: "Ultra-compact", es: "Ultra compacto" },
+  "product.benefits.items.compact.desc": {
+    en: "Fits in your handbag or carry-on — unlike bulky U-shaped pillows.",
+    fr: "Se range dans le sac à main ou bagage cabine — contrairement aux coussins en U.",
+    es: "Cabe en el bolso o equipaje de mano — a diferencia de las almohadas en U.",
+  },
+  "product.benefits.items.discreet.title": { en: "Discreet & elegant", fr: "Discret et élégant", es: "Discreto y elegante" },
+  "product.benefits.items.discreet.desc": {
+    en: "Modern design — you don't look ridiculous on the plane or at the office.",
+    fr: "Design moderne — vous n'avez pas l'air ridicule en avion ou au bureau.",
+    es: "Diseño moderno — no pareces ridículo en el avión o la oficina.",
+  },
+  "product.benefits.items.multimodal.title": { en: "For every trip", fr: "Pour tous les trajets", es: "Para todos los viajes" },
+  "product.benefits.items.multimodal.desc": {
+    en: "Plane, car, train, bus or office — works wherever you need to rest.",
+    fr: "Avion, voiture, train, bus ou bureau — fonctionne partout où vous voulez vous reposer.",
+    es: "Avión, coche, tren, autobús u oficina — funciona donde quieras descansar.",
+  },
+  "product.benefits.compare.title": {
+    en: "Sleep&zy vs classic U-shaped pillow",
+    fr: "Sleep&zy vs coussin en U classique",
+    es: "Sleep&zy vs almohada en U clásica",
+  },
+  "product.benefits.compare.before": { en: "Classic U-pillow", fr: "Coussin en U classique", es: "Almohada en U clásica" },
+  "product.benefits.compare.after": { en: "Sleep&zy", fr: "Sleep&zy", es: "Sleep&zy" },
+  "product.benefits.compare.row1.before": { en: "Head falls forward", fr: "La tête tombe en avant", es: "La cabeza cae hacia delante" },
+  "product.benefits.compare.row1.after": { en: "Jaw & head held in place", fr: "Mâchoire et tête maintenues", es: "Mandíbula y cabeza sujetas" },
+  "product.benefits.compare.row2.before": { en: "Bulky, hard to pack", fr: "Volumineux, dur à transporter", es: "Voluminoso, difícil de llevar" },
+  "product.benefits.compare.row2.after": { en: "Compact, fits anywhere", fr: "Compact, se range partout", es: "Compacto, cabe en todas partes" },
+  "product.benefits.compare.row3.before": { en: "Looks ridiculous", fr: "Vous donne l'air ridicule", es: "Da aspecto ridículo" },
+  "product.benefits.compare.row3.after": { en: "Sleek and discreet", fr: "Élégant et discret", es: "Elegante y discreto" },
+
   // SocialProofToasts
   "social.from": { en: "from", fr: "de", es: "de" },
   "social.minAgo": { en: "min ago", fr: "il y a min", es: "hace min" },
