@@ -24,7 +24,7 @@ const TrustBar = () => {
           {badges.map((b, i) => (
             <div key={i} className="flex items-center gap-2 text-muted-foreground">
               <b.icon size={16} className="text-gold shrink-0" />
-              <span className="text-xs md:text-sm font-sans-body whitespace-nowrap">{b.label}</span>
+              <span className="text-[13px] md:text-sm font-sans-body font-medium whitespace-nowrap tracking-normal">{b.label}</span>
             </div>
           ))}
         </motion.div>
