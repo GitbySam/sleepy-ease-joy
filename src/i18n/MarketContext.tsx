@@ -141,6 +141,16 @@ export const MarketProvider = ({ children }: { children: ReactNode }) => {
           if (!readStoredCountry()) {
             setCountryState(c as Country);
             try { localStorage.setItem(STORAGE_KEY, c); } catch {}
+            // Auto-switch language for France visitors (only if user hasn't picked one)
+            try {
+              const savedLang = localStorage.getItem("sleepzy-lang");
+              if (!savedLang) {
+                const newLang = c === "FR" ? "fr" : "en";
+                localStorage.setItem("sleepzy-lang", newLang);
+                document.documentElement.lang = newLang;
+                window.dispatchEvent(new Event("sleepzy:lang-detected"));
+              }
+            } catch {}
           }
         } else {
           // Unknown geo: keep CA as default but persist nothing so we can re-detect later
