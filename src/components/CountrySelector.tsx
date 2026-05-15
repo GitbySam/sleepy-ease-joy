@@ -1,4 +1,5 @@
 import { Globe, Check } from "lucide-react";
+import FlagIcon from "@/components/FlagIcon";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,10 +11,10 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
 
-const OPTIONS: { code: Country; flag: string; label: string }[] = [
-  { code: "CA", flag: "🇨🇦", label: "Canada" },
-  { code: "US", flag: "🇺🇸", label: "United States" },
-  { code: "FR", flag: "🇫🇷", label: "France" },
+const OPTIONS: { code: Country; label: string }[] = [
+  { code: "CA", label: "Canada" },
+  { code: "US", label: "United States" },
+  { code: "FR", label: "France" },
 ];
 
 const CountrySelector = ({ compact = false }: { compact?: boolean }) => {
@@ -45,7 +46,7 @@ const CountrySelector = ({ compact = false }: { compact?: boolean }) => {
             compact ? "px-2 py-1 text-xs" : "px-3 py-1.5 text-xs"
           } font-sans-body text-foreground`}
         >
-          <span className="text-base leading-none">{current.flag}</span>
+          <FlagIcon code={current.code} className="w-4 h-3 rounded-[1px] shadow-sm" />
           <span className="font-semibold tracking-wide">{current.code}</span>
           <Globe size={12} className="text-muted-foreground" />
         </button>
@@ -57,7 +58,7 @@ const CountrySelector = ({ compact = false }: { compact?: boolean }) => {
             onClick={() => handleSelect(o.code)}
             className="cursor-pointer flex items-center gap-2"
           >
-            <span className="text-base">{o.flag}</span>
+            <FlagIcon code={o.code} className="w-5 h-3.5 rounded-[1px] shadow-sm" />
             <span className="flex-1">{o.label}</span>
             {o.code === country && <Check size={14} className="text-gold" />}
           </DropdownMenuItem>
