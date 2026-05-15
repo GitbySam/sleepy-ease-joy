@@ -507,7 +507,7 @@ export const translations = {
   // Trust Bar
   "trustBar.freeShipping": { en: "Free Shipping", fr: "Livraison gratuite", es: "Envío gratis" },
   "trustBar.securePayment": { en: "Secure Payment", fr: "Paiement sécurisé", es: "Pago seguro" },
-  "trustBar.guarantee": { en: "30-Day Guarantee", fr: "Garantie 30 jours", es: "Garantía 30 días" },
+  "trustBar.guarantee": { en: "30 Day Guarantee", fr: "Garantie 30 jours", es: "Garantía 30 días" },
   "trustBar.ssl": { en: "SSL Encrypted", fr: "Chiffrement SSL", es: "Cifrado SSL" },
 
   // Bundle Countdown
