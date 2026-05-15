@@ -215,7 +215,7 @@ export const ShopifyCartDrawer = () => {
           )}
         </button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-lg flex flex-col h-full">
+      <SheetContent data-clarity-unmask="true" className="w-full sm:max-w-lg flex flex-col h-full">
         <SheetHeader className="flex-shrink-0">
           <SheetTitle className="font-serif-display">{t("cart.title")}</SheetTitle>
             <SheetDescription className="font-numeric-safe text-sm tracking-normal">
