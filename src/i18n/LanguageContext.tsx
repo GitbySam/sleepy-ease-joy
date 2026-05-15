@@ -28,6 +28,19 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     document.documentElement.lang = lang;
   }, []);
 
+  // Sync with IP-based detection from MarketContext (fires once per session)
+  useEffect(() => {
+    const onDetected = () => {
+      const saved = localStorage.getItem("sleepzy-lang") as Lang;
+      if (saved && ["en", "fr", "es"].includes(saved)) {
+        setLangState(saved);
+        document.documentElement.lang = saved;
+      }
+    };
+    window.addEventListener("sleepzy:lang-detected", onDetected);
+    return () => window.removeEventListener("sleepzy:lang-detected", onDetected);
+  }, []);
+
   const t = (key: TranslationKey): string => {
     const entry = translations[key];
     if (!entry) return key;
