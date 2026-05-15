@@ -23,7 +23,7 @@ const Placeholder = ({ height = "400px" }: { height?: string }) => (
 );
 
 const Index = () => (
-  <>
+  <div data-clarity-unmask="true">
     <Header />
     <Suspense fallback={null}><StickyMobileCTA /></Suspense>
     <ScrollToTop />
@@ -62,7 +62,7 @@ const Index = () => (
       <SocialProofToasts />
       <InactivityPopup />
     </Suspense>
-  </>
+  </div>
 );
 
 export default Index;
