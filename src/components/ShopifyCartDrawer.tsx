@@ -209,7 +209,7 @@ export const ShopifyCartDrawer = () => {
         <button className="relative p-2 hover:bg-muted rounded-lg transition-colors">
           <ShoppingCart className="h-5 w-5 text-foreground" />
           {totalItems > 0 && (
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-[10px] bg-gold text-primary-foreground border-0">
+            <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs font-numeric-safe font-bold bg-gold text-primary-foreground border-0">
               {totalItems}
             </Badge>
           )}
@@ -218,7 +218,7 @@ export const ShopifyCartDrawer = () => {
       <SheetContent className="w-full sm:max-w-lg flex flex-col h-full">
         <SheetHeader className="flex-shrink-0">
           <SheetTitle className="font-serif-display">{t("cart.title")}</SheetTitle>
-          <SheetDescription>
+            <SheetDescription className="font-numeric-safe text-sm tracking-normal">
             {totalItems === 0 ? t("cart.empty") : `${totalItems} ${t("cart.items")}`}
           </SheetDescription>
         </SheetHeader>
@@ -233,13 +233,13 @@ export const ShopifyCartDrawer = () => {
           <div className="flex-shrink-0 space-y-2 pt-2">
             <div className="flex items-center gap-2 bg-gold/10 border border-gold/20 rounded-lg px-3 py-2">
               <CheckCircle className="w-4 h-4 text-gold flex-shrink-0" />
-              <span className="text-xs font-semibold text-foreground">{t("cart.trustBanner")}</span>
+              <span className="font-numeric-safe text-[13px] leading-snug font-semibold text-foreground tracking-normal">{t("cart.trustBanner")}</span>
             </div>
             <div className="flex items-center justify-center gap-1.5 py-1">
               {[...Array(5)].map((_, i) => (
                 <Star key={i} className="w-3.5 h-3.5 fill-gold text-gold" />
               ))}
-              <span className="text-xs font-medium text-muted-foreground ml-1">{t("cart.socialProof")}</span>
+              <span className="font-numeric-safe text-[13px] font-medium text-muted-foreground ml-1 tracking-normal">{t("cart.socialProof")}</span>
             </div>
           </div>
         )}
@@ -276,21 +276,21 @@ export const ShopifyCartDrawer = () => {
                         {item.bundleLabel && (
                           <span className="inline-flex items-center gap-1.5 text-xs font-bold bg-gold/20 text-gold px-2 py-1 rounded-md mt-1">
                             {item.bundleLabel}
-                            <span className="bg-gold text-primary-foreground px-1.5 py-0.5 rounded text-[11px] font-extrabold">
+                            <span className="bg-gold text-primary-foreground px-1.5 py-0.5 rounded text-xs font-numeric-safe font-extrabold tracking-normal">
                               ×{item.bundleUnitSize ? Math.round(item.quantity / item.bundleUnitSize) : item.quantity}
                             </span>
                           </span>
                         )}
                         {!item.bundleLabel && item.quantity > 1 && (
                           <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground mt-1">
-                            Qty: <span className="font-bold text-foreground">{item.quantity}</span>
+                            Qty: <span className="font-numeric-safe font-bold text-foreground tracking-normal">{item.quantity}</span>
                           </span>
                         )}
                         <p className="text-xs text-muted-foreground">{item.selectedOptions.map(o => o.value).join(' • ')}</p>
                         <p className="text-xs text-muted-foreground">
-                          + {item.quantity}× {t("cart.transportBag")}
+                          <span className="font-numeric-safe tracking-normal">+ {item.quantity}×</span> {t("cart.transportBag")}
                         </p>
-                        <p className="font-semibold text-foreground mt-1">
+                        <p className="font-numeric-safe text-[15px] font-semibold text-foreground mt-1 tracking-normal">
                           {formatPrice(item.bundlePrice ? item.bundlePrice : parseFloat(item.price.amount) * item.quantity)}
                         </p>
                       </div>
@@ -313,7 +313,7 @@ export const ShopifyCartDrawer = () => {
                               >
                                 <Minus className="h-3 w-3" />
                               </button>
-                              <span className="text-xs font-semibold w-5 text-center text-foreground">{packs}</span>
+                              <span className="font-numeric-safe text-sm font-semibold w-5 text-center text-foreground tracking-normal">{packs}</span>
                               <button
                                 onClick={increase}
                                 disabled={isLoading}
@@ -349,7 +349,7 @@ export const ShopifyCartDrawer = () => {
 
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold text-foreground">{t("cart.total")}</span>
-                  <span className="text-xl font-bold text-foreground">
+                  <span className="font-numeric-safe text-xl font-bold text-foreground tracking-normal">
                     {formatPrice(totalPrice)}
                   </span>
                 </div>
@@ -364,7 +364,7 @@ export const ShopifyCartDrawer = () => {
                   )}
                 </Button>
                 <div className="space-y-3 pt-2">
-                  <div className="flex items-center justify-center gap-4 text-[11px] text-muted-foreground">
+                  <div className="font-numeric-safe flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-muted-foreground tracking-normal">
                     <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5" /> {t("product.securePayment")}</span>
                     <span className="flex items-center gap-1"><Truck className="w-3.5 h-3.5" /> {t("product.freeShipping")}</span>
                     <span className="flex items-center gap-1"><RotateCcw className="w-3.5 h-3.5" /> {t("product.guarantee90")}</span>
@@ -376,7 +376,7 @@ export const ShopifyCartDrawer = () => {
                     <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#F5F5F5" stroke="#ddd" strokeWidth="0.5"/><text x="24" y="18" textAnchor="middle" fill="#3C4043" fontSize="7" fontWeight="bold" fontFamily="Arial">G Pay</text></svg>
                     <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#F5F5F5" stroke="#ddd" strokeWidth="0.5"/><text x="24" y="19" textAnchor="middle" fill="#003087" fontSize="7" fontWeight="bold" fontFamily="Arial">PayPal</text></svg>
                   </div>
-                  <p className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground">
+                  <p className="font-numeric-safe flex items-center justify-center gap-1 text-xs text-muted-foreground tracking-normal">
                     <Lock className="w-3 h-3" /> {t("product.sslEncryption")}
                   </p>
                 </div>
