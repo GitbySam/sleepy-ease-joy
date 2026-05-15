@@ -470,6 +470,9 @@ const Product = () => {
                           <span className="bg-gold/20 text-gold text-[10px] font-bold px-1.5 py-0.5 rounded">
                             {b.discount}
                           </span>
+                          {b.subtitle && (
+                            <span className="text-gold italic text-[11px] font-medium">— {b.subtitle}</span>
+                          )}
                         </p>
                         <p className="text-xs text-muted-foreground">{b.desc}</p>
                       </div>
