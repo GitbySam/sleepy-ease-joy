@@ -45,6 +45,7 @@ const CartDrawer = ({ open, onClose, items, onUpdateQty, onRemove }: CartDrawerP
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
+            data-clarity-unmask="true"
             className="fixed top-0 right-0 h-full w-full max-w-md bg-card z-50 shadow-2xl flex flex-col"
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-border">

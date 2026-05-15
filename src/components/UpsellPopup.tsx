@@ -48,7 +48,7 @@ const UpsellPopup = ({ open, onClose, onAccept }: UpsellPopupProps) => {
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className="fixed inset-0 z-[100] flex items-center justify-center p-4"
           >
-            <div className="w-full max-w-md">
+            <div data-clarity-unmask="true" className="w-full max-w-md">
             <div className="bg-card rounded-2xl shadow-2xl overflow-hidden border border-border">
               <div className="bg-gradient-to-r from-gold to-gold-dark text-primary-foreground text-center py-3 px-4">
                 <div className="flex items-center justify-center gap-2 mb-1">
