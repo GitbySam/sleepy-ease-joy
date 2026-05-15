@@ -142,7 +142,7 @@ const Hero = () => {
           <div className="flex items-center justify-center gap-2">
             <span className="text-base font-bold text-foreground font-sans-body">{formatPrice(prices.single)}</span>
             <span className="text-sm text-muted-foreground line-through font-sans-body">{formatPrice(prices.oldSingle)}</span>
-            <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-50%</span>
+            <span className="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full leading-none tracking-normal whitespace-nowrap">-50%</span>
           </div>
 
           {/* Micro-reassurances — below CTA, secondary */}
@@ -218,7 +218,7 @@ const Hero = () => {
             <motion.div variants={fadeUp} className="flex items-baseline gap-3">
               <span className="text-xl font-bold text-foreground font-sans-body">{formatPrice(prices.single)}</span>
               <span className="text-base text-muted-foreground line-through font-sans-body">{formatPrice(prices.oldSingle)}</span>
-              <span className="bg-red-500/10 text-red-500 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase">-50%</span>
+              <span className="bg-red-500/10 text-red-500 text-xs font-bold px-2.5 py-1 rounded-full uppercase leading-none tracking-normal whitespace-nowrap">-50%</span>
             </motion.div>
 
             {/* Micro-reassurances */}
