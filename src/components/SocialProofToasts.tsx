@@ -3,7 +3,9 @@ import { toast } from "sonner";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { TranslationKey } from "@/i18n/translations";
 
-const messageKeys: { emoji: string; name: string; city: string; lineKey: TranslationKey }[] = [
+type ToastEntry = { emoji: string; name: string; city: string; lineKey: TranslationKey };
+
+const messageKeysCA: ToastEntry[] = [
   { emoji: "😴", name: "Sarah L.", city: "Toronto", lineKey: "social.lines.1" },
   { emoji: "🫣", name: "Marc-André D.", city: "Montréal", lineKey: "social.lines.2" },
   { emoji: "✈️", name: "Emily M.", city: "Vancouver", lineKey: "social.lines.3" },
@@ -18,11 +20,27 @@ const messageKeys: { emoji: string; name: string; city: string; lineKey: Transla
   { emoji: "✅", name: "Jean-Philippe W.", city: "Laval", lineKey: "social.lines.12" },
 ];
 
+const messageKeysFR: ToastEntry[] = [
+  { emoji: "😴", name: "Camille L.", city: "Paris", lineKey: "social.lines.1" },
+  { emoji: "🫣", name: "Thomas D.", city: "Lyon", lineKey: "social.lines.2" },
+  { emoji: "✈️", name: "Émilie M.", city: "Marseille", lineKey: "social.lines.3" },
+  { emoji: "😮‍💨", name: "Julien B.", city: "Toulouse", lineKey: "social.lines.4" },
+  { emoji: "📸", name: "Isabelle R.", city: "Bordeaux", lineKey: "social.lines.5" },
+  { emoji: "🙈", name: "Christophe P.", city: "Lille", lineKey: "social.lines.6" },
+  { emoji: "😤", name: "Amélie F.", city: "Nantes", lineKey: "social.lines.7" },
+  { emoji: "💤", name: "David G.", city: "Strasbourg", lineKey: "social.lines.8" },
+  { emoji: "🫡", name: "Sophie V.", city: "Nice", lineKey: "social.lines.9" },
+  { emoji: "😎", name: "Romain C.", city: "Rennes", lineKey: "social.lines.10" },
+  { emoji: "🛡️", name: "Laure H.", city: "Montpellier", lineKey: "social.lines.11" },
+  { emoji: "✅", name: "Jean-Philippe W.", city: "Grenoble", lineKey: "social.lines.12" },
+];
+
 const SocialProofToasts = () => {
   const indexRef = useRef(0);
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   useEffect(() => {
+    const messageKeys = lang === "fr" ? messageKeysFR : messageKeysCA;
     const showToast = () => {
       const msg = messageKeys[Math.floor(Math.random() * messageKeys.length)];
       const minutes = Math.floor(Math.random() * 15) + 1;
@@ -46,7 +64,7 @@ const SocialProofToasts = () => {
       clearTimeout(initialTimeout);
       clearInterval(interval);
     };
-  }, [t]);
+  }, [t, lang]);
 
   return null;
 };
