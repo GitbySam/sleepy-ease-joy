@@ -151,10 +151,13 @@ const Product = () => {
     t("product.badgeWinterSale"),
   ];
 
+  const calcDiscount = (price: number, oldPrice: number) =>
+    `-${Math.round((1 - price / oldPrice) * 100)}%`;
+
   const bundles = [
-    { qty: 1, label: "1 Sleep&zy", desc: t("product.desc1"), discount: "-50%", tag: null, tagColor: "", variantNode: singleVariant },
-    { qty: 2, label: "2 Sleep&zy", desc: t("product.desc2"), discount: "-50%", tag: "DUO PACK", tagColor: "bg-gold", variantNode: duoVariant },
-    { qty: 3, label: "3 Sleep&zy", desc: t("product.desc3"), discount: "-64%", tag: "FAMILY PACK", tagColor: "bg-destructive", variantNode: familyVariant },
+    { qty: 1, label: "1 Sleep&zy", desc: t("product.desc1"), subtitle: null as string | null, discount: calcDiscount(singlePrice, prices.oldSingle), tag: null, tagColor: "", variantNode: singleVariant },
+    { qty: 2, label: "2 Sleep&zy", desc: t("product.desc2"), subtitle: t("product.duoSubtitle"), discount: calcDiscount(duoPrice, prices.oldDuo), tag: "DUO PACK", tagColor: "bg-gold", variantNode: duoVariant },
+    { qty: 3, label: "3 Sleep&zy", desc: t("product.desc3"), subtitle: null as string | null, discount: calcDiscount(familyPrice, prices.oldFamily), tag: "FAMILY PACK", tagColor: "bg-destructive", variantNode: familyVariant },
   ];
 
   const bundlePrices: Record<number, number> = { 1: singlePrice * promoMultiplier, 2: duoPrice * promoMultiplier, 3: familyPrice * promoMultiplier };
@@ -467,6 +470,9 @@ const Product = () => {
                           <span className="bg-gold/20 text-gold text-[10px] font-bold px-1.5 py-0.5 rounded">
                             {b.discount}
                           </span>
+                          {b.subtitle && (
+                            <span className="text-gold italic text-[11px] font-medium">— {b.subtitle}</span>
+                          )}
                         </p>
                         <p className="text-xs text-muted-foreground">{b.desc}</p>
                       </div>

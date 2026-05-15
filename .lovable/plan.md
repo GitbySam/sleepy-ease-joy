@@ -1,22 +1,28 @@
-## Problème observé
+## Changements demandés (marché Canada uniquement)
 
-Sur la capture Clarity (mobile, langue FR), le bouton sticky en bas affiche « ACHETER —--%  €€€ » au lieu de « Acheter — -50%  ~~51,90 €~~ 25,95 € ».
+### 1. Prix du Duo Pack — CA
+Dans `src/i18n/MarketContext.tsx`, marché `CA` :
+- `duo: 59.90` → **`56.90`**
+- `oldDuo: 119.80` (inchangé)
 
-Cause : dans `src/components/StickyMobileCTA.tsx`, le label (`sticky.cta` = « Acheter — -50% »), l'icône, le prix barré et le prix actuel sont tous mis sur **une seule ligne** dans un bouton arrondi. En français le symbole « € » est placé **après** le nombre (ex. « 25,95 € »), donc la chaîne est plus longue qu'en anglais (« $25.95 »). Sur les petits écrans (≤ 360 px), la ligne dépasse et seul le début et la fin (« —--% €€€ ») restent visibles ; le reste est tronqué/écrasé.
+Note : `prices.duo` est utilisé à la fois sur la page produit (`/product`) et sur la landing page (`BundleOffer`). Le prix CA sera donc cohérent partout (un seul prix par marché). US et FR ne sont pas modifiés.
 
-## Correctif proposé (UI uniquement)
+### 2. Pourcentage de réduction recalculé
+Calcul : `1 - 56.90 / 119.80 = 52,5%` → affichage **`-52%`**.
 
-Modifier `src/components/StickyMobileCTA.tsx` :
+Dans `src/pages/Product.tsx`, rendre le `discount` du Duo dynamique au lieu d'être codé en dur à `-50%` :
+```ts
+const duoDiscount = `-${Math.round((1 - (duoPrice / prices.oldDuo)) * 100)}%`;
+```
+puis l'utiliser dans le bundle Duo. Cela donnera automatiquement `-52%` en CA, et restera `-50%` pour US/FR.
 
-1. Empiler verticalement le label et le bloc de prix au lieu de les mettre côte à côte :
-   - Ligne 1 : icône + « Acheter — -50% »
-   - Ligne 2 (plus petite) : prix barré + prix actuel
-2. Ajouter `whitespace-nowrap` sur la ligne des prix pour éviter le retour à la ligne au milieu d'un montant, et `text-xs` pour gagner de la place.
-3. Réduire le `tracking-wider` à `tracking-wide` et passer `text-sm` → `text-[13px]` sur les très petits écrans pour garder le bouton lisible.
-4. Vérifier sur viewport 360 × 800 (Clarity), 375 × 812 (iPhone SE) et 390 × 844.
+### 3. Ajout du tag "For couples"
+Sur le bundle Duo de la page produit, ajouter un petit sous-libellé "For couples" (traduit FR : "Pour les couples", ES : "Para parejas") visible à côté ou sous le label `2 Sleep&zy` (ou en complément du badge `DUO PACK`).
 
-## Fichiers touchés
+Implémentation :
+- Nouvelle clé i18n `product.duoSubtitle` ("For couples" / "Pour les couples" / "Para parejas") dans `src/i18n/translations.ts`.
+- Dans `src/pages/Product.tsx`, ajouter un champ optionnel `subtitle` au bundle Duo et l'afficher en petit texte gold/italique sous le label dans la carte de sélection.
 
-- `src/components/StickyMobileCTA.tsx` (présentation uniquement, aucune logique métier modifiée)
-
-Aucune traduction ni logique de prix n'est changée — la version CA/EN reste identique visuellement, et le contenu FR s'affichera enfin correctement.
+### Hors scope
+- Aucun changement sur la landing page hormis le prix CA déjà partagé via MarketContext.
+- Aucun changement US / FR.

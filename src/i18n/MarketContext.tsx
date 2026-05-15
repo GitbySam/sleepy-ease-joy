@@ -36,7 +36,7 @@ export const MARKETS: Record<Country, MarketConfig> = {
     locale: "en-CA",
     prices: {
       single: 29.95,
-      duo: 59.90,
+      duo: 56.90,
       family: 64.95,
       oldSingle: 59.90,
       oldDuo: 119.80,

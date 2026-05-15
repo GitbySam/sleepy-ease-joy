@@ -363,6 +363,11 @@ export const translations = {
     fr: "3× Oreiller Sleep&zy Anti-Gêne + 3× Sac de transport",
     es: "3× Almohada Sleep&zy Anti-Vergüenza + 3× Bolsa de transporte",
   },
+  "product.duoSubtitle": {
+    en: "For couples",
+    fr: "Pour les couples",
+    es: "Para parejas",
+  },
 
   // Product Benefits section
   "product.benefits.eyebrow": { en: "Designed to actually sleep", fr: "Conçu pour vraiment dormir", es: "Diseñado para dormir de verdad" },
