@@ -107,15 +107,15 @@ const Hero = () => {
           {/* Overlaid content — instant, no animations */}
           <div className="absolute bottom-0 left-0 right-0 p-5 space-y-3">
             {/* Stars — compact proof */}
-            <div className="flex items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 min-w-0">
               <StarRating size="small" />
-              <span className="text-[11px] text-white/80 font-sans-body">{t("hero.reviews")}</span>
+              <span className="text-[11px] text-white/80 font-sans-body break-words">{t("hero.reviews")}</span>
             </div>
 
             {/* Live viewers — urgence sociale */}
-            <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white text-[11px] font-semibold px-2.5 py-1 rounded-full">
-              <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
-              🔥 {viewerCount} {t("hero.viewingNow")}
+            <span className="inline-flex max-w-full items-center gap-2 bg-white/10 backdrop-blur-sm text-white text-[11px] font-semibold px-2.5 py-1 rounded-full">
+              <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse shrink-0" />
+              <span className="break-words">🔥 {viewerCount} {t("hero.viewingNow")}</span>
             </span>
 
             {/* Subtitle */}
