@@ -31,7 +31,7 @@ const Testimonials = () => {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <p className="text-xs uppercase tracking-[0.3em] text-dark-blue-foreground/50 mb-3">
+          <p className="text-[10px] sm:text-xs uppercase tracking-[0.14em] sm:tracking-[0.3em] leading-relaxed text-dark-blue-foreground/50 mb-3 px-2 break-words">
             {t("testimonials.subtitle")}
           </p>
           <h2 className="text-4xl md:text-5xl font-serif font-bold text-dark-blue-foreground">
