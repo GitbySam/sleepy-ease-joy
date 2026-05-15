@@ -187,6 +187,13 @@
   .font-sans-body {
     font-family: 'DM Sans', sans-serif;
   }
+  .font-numeric-safe {
+    font-family: Arial, Helvetica, sans-serif;
+    font-variant-numeric: lining-nums tabular-nums;
+    font-feature-settings: "lnum" 1, "tnum" 1;
+    letter-spacing: 0;
+    text-rendering: geometricPrecision;
+  }
   .text-gold {
     color: hsl(var(--gold));
   }
