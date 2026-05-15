@@ -68,7 +68,7 @@ const BundleOffer = () => {
       price: formatPrice(prices.single),
       oldPrice: formatPrice(prices.oldSingle),
       perUnit: `${formatPrice(prices.single)}${t("bundle.perUnit")}`,
-      tag: null, packValue: "Single", priceNum: prices.single,
+      tag: "SOLO TRAVELERS", packValue: "Single", priceNum: prices.single,
     },
     {
       qty: 2, label: "2 Sleep&zy",
@@ -186,7 +186,7 @@ const BundleOffer = () => {
               }`}
             >
               {b.tag && (
-                <span className={`absolute -top-3 right-4 ${b.tag === "FAMILY PACK" ? "bg-destructive" : "bg-gold"} text-primary-foreground text-xs font-bold px-3 py-1 rounded-full`}>
+                <span className={`absolute -top-3 right-4 ${b.tag === "FAMILY PACK" ? "bg-destructive" : b.tag === "SOLO TRAVELERS" ? "bg-dark-blue" : "bg-gold"} text-primary-foreground text-xs font-bold px-3 py-1 rounded-full`}>
                   {b.tag}
                 </span>
               )}
