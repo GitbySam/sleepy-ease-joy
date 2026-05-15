@@ -89,11 +89,13 @@ const StickyMobileCTA = () => {
                 const offer = document.getElementById("offer");
                 if (offer) offer.scrollIntoView({ behavior: "smooth" });
               }}
-              className="w-full bg-gold text-primary-foreground text-center py-3.5 rounded-full font-bold shadow-gold-glow flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full bg-gold text-primary-foreground text-center py-2.5 rounded-full font-bold shadow-gold-glow flex flex-col items-center justify-center gap-0.5 cursor-pointer leading-tight"
             >
-              <ShoppingBag size={18} />
-              <span className="text-sm uppercase tracking-wider">{t("sticky.cta")}</span>
-              <span className="text-sm font-normal ml-1">
+              <span className="flex items-center justify-center gap-2">
+                <ShoppingBag size={16} />
+                <span className="text-[13px] uppercase tracking-wide">{t("sticky.cta")}</span>
+              </span>
+              <span className="text-[11px] font-normal whitespace-nowrap">
                 <span className="line-through opacity-60">{formatPrice(prices.oldSingle)}</span>{" "}
                 <span className="font-bold">{formatPrice(prices.single)}</span>
               </span>
