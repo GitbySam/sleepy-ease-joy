@@ -610,6 +610,74 @@ export const translations = {
     fr: "Économisez 50% aujourd'hui",
     es: "Ahorra 50% hoy",
   },
+
+  // Sleep Kit add-on (Canada only)
+  "sleepKit.title": {
+    en: "Complete your sleep experience",
+    fr: "Complétez votre expérience de sommeil",
+    es: "Completa tu experiencia de sueño",
+  },
+  "sleepKit.subtitle": {
+    en: "Add Sleep Kit — sleep mask + earplugs ($16.95 each)",
+    fr: "Ajoutez le Sleep Kit — masque + bouchons d'oreilles (16,95 $ chacun)",
+    es: "Añade el Sleep Kit — antifaz + tapones ($16.95 cada uno)",
+  },
+  "sleepKit.name": { en: "Sleep Kit", fr: "Sleep Kit", es: "Sleep Kit" },
+  "sleepKit.maxReached": {
+    en: "Maxed out — one kit per pillow",
+    fr: "Maximum atteint — un kit par oreiller",
+    es: "Máximo alcanzado — un kit por almohada",
+  },
+  "sleepKit.add": { en: "Add", fr: "Ajouter", es: "Añadir" },
+  "sleepKit.remove": { en: "Remove", fr: "Retirer", es: "Quitar" },
+  "preBundles.title": {
+    en: "Or get the complete kit",
+    fr: "Ou prenez le kit complet",
+    es: "O lleva el kit completo",
+  },
+  "preBundles.subtitle": {
+    en: "Pre-built bundles with everything you need",
+    fr: "Packs prêts à l'emploi avec tout le nécessaire",
+    es: "Packs listos con todo lo que necesitas",
+  },
+  "preBundles.save": { en: "SAVE", fr: "ÉCONOMISEZ", es: "AHORRA" },
+  "preBundles.solo": {
+    en: "Solo Sleep Bundle",
+    fr: "Pack Sleep Solo",
+    es: "Pack Sleep Solo",
+  },
+  "preBundles.duo": {
+    en: "Duo Sleep Bundle",
+    fr: "Pack Sleep Duo",
+    es: "Pack Sleep Dúo",
+  },
+  "preBundles.family": {
+    en: "Family Sleep Bundle",
+    fr: "Pack Sleep Famille",
+    es: "Pack Sleep Familia",
+  },
+  "preBundles.includes": {
+    en: "Includes",
+    fr: "Comprend",
+    es: "Incluye",
+  },
+  "preBundles.pillow": {
+    en: "pillow",
+    fr: "oreiller",
+    es: "almohada",
+  },
+  "preBundles.pillows": {
+    en: "pillows",
+    fr: "oreillers",
+    es: "almohadas",
+  },
+  "preBundles.kit": { en: "Sleep Kit", fr: "Sleep Kit", es: "Sleep Kit" },
+  "preBundles.kits": { en: "Sleep Kits", fr: "Sleep Kits", es: "Sleep Kits" },
+  "preBundles.add": {
+    en: "Add bundle to cart",
+    fr: "Ajouter au panier",
+    es: "Añadir al carrito",
+  },
 } as const;
 
 export type TranslationKey = keyof typeof translations;
