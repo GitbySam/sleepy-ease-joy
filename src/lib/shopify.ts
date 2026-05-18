@@ -107,7 +107,6 @@ const STOREFRONT_QUERY = `
               node {
                 id
                 title
-                sku
                 price {
                   amount
                   currencyCode

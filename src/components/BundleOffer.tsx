@@ -5,8 +5,6 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useMarket } from "@/i18n/MarketContext";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
-import { useSleepKit, SLEEP_KIT_PRICE_CAD } from "@/hooks/useSleepKit";
-import SleepKitAddon from "@/components/SleepKitAddon";
 
 const COLOR_MAP: Record<string, string> = {
   Grey: "#9CA3AF",
@@ -49,15 +47,12 @@ const BundleOffer = () => {
   const [selected, setSelected] = useState(2);
   const [selectedColor, setSelectedColor] = useState("Grey");
   const [product, setProduct] = useState<ShopifyProduct | null>(null);
-  const [sleepKitQty, setSleepKitQty] = useState(0);
   const { t } = useLanguage();
   const { country, prices, formatPrice } = useMarket();
   const countdown = useCountdown(15);
   const addItem = useCartStore((s) => s.addItem);
   const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
   const isLoading = useCartStore((s) => s.isLoading);
-  const sleepKit = useSleepKit(country);
-  const showSleepKit = country === "CA" && !!sleepKit;
 
   useEffect(() => {
     fetchProducts(20, undefined, country)
@@ -91,22 +86,13 @@ const BundleOffer = () => {
     },
   ];
 
-  const selectedBundle = bundles[selected];
-  const maxKits = selectedBundle.qty;
-
-  // Clamp kit qty when pack changes
-  useEffect(() => {
-    if (sleepKitQty > maxKits) setSleepKitQty(maxKits);
-  }, [maxKits, sleepKitQty]);
-
-  const kitSubtotal = showSleepKit ? sleepKitQty * SLEEP_KIT_PRICE_CAD : 0;
-  const grandTotal = selectedBundle.priceNum + kitSubtotal;
-
   const titleParts = t("bundle.title").split(/<gold>|<\/gold>/);
   const socialParts = t("bundle.socialProof").split(/<bold>|<\/bold>/);
 
   const handleAddToCart = async () => {
     if (!product) return;
+    const selectedBundle = bundles[selected];
+
     const variants = product.node.variants.edges;
     const matchingVariant = variants.find((v) => {
       const opts = v.node.selectedOptions || [];
@@ -133,21 +119,6 @@ const BundleOffer = () => {
       bundlePrice: selectedBundle.priceNum,
       bundleUnitSize: 1,
     }, country);
-
-    // Add Sleep Kits as a second line (CA only)
-    if (showSleepKit && sleepKit && sleepKitQty > 0) {
-      await addItem({
-        product: sleepKit.product,
-        variantId: sleepKit.variantId,
-        variantTitle: sleepKit.variantTitle,
-        price: sleepKit.price,
-        quantity: sleepKitQty,
-        selectedOptions: sleepKit.selectedOptions,
-        bundleLabel: "Sleep Kit",
-        bundlePrice: sleepKitQty * SLEEP_KIT_PRICE_CAD,
-        bundleUnitSize: 1,
-      }, country);
-    }
 
     setTimeout(() => setDrawerOpen(true), 500);
   };
@@ -251,24 +222,6 @@ const BundleOffer = () => {
             </motion.button>
           ))}
         </div>
-
-        {/* Sleep Kit add-on — Canada only */}
-        {showSleepKit && sleepKit && (
-          <div className="mb-6">
-            <SleepKitAddon
-              variant={sleepKit}
-              value={sleepKitQty}
-              max={maxKits}
-              onChange={setSleepKitQty}
-            />
-            {sleepKitQty > 0 && (
-              <div className="mt-3 flex items-center justify-between text-sm font-semibold text-foreground px-1" data-clarity-unmask="true">
-                <span>Total</span>
-                <span className="tabular-nums">{formatPrice(grandTotal)}</span>
-              </div>
-            )}
-          </div>
-        )}
 
         <motion.div
           initial={{ opacity: 0 }}
