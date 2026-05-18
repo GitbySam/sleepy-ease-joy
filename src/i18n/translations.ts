@@ -56,14 +56,14 @@ export const translations = {
     es: "Más vendido 🏆",
   },
   "hero.priceOld": {
-    en: "$59.90 CAD",
-    fr: "59,95$ CAD",
-    es: "$59.90 CAD",
+    en: "$69.90 CAD",
+    fr: "69,90$ CAD",
+    es: "$69.90 CAD",
   },
   "hero.priceNew": {
-    en: "$29.95 CAD",
-    fr: "29,95$ CAD",
-    es: "$29.95 CAD",
+    en: "$34.95 CAD",
+    fr: "34,95$ CAD",
+    es: "$34.95 CAD",
   },
   "hero.freeShipping": {
     en: "🚚 Free shipping",
@@ -536,9 +536,9 @@ export const translations = {
     es: "✅ ¡SÍ! Añadir la diadema — 19,90€",
   },
   "upsell.decline": {
-    en: "No thanks, I'll pay full price later ($59.90 CAD)",
-    fr: "Non merci, je paierai le prix plein plus tard (59,95$ CAD)",
-    es: "No gracias, pagaré el precio completo después ($59.90 CAD)",
+    en: "No thanks, I'll pay full price later ($69.90 CAD)",
+    fr: "Non merci, je paierai le prix plein plus tard (69,90$ CAD)",
+    es: "No gracias, pagaré el precio completo después ($69.90 CAD)",
   },
   "upsell.exclusive": {
     en: "🔒 This exclusive offer expires when you close this window",

@@ -37,10 +37,10 @@ export const MARKETS: Record<Country, MarketConfig> = {
     prices: {
       single: 34.95,
       duo: 69.90,
-      family: 64.95,
+      family: 75.95,
       oldSingle: 69.90,
       oldDuo: 139.80,
-      oldFamily: 179.70,
+      oldFamily: 209.70,
     },
   },
   US: {
