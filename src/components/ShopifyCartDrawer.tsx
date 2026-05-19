@@ -50,10 +50,10 @@ export const ShopifyCartDrawer = () => {
   // Render items list without the Sleep Kit (it's shown via the upsell card)
   const displayItems = items.filter((i) => i.bundleLabel !== SLEEP_KIT_LABEL);
   const totalItems = displayItems.length + (sleepKits > 0 ? 1 : 0);
-  const totalPrice = items.reduce(
+  const totalPrice = displayItems.reduce(
     (sum, item) => sum + (item.bundlePrice ? item.bundlePrice : parseFloat(item.price.amount) * item.quantity),
     0
-  );
+  ) + sleepKits * kitPrice;
 
   // Fetch Sleep Kit product (once per market) so we can add it as a real Shopify line
   const [sleepKitProduct, setSleepKitProduct] = useState<ShopifyProduct | null>(null);
