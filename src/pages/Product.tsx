@@ -468,14 +468,7 @@ const Product = () => {
               {bundles.map((b) => (
                 <button
                   key={b.qty}
-                  onClick={() => {
-                    setSelectedQty(b.qty);
-                    trackFunnelStep('select_bundle', {
-                      step_value: b.tag || b.label,
-                      value: bundlePrices[b.qty],
-                      currency,
-                    });
-                  }}
+                  onClick={() => handleSelectPack(b.qty)}
                   className={`w-full rounded-xl p-4 border-2 transition-all text-left relative ${
                     selectedQty === b.qty
                       ? "border-gold bg-gold/5 shadow-md"
@@ -525,36 +518,57 @@ const Product = () => {
             </div>
 
             {/* Sleep Bundles — shown right under the first offers */}
-            <Suspense fallback={null}>
-              <SleepBundles compact />
-            </Suspense>
+            <SleepBundles
+              ref={bundlesRef}
+              compact
+              hideCta
+              selectedBundle={selectedBundleKey}
+              onSelectBundle={handleSelectBundle}
+              onSelectionChange={handleBundleSummary}
+            />
 
-            {/* Price summary */}
-            <div className="flex items-center gap-3 bg-muted/30 rounded-lg px-4 py-3">
-              <span className="text-sm text-muted-foreground font-sans-body">{t("product.yourPrice")}</span>
-              <span className="text-2xl font-bold text-foreground">{formatPrice(currentPrice)}</span>
-              {hasPromo && (
-                <span className="text-sm text-muted-foreground line-through">{formatPrice(currentPrice / promoMultiplier)}</span>
-              )}
-              <span className="text-sm text-muted-foreground line-through">{formatPrice(currentOldPrice)}</span>
-              <span className="bg-gold text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">{selectedBundle.discount}</span>
-              {hasPromo && (
-                <span className="bg-destructive text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">-10% EXTRA</span>
-              )}
-            </div>
+            {/* Price summary — only when a selection is active */}
+            {hasSelection && ctaPrice !== null && (
+              <div className="flex items-center gap-3 bg-muted/30 rounded-lg px-4 py-3">
+                <span className="text-sm text-muted-foreground font-sans-body">{t("product.yourPrice")}</span>
+                <span className="text-2xl font-bold text-foreground">{formatPrice(ctaPrice)}</span>
+                {selectedQty && currentOldPrice !== null && (
+                  <>
+                    {hasPromo && (
+                      <span className="text-sm text-muted-foreground line-through">{formatPrice(ctaPrice / promoMultiplier)}</span>
+                    )}
+                    <span className="text-sm text-muted-foreground line-through">{formatPrice(currentOldPrice)}</span>
+                    {selectedBundle && (
+                      <span className="bg-gold text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">{selectedBundle.discount}</span>
+                    )}
+                  </>
+                )}
+                {selectedBundleKey && (
+                  <>
+                    <span className="text-sm text-muted-foreground line-through">{formatPrice(ctaPrice * 2)}</span>
+                    <span className="bg-gold text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">-50%</span>
+                  </>
+                )}
+                {hasPromo && (
+                  <span className="bg-destructive text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">-10% EXTRA</span>
+                )}
+              </div>
+            )}
 
-            {/* CTA */}
+            {/* Unified CTA (desktop inline) */}
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={handleAddToCart}
-              disabled={isLoading || !product}
-              className="w-full bg-gold text-primary-foreground py-4 rounded-xl text-base font-bold shadow-gold-glow flex items-center justify-center gap-2 uppercase tracking-wider disabled:opacity-50"
+              whileHover={{ scale: hasSelection ? 1.02 : 1 }}
+              whileTap={{ scale: hasSelection ? 0.97 : 1 }}
+              onClick={handleUnifiedAdd}
+              disabled={isLoading || !product || !hasSelection}
+              className="w-full bg-gold text-primary-foreground py-4 rounded-xl text-base font-bold shadow-gold-glow flex items-center justify-center gap-2 uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
+              ) : !hasSelection ? (
+                <>{t("product.chooseFormat") !== "product.chooseFormat" ? t("product.chooseFormat") : "Choisissez un format ci-dessus"}</>
               ) : (
-                <>🛒 {t("product.addToCart")} — {selectedBundle.label}</>
+                <>{ctaLabel}</>
               )}
             </motion.button>
 
