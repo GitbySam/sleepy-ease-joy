@@ -32,6 +32,7 @@ import { trackViewContent, trackAddToCart } from "@/lib/metaPixel";
 import { trackFunnelStep, trackFriction } from "@/lib/funnelTracking";
 import { lazy, Suspense } from "react";
 const ProductBenefits = lazy(() => import("@/components/ProductBenefits"));
+const SleepBundles = lazy(() => import("@/components/SleepBundles"));
 
 const COLOR_MAP: Record<string, string> = {
   Grey: "#9CA3AF",
@@ -533,6 +534,10 @@ const Product = () => {
 
         <Suspense fallback={null}>
           <ProductBenefits />
+        </Suspense>
+
+        <Suspense fallback={null}>
+          <SleepBundles />
         </Suspense>
       </div>
 
