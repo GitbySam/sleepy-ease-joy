@@ -481,6 +481,11 @@ const Product = () => {
               ))}
             </div>
 
+            {/* Sleep Bundles — shown right under the first offers */}
+            <Suspense fallback={null}>
+              <SleepBundles compact />
+            </Suspense>
+
             {/* Price summary */}
             <div className="flex items-center gap-3 bg-muted/30 rounded-lg px-4 py-3">
               <span className="text-sm text-muted-foreground font-sans-body">{t("product.yourPrice")}</span>
@@ -534,10 +539,6 @@ const Product = () => {
 
         <Suspense fallback={null}>
           <ProductBenefits />
-        </Suspense>
-
-        <Suspense fallback={null}>
-          <SleepBundles />
         </Suspense>
       </div>
 
