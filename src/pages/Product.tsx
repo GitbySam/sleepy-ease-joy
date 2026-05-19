@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ShieldCheck, Truck, RotateCcw, Clock, Loader2, ArrowLeft } from "lucide-react";
@@ -32,7 +32,7 @@ import { trackViewContent, trackAddToCart } from "@/lib/metaPixel";
 import { trackFunnelStep, trackFriction } from "@/lib/funnelTracking";
 import { lazy, Suspense } from "react";
 const ProductBenefits = lazy(() => import("@/components/ProductBenefits"));
-const SleepBundles = lazy(() => import("@/components/SleepBundles"));
+import SleepBundles, { type SleepBundlesHandle, type BundleSelectionSummary } from "@/components/SleepBundles";
 
 const COLOR_MAP: Record<string, string> = {
   Grey: "#9CA3AF",
@@ -72,16 +72,20 @@ function useCountdown(minutes: number) {
 
 const Product = () => {
   const [searchParams] = useSearchParams();
-  const bundleParam = parseInt(searchParams.get("bundle") || "1", 10);
+  const bundleParamRaw = searchParams.get("bundle");
+  const bundleParam = bundleParamRaw ? parseInt(bundleParamRaw, 10) : null;
   const colorParam = searchParams.get("color");
   const initialColor = colorParam && ["Grey", "Black", "Red"].includes(colorParam) ? colorParam : "Grey";
   const promoCode = searchParams.get("promo") || null;
   const hasPromo = promoCode === "SLEEPZY10";
   const promoMultiplier = hasPromo ? 0.9 : 1;
-  const initialQty = [1, 2, 3].includes(bundleParam) ? bundleParam : 1;
+  const initialQty = bundleParam && [1, 2, 3].includes(bundleParam) ? bundleParam : null;
   const [product, setProduct] = useState<ShopifyProduct | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedQty, setSelectedQty] = useState(initialQty);
+  const [selectedQty, setSelectedQty] = useState<number | null>(initialQty);
+  const [selectedBundleKey, setSelectedBundleKey] = useState<BundleSelectionSummary["key"] | null>(null);
+  const [bundleSummary, setBundleSummary] = useState<BundleSelectionSummary | null>(null);
+  const bundlesRef = useRef<SleepBundlesHandle>(null);
   const [selectedColor, setSelectedColor] = useState(initialColor);
   const [galleryOffset, setGalleryOffset] = useState(0);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
@@ -162,7 +166,7 @@ const Product = () => {
   const bundleOldPrices: Record<number, number> = { 1: prices.oldSingle, 2: prices.oldDuo, 3: prices.oldFamily };
 
   const handleAddToCart = async () => {
-    if (!product) return;
+    if (!product || !selectedQty) return;
     const selectedBundle = bundles.find(b => b.qty === selectedQty)!;
     const selectedVariant = selectedBundle.variantNode;
     if (!selectedVariant) {
@@ -217,6 +221,45 @@ const Product = () => {
     setDrawerOpen(true);
   };
 
+  const handleSelectPack = (qty: number) => {
+    setSelectedQty(prev => (prev === qty ? null : qty));
+    setSelectedBundleKey(null);
+    trackFunnelStep('select_bundle', {
+      step_value: bundles.find(b => b.qty === qty)?.tag || `pack-${qty}`,
+      value: bundlePrices[qty],
+      currency,
+    });
+  };
+
+  const handleSelectBundle = useCallback((key: BundleSelectionSummary["key"] | null) => {
+    setSelectedBundleKey(key);
+    if (key) setSelectedQty(null);
+  }, []);
+
+  const handleBundleSummary = useCallback((s: BundleSelectionSummary | null) => {
+    setBundleSummary(s);
+  }, []);
+
+  const hasSelection = selectedQty !== null || (selectedBundleKey !== null && bundleSummary !== null);
+
+  const handleUnifiedAdd = async () => {
+    if (selectedQty) {
+      await handleAddToCart();
+    } else if (selectedBundleKey) {
+      await bundlesRef.current?.addSelected();
+    }
+  };
+
+  const ctaLabel = selectedQty
+    ? `🛒 ${t("product.addToCart")} — ${bundles.find(b => b.qty === selectedQty)?.label}`
+    : selectedBundleKey && bundleSummary
+      ? `🛒 ${t("product.addToCart")} — ${bundleSummary.label}`
+      : t("product.addToCart");
+
+  const ctaPrice = selectedQty
+    ? bundlePrices[selectedQty]
+    : bundleSummary?.price ?? null;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -225,9 +268,9 @@ const Product = () => {
     );
   }
 
-  const selectedBundle = bundles.find(b => b.qty === selectedQty)!;
-  const currentPrice = bundlePrices[selectedQty];
-  const currentOldPrice = bundleOldPrices[selectedQty];
+  const selectedBundle = selectedQty ? bundles.find(b => b.qty === selectedQty)! : null;
+  const currentPrice = selectedQty ? bundlePrices[selectedQty] : null;
+  const currentOldPrice = selectedQty ? bundleOldPrices[selectedQty] : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -425,14 +468,7 @@ const Product = () => {
               {bundles.map((b) => (
                 <button
                   key={b.qty}
-                  onClick={() => {
-                    setSelectedQty(b.qty);
-                    trackFunnelStep('select_bundle', {
-                      step_value: b.tag || b.label,
-                      value: bundlePrices[b.qty],
-                      currency,
-                    });
-                  }}
+                  onClick={() => handleSelectPack(b.qty)}
                   className={`w-full rounded-xl p-4 border-2 transition-all text-left relative ${
                     selectedQty === b.qty
                       ? "border-gold bg-gold/5 shadow-md"
@@ -482,36 +518,57 @@ const Product = () => {
             </div>
 
             {/* Sleep Bundles — shown right under the first offers */}
-            <Suspense fallback={null}>
-              <SleepBundles compact />
-            </Suspense>
+            <SleepBundles
+              ref={bundlesRef}
+              compact
+              hideCta
+              selectedBundle={selectedBundleKey}
+              onSelectBundle={handleSelectBundle}
+              onSelectionChange={handleBundleSummary}
+            />
 
-            {/* Price summary */}
-            <div className="flex items-center gap-3 bg-muted/30 rounded-lg px-4 py-3">
-              <span className="text-sm text-muted-foreground font-sans-body">{t("product.yourPrice")}</span>
-              <span className="text-2xl font-bold text-foreground">{formatPrice(currentPrice)}</span>
-              {hasPromo && (
-                <span className="text-sm text-muted-foreground line-through">{formatPrice(currentPrice / promoMultiplier)}</span>
-              )}
-              <span className="text-sm text-muted-foreground line-through">{formatPrice(currentOldPrice)}</span>
-              <span className="bg-gold text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">{selectedBundle.discount}</span>
-              {hasPromo && (
-                <span className="bg-destructive text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">-10% EXTRA</span>
-              )}
-            </div>
+            {/* Price summary — only when a selection is active */}
+            {hasSelection && ctaPrice !== null && (
+              <div className="flex items-center gap-3 bg-muted/30 rounded-lg px-4 py-3">
+                <span className="text-sm text-muted-foreground font-sans-body">{t("product.yourPrice")}</span>
+                <span className="text-2xl font-bold text-foreground">{formatPrice(ctaPrice)}</span>
+                {selectedQty && currentOldPrice !== null && (
+                  <>
+                    {hasPromo && (
+                      <span className="text-sm text-muted-foreground line-through">{formatPrice(ctaPrice / promoMultiplier)}</span>
+                    )}
+                    <span className="text-sm text-muted-foreground line-through">{formatPrice(currentOldPrice)}</span>
+                    {selectedBundle && (
+                      <span className="bg-gold text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">{selectedBundle.discount}</span>
+                    )}
+                  </>
+                )}
+                {selectedBundleKey && (
+                  <>
+                    <span className="text-sm text-muted-foreground line-through">{formatPrice(ctaPrice * 2)}</span>
+                    <span className="bg-gold text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">-50%</span>
+                  </>
+                )}
+                {hasPromo && (
+                  <span className="bg-destructive text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">-10% EXTRA</span>
+                )}
+              </div>
+            )}
 
-            {/* CTA */}
+            {/* Unified CTA (desktop inline) */}
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={handleAddToCart}
-              disabled={isLoading || !product}
-              className="w-full bg-gold text-primary-foreground py-4 rounded-xl text-base font-bold shadow-gold-glow flex items-center justify-center gap-2 uppercase tracking-wider disabled:opacity-50"
+              whileHover={{ scale: hasSelection ? 1.02 : 1 }}
+              whileTap={{ scale: hasSelection ? 0.97 : 1 }}
+              onClick={handleUnifiedAdd}
+              disabled={isLoading || !product || !hasSelection}
+              className="w-full bg-gold text-primary-foreground py-4 rounded-xl text-base font-bold shadow-gold-glow flex items-center justify-center gap-2 uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
+              ) : !hasSelection ? (
+                <>{t("product.chooseFormat")}</>
               ) : (
-                <>🛒 {t("product.addToCart")} — {selectedBundle.label}</>
+                <>{ctaLabel}</>
               )}
             </motion.button>
 
@@ -541,6 +598,28 @@ const Product = () => {
           <ProductBenefits />
         </Suspense>
       </div>
+
+      {/* Sticky mobile CTA — single global CTA driven by current selection */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-card/95 backdrop-blur-md border-t border-border px-4 pt-2 pb-3 shadow-[0_-4px_20px_rgba(0,0,0,0.15)]">
+        <motion.button
+          whileTap={{ scale: hasSelection ? 0.97 : 1 }}
+          onClick={handleUnifiedAdd}
+          disabled={isLoading || !product || !hasSelection}
+          className="w-full bg-gold text-primary-foreground py-3 rounded-full text-sm font-bold uppercase tracking-wider shadow-gold-glow flex items-center justify-center gap-2 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed"
+        >
+          {isLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : !hasSelection ? (
+            <>{t("product.chooseFormat")}</>
+          ) : (
+            <span className="flex items-center gap-2 truncate">
+              <span className="truncate">{ctaLabel}</span>
+              {ctaPrice !== null && <span className="font-numeric-safe">· {formatPrice(ctaPrice)}</span>}
+            </span>
+          )}
+        </motion.button>
+      </div>
+      <div className="md:hidden h-20" aria-hidden="true" />
 
       {/* Image lightbox */}
       <AnimatePresence>

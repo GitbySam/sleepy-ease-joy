@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { motion } from "framer-motion";
 import { Check, Loader2, Sparkles } from "lucide-react";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
@@ -21,7 +21,17 @@ const FALLBACK_IMAGES: Record<string, string> = {
   RED: pillowRed,
 };
 
-type BundleKey = "solo" | "duo" | "family";
+export type BundleKey = "solo" | "duo" | "family";
+
+export interface SleepBundlesHandle {
+  addSelected: () => Promise<void>;
+}
+
+export interface BundleSelectionSummary {
+  key: BundleKey;
+  label: string;
+  price: number;
+}
 
 function classify(handle: string, title: string): BundleKey | null {
   const s = `${handle} ${title}`.toLowerCase();
@@ -33,9 +43,19 @@ function classify(handle: string, title: string): BundleKey | null {
 
 interface SleepBundlesProps {
   compact?: boolean;
+  selectedBundle?: BundleKey | null;
+  onSelectBundle?: (key: BundleKey | null) => void;
+  hideCta?: boolean;
+  onSelectionChange?: (summary: BundleSelectionSummary | null) => void;
 }
 
-const SleepBundles = ({ compact = false }: SleepBundlesProps) => {
+const SleepBundles = forwardRef<SleepBundlesHandle, SleepBundlesProps>(({
+  compact = false,
+  selectedBundle: controlledSelected,
+  onSelectBundle,
+  hideCta = false,
+  onSelectionChange,
+}, ref) => {
   const { t } = useLanguage();
   const { country, currency, formatPrice } = useMarket();
   const addItem = useCartStore((s) => s.addItem);
@@ -49,7 +69,13 @@ const SleepBundles = ({ compact = false }: SleepBundlesProps) => {
   const [loading, setLoading] = useState(true);
   const [soloColor, setSoloColor] = useState<string>("GREY");
   const [adding, setAdding] = useState<BundleKey | null>(null);
-  const [selectedBundle, setSelectedBundle] = useState<BundleKey | null>(null);
+  const [internalSelected, setInternalSelected] = useState<BundleKey | null>(null);
+  const isControlled = controlledSelected !== undefined;
+  const selectedBundle = isControlled ? controlledSelected : internalSelected;
+  const setSelectedBundle = (next: BundleKey | null) => {
+    if (!isControlled) setInternalSelected(next);
+    onSelectBundle?.(next);
+  };
 
   useEffect(() => {
     fetchProducts(10, `product_type:"Sleep Kit Bundle"`, country)
@@ -124,6 +150,27 @@ const SleepBundles = ({ compact = false }: SleepBundlesProps) => {
     }
   };
 
+  // Expose imperative add for parent (controlled mode)
+  useImperativeHandle(ref, () => ({
+    addSelected: async () => {
+      if (!selectedBundle) return;
+      const product = products[selectedBundle];
+      if (!product) return;
+      await handleAdd(selectedBundle, product);
+    },
+  }), [selectedBundle, products, soloColor]);
+
+  // Notify parent of selection summary changes
+  useEffect(() => {
+    if (!onSelectionChange) return;
+    if (!selectedBundle) { onSelectionChange(null); return; }
+    const product = products[selectedBundle];
+    if (!product) { onSelectionChange(null); return; }
+    const variant = product.node.variants.edges[0]?.node;
+    const price = variant ? parseFloat(variant.price.amount) : 0;
+    onSelectionChange({ key: selectedBundle, label: product.node.title, price });
+  }, [selectedBundle, products, onSelectionChange]);
+
   if (loading) {
     return (
       <section className="mt-16 md:mt-24">
@@ -158,7 +205,7 @@ const SleepBundles = ({ compact = false }: SleepBundlesProps) => {
             return (
               <button
                 key={key}
-                onClick={() => setSelectedBundle((prev) => (prev === key ? null : key))}
+                onClick={() => setSelectedBundle(selectedBundle === key ? null : key)}
                 className={`w-full rounded-xl p-4 border-2 transition-all text-left relative ${
                   isSelected
                     ? "border-gold bg-gold/5 shadow-md"
@@ -205,6 +252,7 @@ const SleepBundles = ({ compact = false }: SleepBundlesProps) => {
             );
           })}
         </div>
+        {!hideCta && (
         <motion.button
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.98 }}
@@ -220,6 +268,7 @@ const SleepBundles = ({ compact = false }: SleepBundlesProps) => {
             <>🛒 {t("product.addToCart")} — {t(`bundles.${selectedBundle}.name`)}</>
           )}
         </motion.button>
+        )}
       </section>
     );
   }
@@ -369,6 +418,8 @@ const SleepBundles = ({ compact = false }: SleepBundlesProps) => {
       </div>
     </section>
   );
-};
+});
+
+SleepBundles.displayName = "SleepBundles";
 
 export default SleepBundles;
