@@ -15,7 +15,7 @@ import { getVisitorId } from "@/lib/visitorId";
 import pillowGrey from "@/assets/product-pillow-grey-new.webp";
 import pillowBlack from "@/assets/product-pillow-black.webp";
 import pillowRed from "@/assets/product-pillow-red.webp";
-import sleepMaskImg from "@/assets/sleep-mask.png";
+import sleepMaskImg from "@/assets/sleep-kit-bundle.jpg";
 
 const COLOR_IMAGES: Record<string, string> = {
   Grey: pillowGrey,
