@@ -14,6 +14,7 @@ import { getVisitorId } from "@/lib/visitorId";
 import pillowGrey from "@/assets/product-pillow-grey-new.webp";
 import pillowBlack from "@/assets/product-pillow-black.webp";
 import pillowRed from "@/assets/product-pillow-red.webp";
+import sleepMaskImg from "@/assets/sleep-mask.png";
 
 const COLOR_IMAGES: Record<string, string> = {
   Grey: pillowGrey,
@@ -28,9 +29,26 @@ const TESTIMONIAL_KEYS = ["cart.testimonial1", "cart.testimonial2", "cart.testim
 export const ShopifyCartDrawer = () => {
   const { items, isLoading, isSyncing, isDrawerOpen, setDrawerOpen, updateQuantity, removeItem, getCheckoutUrl, syncCart } = useCartStore();
   const { t } = useLanguage();
-  const { currency, formatPrice } = useMarket();
+  const { currency, formatPrice, prices } = useMarket();
   const totalItems = items.length;
-  const totalPrice = items.reduce((sum, item) => sum + (item.bundlePrice ? item.bundlePrice : parseFloat(item.price.amount) * item.quantity), 0);
+  const itemsTotal = items.reduce((sum, item) => sum + (item.bundlePrice ? item.bundlePrice : parseFloat(item.price.amount) * item.quantity), 0);
+
+  // Sleep Kit upsell — only when cart has a Sleep&zy pack (no Sleep Bundle)
+  const PACK_LABELS = ["SOLO TRAVELERS", "DUO PACK", "FAMILY PACK"];
+  const hasSleepzyPack = items.some(
+    (i) => !i.bundleLabel || PACK_LABELS.includes((i.bundleLabel || "").toUpperCase())
+  );
+  const hasSleepBundle = items.some((i) => (i.bundleLabel || "").toLowerCase().includes("bundle"));
+  const showSleepKit = hasSleepzyPack && !hasSleepBundle;
+  const SLEEP_KIT_MAX = 5;
+  const [sleepKits, setSleepKits] = useState(0);
+  const kitPrice = prices.sleepKit;
+  const kitTotal = sleepKits * kitPrice;
+  // Reset kit counter if the upsell becomes irrelevant
+  useEffect(() => {
+    if (!showSleepKit && sleepKits !== 0) setSleepKits(0);
+  }, [showSleepKit, sleepKits]);
+  const totalPrice = itemsTotal + kitTotal;
 
   const [testimonialIndex, setTestimonialIndex] = useState(0);
 
@@ -337,6 +355,60 @@ export const ShopifyCartDrawer = () => {
                   </div>
                   <span className="text-xs font-bold text-gold">{t("cart.freeShippingQualified")}</span>
                 </div>
+
+                {/* Sleep Kit upsell — only when cart has Sleep&zy pack(s), not Sleep Bundle */}
+                {showSleepKit && (
+                  <div className="mt-4 rounded-xl border-2 border-dashed border-gold/40 bg-gold/5 p-3 space-y-3">
+                    <div className="flex items-start gap-2">
+                      <span className="text-gold text-base leading-none">✨</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[11px] font-bold uppercase tracking-wider text-gold">
+                          {t("product.sleepKit.title")}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {t("product.sleepKit.subtitle")} ({formatPrice(kitPrice)} {t("product.sleepKit.each")})
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 bg-card rounded-lg p-2.5 border border-border">
+                      <div className="w-14 h-14 rounded-md bg-muted/40 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        <img src={sleepMaskImg} alt="Sleep Kit" className="w-full h-full object-contain" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-foreground text-sm truncate">{t("product.sleepKit.name")}</p>
+                        <p className="text-xs text-muted-foreground font-numeric-safe tracking-normal">
+                          {sleepKits > 0 ? `+ ${formatPrice(kitTotal)}` : formatPrice(kitPrice)}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1 border border-border rounded-full bg-background">
+                        <button
+                          type="button"
+                          onClick={() => setSleepKits((n) => Math.max(0, n - 1))}
+                          disabled={sleepKits === 0}
+                          className="w-7 h-7 rounded-full flex items-center justify-center text-foreground disabled:opacity-30 hover:bg-muted transition-colors"
+                          aria-label="Decrease Sleep Kit"
+                        >
+                          <Minus className="h-3 w-3" />
+                        </button>
+                        <span className="font-numeric-safe text-sm font-bold w-5 text-center tracking-normal">{sleepKits}</span>
+                        <button
+                          type="button"
+                          onClick={() => setSleepKits((n) => Math.min(SLEEP_KIT_MAX, n + 1))}
+                          disabled={sleepKits >= SLEEP_KIT_MAX}
+                          className="w-7 h-7 rounded-full flex items-center justify-center text-foreground disabled:opacity-30 hover:bg-muted transition-colors"
+                          aria-label="Increase Sleep Kit"
+                        >
+                          <Plus className="h-3 w-3" />
+                        </button>
+                      </div>
+                    </div>
+                    {sleepKits >= SLEEP_KIT_MAX && (
+                      <p className="text-xs font-semibold text-gold text-center">
+                        ⭐ {t("product.sleepKit.maxReached")}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="flex-shrink-0 space-y-4 pt-4 border-t border-border bg-background">
