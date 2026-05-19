@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ShieldCheck, Truck, RotateCcw, Clock, Loader2, ArrowLeft } from "lucide-react";
@@ -32,7 +32,7 @@ import { trackViewContent, trackAddToCart } from "@/lib/metaPixel";
 import { trackFunnelStep, trackFriction } from "@/lib/funnelTracking";
 import { lazy, Suspense } from "react";
 const ProductBenefits = lazy(() => import("@/components/ProductBenefits"));
-const SleepBundles = lazy(() => import("@/components/SleepBundles"));
+import SleepBundles, { type SleepBundlesHandle, type BundleSelectionSummary } from "@/components/SleepBundles";
 
 const COLOR_MAP: Record<string, string> = {
   Grey: "#9CA3AF",
@@ -72,16 +72,20 @@ function useCountdown(minutes: number) {
 
 const Product = () => {
   const [searchParams] = useSearchParams();
-  const bundleParam = parseInt(searchParams.get("bundle") || "1", 10);
+  const bundleParamRaw = searchParams.get("bundle");
+  const bundleParam = bundleParamRaw ? parseInt(bundleParamRaw, 10) : null;
   const colorParam = searchParams.get("color");
   const initialColor = colorParam && ["Grey", "Black", "Red"].includes(colorParam) ? colorParam : "Grey";
   const promoCode = searchParams.get("promo") || null;
   const hasPromo = promoCode === "SLEEPZY10";
   const promoMultiplier = hasPromo ? 0.9 : 1;
-  const initialQty = [1, 2, 3].includes(bundleParam) ? bundleParam : 1;
+  const initialQty = bundleParam && [1, 2, 3].includes(bundleParam) ? bundleParam : null;
   const [product, setProduct] = useState<ShopifyProduct | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedQty, setSelectedQty] = useState(initialQty);
+  const [selectedQty, setSelectedQty] = useState<number | null>(initialQty);
+  const [selectedBundleKey, setSelectedBundleKey] = useState<BundleSelectionSummary["key"] | null>(null);
+  const [bundleSummary, setBundleSummary] = useState<BundleSelectionSummary | null>(null);
+  const bundlesRef = useRef<SleepBundlesHandle>(null);
   const [selectedColor, setSelectedColor] = useState(initialColor);
   const [galleryOffset, setGalleryOffset] = useState(0);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
@@ -162,7 +166,7 @@ const Product = () => {
   const bundleOldPrices: Record<number, number> = { 1: prices.oldSingle, 2: prices.oldDuo, 3: prices.oldFamily };
 
   const handleAddToCart = async () => {
-    if (!product) return;
+    if (!product || !selectedQty) return;
     const selectedBundle = bundles.find(b => b.qty === selectedQty)!;
     const selectedVariant = selectedBundle.variantNode;
     if (!selectedVariant) {
@@ -217,6 +221,45 @@ const Product = () => {
     setDrawerOpen(true);
   };
 
+  const handleSelectPack = (qty: number) => {
+    setSelectedQty(prev => (prev === qty ? null : qty));
+    setSelectedBundleKey(null);
+    trackFunnelStep('select_bundle', {
+      step_value: bundles.find(b => b.qty === qty)?.tag || `pack-${qty}`,
+      value: bundlePrices[qty],
+      currency,
+    });
+  };
+
+  const handleSelectBundle = useCallback((key: BundleSelectionSummary["key"] | null) => {
+    setSelectedBundleKey(key);
+    if (key) setSelectedQty(null);
+  }, []);
+
+  const handleBundleSummary = useCallback((s: BundleSelectionSummary | null) => {
+    setBundleSummary(s);
+  }, []);
+
+  const hasSelection = selectedQty !== null || (selectedBundleKey !== null && bundleSummary !== null);
+
+  const handleUnifiedAdd = async () => {
+    if (selectedQty) {
+      await handleAddToCart();
+    } else if (selectedBundleKey) {
+      await bundlesRef.current?.addSelected();
+    }
+  };
+
+  const ctaLabel = selectedQty
+    ? `🛒 ${t("product.addToCart")} — ${bundles.find(b => b.qty === selectedQty)?.label}`
+    : selectedBundleKey && bundleSummary
+      ? `🛒 ${t("product.addToCart")} — ${bundleSummary.label}`
+      : t("product.addToCart");
+
+  const ctaPrice = selectedQty
+    ? bundlePrices[selectedQty]
+    : bundleSummary?.price ?? null;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -225,9 +268,9 @@ const Product = () => {
     );
   }
 
-  const selectedBundle = bundles.find(b => b.qty === selectedQty)!;
-  const currentPrice = bundlePrices[selectedQty];
-  const currentOldPrice = bundleOldPrices[selectedQty];
+  const selectedBundle = selectedQty ? bundles.find(b => b.qty === selectedQty)! : null;
+  const currentPrice = selectedQty ? bundlePrices[selectedQty] : null;
+  const currentOldPrice = selectedQty ? bundleOldPrices[selectedQty] : null;
 
   return (
     <div className="min-h-screen bg-background">
