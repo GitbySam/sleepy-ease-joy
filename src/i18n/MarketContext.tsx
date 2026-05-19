@@ -67,12 +67,12 @@ export const MARKETS: Record<Country, MarketConfig> = {
     symbolBefore: false,
     locale: "fr-FR",
     prices: {
-      single: 29.95,
-      duo: 59.90,
-      family: 65.95,
-      oldSingle: 59.90,
-      oldDuo: 119.80,
-      oldFamily: 179.70,
+      single: 34.95,
+      duo: 69.90,
+      family: 75.95,
+      oldSingle: 69.90,
+      oldDuo: 139.80,
+      oldFamily: 227.85,
     },
   },
 };
