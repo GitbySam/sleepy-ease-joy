@@ -22,6 +22,7 @@ import inUsePlane from "@/assets/lifestyle-plane.webp";
 import inUsePlane2 from "@/assets/lifestyle-plane2.webp";
 import inUseCar2 from "@/assets/lifestyle-car2.webp";
 import inUsePlane3 from "@/assets/lifestyle-plane3.webp";
+import sleepMaskImg from "@/assets/sleep-mask.png";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchProducts, type ShopifyProduct, applyDiscountToCart } from "@/lib/shopify";
 import { toast } from "sonner";
@@ -85,6 +86,8 @@ const Product = () => {
   const [selectedQty, setSelectedQty] = useState<number | null>(initialQty);
   const [selectedBundleKey, setSelectedBundleKey] = useState<BundleSelectionSummary["key"] | null>(null);
   const [bundleSummary, setBundleSummary] = useState<BundleSelectionSummary | null>(null);
+  const [selectedKits, setSelectedKits] = useState(0);
+  const SLEEP_KIT_MAX = 5;
   const bundlesRef = useRef<SleepBundlesHandle>(null);
   const [selectedColor, setSelectedColor] = useState(initialColor);
   const [galleryOffset, setGalleryOffset] = useState(0);
@@ -241,6 +244,8 @@ const Product = () => {
   }, []);
 
   const hasSelection = selectedQty !== null || (selectedBundleKey !== null && bundleSummary !== null);
+  const kitPrice = prices.sleepKit;
+  const kitTotal = selectedKits * kitPrice;
 
   const handleUnifiedAdd = async () => {
     if (selectedQty) {
@@ -257,8 +262,10 @@ const Product = () => {
       : t("product.addToCart");
 
   const ctaPrice = selectedQty
-    ? bundlePrices[selectedQty]
-    : bundleSummary?.price ?? null;
+    ? bundlePrices[selectedQty] + kitTotal
+    : bundleSummary?.price !== undefined
+      ? bundleSummary.price + kitTotal
+      : null;
 
   if (loading) {
     return (
