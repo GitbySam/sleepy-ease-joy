@@ -31,7 +31,11 @@ function classify(handle: string, title: string): BundleKey | null {
   return null;
 }
 
-const SleepBundles = () => {
+interface SleepBundlesProps {
+  compact?: boolean;
+}
+
+const SleepBundles = ({ compact = false }: SleepBundlesProps) => {
   const { t } = useLanguage();
   const { country, currency, formatPrice } = useMarket();
   const addItem = useCartStore((s) => s.addItem);
@@ -133,21 +137,21 @@ const SleepBundles = () => {
   if (available.length === 0) return null;
 
   return (
-    <section className="mt-16 md:mt-24" data-clarity-unmask="true">
-      <div className="text-center mb-8 md:mb-10">
-        <div className="inline-flex items-center gap-2 bg-gold/10 text-gold text-xs font-bold px-3 py-1.5 rounded-full mb-3 uppercase tracking-wider">
+    <section className={compact ? "mt-6" : "mt-16 md:mt-24"} data-clarity-unmask="true">
+      <div className={`text-center ${compact ? "mb-4" : "mb-8 md:mb-10"}`}>
+        <div className="inline-flex items-center gap-2 bg-gold/10 text-gold text-xs font-bold px-3 py-1.5 rounded-full mb-2 uppercase tracking-wider">
           <Sparkles size={14} />
           {t("bundles.eyebrow")}
         </div>
-        <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground">
+        <h2 className={`font-serif font-bold text-foreground ${compact ? "text-xl md:text-2xl" : "text-3xl md:text-4xl"}`}>
           {t("bundles.title")}
         </h2>
-        <p className="text-muted-foreground mt-2 max-w-xl mx-auto text-sm md:text-base">
+        <p className={`text-muted-foreground mt-2 max-w-xl mx-auto ${compact ? "text-xs" : "text-sm md:text-base"}`}>
           {t("bundles.subtitle")}
         </p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-5 md:gap-6">
+      <div className={compact ? "flex flex-col gap-3" : "grid md:grid-cols-3 gap-5 md:gap-6"}>
         {available.map(({ key, pillowCount, tagLabel, tagColor }) => {
           const product = products[key]!;
           const variant = product.node.variants.edges[0]?.node;
