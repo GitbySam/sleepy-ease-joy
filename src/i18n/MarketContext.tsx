@@ -10,6 +10,7 @@ export interface MarketPrices {
   oldSingle: number;
   oldDuo: number;
   oldFamily: number;
+  sleepKit: number;
 }
 
 export interface MarketConfig {
@@ -41,6 +42,7 @@ export const MARKETS: Record<Country, MarketConfig> = {
       oldSingle: 69.90,
       oldDuo: 139.80,
       oldFamily: 209.70,
+      sleepKit: 19.95,
     },
   },
   US: {
@@ -57,6 +59,7 @@ export const MARKETS: Record<Country, MarketConfig> = {
       oldSingle: 59.90,
       oldDuo: 119.80,
       oldFamily: 179.95,
+      sleepKit: 19.95,
     },
   },
   FR: {
@@ -73,6 +76,7 @@ export const MARKETS: Record<Country, MarketConfig> = {
       oldSingle: 59.90,
       oldDuo: 119.80,
       oldFamily: 179.85,
+      sleepKit: 16.95,
     },
   },
 };
