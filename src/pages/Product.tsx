@@ -566,7 +566,7 @@ const Product = () => {
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : !hasSelection ? (
-                <>{t("product.chooseFormat") !== "product.chooseFormat" ? t("product.chooseFormat") : "Choisissez un format ci-dessus"}</>
+                <>{t("product.chooseFormat")}</>
               ) : (
                 <>{ctaLabel}</>
               )}
