@@ -136,6 +136,70 @@ const SleepBundles = ({ compact = false }: SleepBundlesProps) => {
   const available = ORDER.filter((o) => products[o.key]);
   if (available.length === 0) return null;
 
+  // Compact mode: mirror the Sleep&zy pack selector style (no images)
+  if (compact) {
+    return (
+      <section className="mt-6 space-y-3" data-clarity-unmask="true">
+        <div className="flex items-center gap-2">
+          <Sparkles size={14} className="text-gold" />
+          <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">
+            {t("bundles.title")}
+          </h3>
+        </div>
+        <div className="space-y-3">
+          {available.map(({ key, pillowCount, tagLabel, tagColor }) => {
+            const product = products[key]!;
+            const variant = product.node.variants.edges[0]?.node;
+            const price = variant ? parseFloat(variant.price.amount) : 0;
+            const oldPrice = price * 2;
+            const isFeatured = key === "family";
+            const isAdding = adding === key;
+            return (
+              <button
+                key={key}
+                onClick={() => handleAdd(key, product)}
+                disabled={isLoading || isAdding}
+                className={`w-full rounded-xl p-4 border-2 transition-all text-left relative disabled:opacity-60 ${
+                  isFeatured
+                    ? "border-gold bg-gold/5 shadow-md"
+                    : "border-border bg-card hover:border-gold/40"
+                }`}
+              >
+                <span
+                  className={`absolute -top-2.5 right-4 ${tagColor} text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider`}
+                >
+                  {tagLabel}
+                </span>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-foreground text-sm flex items-center gap-2">
+                      {t(`bundles.${key}.name`)}
+                      <span className="bg-gold/20 text-gold text-[10px] font-bold px-1.5 py-0.5 rounded">
+                        -50%
+                      </span>
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {pillowCount} × {t("bundles.item.pillow")} · {t("bundles.item.mask")} · {t("bundles.item.earplugs")}
+                    </p>
+                    {isAdding && (
+                      <p className="text-[11px] text-gold mt-1 flex items-center gap-1">
+                        <Loader2 className="w-3 h-3 animate-spin" /> {t("product.addedToCart")}
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-right shrink-0 font-numeric-safe" data-clarity-unmask="true">
+                    <p className="text-lg font-bold text-foreground">{formatPrice(price)}</p>
+                    <p className="text-xs text-muted-foreground line-through">{formatPrice(oldPrice)}</p>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className={compact ? "mt-6" : "mt-16 md:mt-24"} data-clarity-unmask="true">
       <div className={`text-center ${compact ? "mb-4" : "mb-8 md:mb-10"}`}>
