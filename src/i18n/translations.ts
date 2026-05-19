@@ -334,6 +334,7 @@ export const translations = {
   "product.selected": { en: "SELECTED", fr: "SÉLECTIONNÉ", es: "SELECCIONADO" },
   "product.yourPrice": { en: "Your price:", fr: "Votre prix :", es: "Tu precio:" },
   "product.addToCart": { en: "Add to cart", fr: "Ajouter au panier", es: "Añadir al carrito" },
+ "product.chooseFormat": { en: "Choose a format above", fr: "Choisissez un format ci-dessus", es: "Elige un formato arriba" },
   "product.addedToCart": { en: "added to cart", fr: "ajouté au panier", es: "añadido al carrito" },
   "product.securePayment": { en: "Secure payment", fr: "Paiement sécurisé", es: "Pago seguro" },
   "product.freeShipping": { en: "Free shipping", fr: "Livraison gratuite", es: "Envío gratis" },
