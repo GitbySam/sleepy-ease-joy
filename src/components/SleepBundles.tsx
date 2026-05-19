@@ -49,7 +49,7 @@ const SleepBundles = ({ compact = false }: SleepBundlesProps) => {
   const [loading, setLoading] = useState(true);
   const [soloColor, setSoloColor] = useState<string>("GREY");
   const [adding, setAdding] = useState<BundleKey | null>(null);
-  const [selectedBundle, setSelectedBundle] = useState<BundleKey>("family");
+  const [selectedBundle, setSelectedBundle] = useState<BundleKey | null>(null);
 
   useEffect(() => {
     fetchProducts(10, `product_type:"Sleep Kit Bundle"`, country)
@@ -139,7 +139,7 @@ const SleepBundles = ({ compact = false }: SleepBundlesProps) => {
 
   // Compact mode: mirror the Sleep&zy pack selector style (no images)
   if (compact) {
-    const selectedProduct = products[selectedBundle];
+    const selectedProduct = selectedBundle ? products[selectedBundle] : null;
     return (
       <section className="mt-6 space-y-3" data-clarity-unmask="true">
         <div className="flex items-center gap-2">
@@ -158,7 +158,7 @@ const SleepBundles = ({ compact = false }: SleepBundlesProps) => {
             return (
               <button
                 key={key}
-                onClick={() => setSelectedBundle(key)}
+                onClick={() => setSelectedBundle((prev) => (prev === key ? null : key))}
                 className={`w-full rounded-xl p-4 border-2 transition-all text-left relative ${
                   isSelected
                     ? "border-gold bg-gold/5 shadow-md"
@@ -208,12 +208,14 @@ const SleepBundles = ({ compact = false }: SleepBundlesProps) => {
         <motion.button
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => selectedProduct && handleAdd(selectedBundle, selectedProduct)}
-          disabled={isLoading || adding !== null || !selectedProduct}
+          onClick={() => selectedBundle && selectedProduct && handleAdd(selectedBundle, selectedProduct)}
+          disabled={isLoading || adding !== null || !selectedBundle || !selectedProduct}
           className="w-full bg-foreground text-background py-3 rounded-xl text-sm font-bold uppercase tracking-wider disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {adding ? (
             <Loader2 className="w-4 h-4 animate-spin" />
+          ) : !selectedBundle ? (
+            <>{t("product.addToCart")}</>
           ) : (
             <>🛒 {t("product.addToCart")} — {t(`bundles.${selectedBundle}.name`)}</>
           )}
