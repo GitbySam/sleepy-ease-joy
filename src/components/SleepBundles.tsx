@@ -188,64 +188,89 @@ const SleepBundles = forwardRef<SleepBundlesHandle, SleepBundlesProps>(({
   if (compact) {
     const selectedProduct = selectedBundle ? products[selectedBundle] : null;
     return (
-      <section className="mt-6 space-y-3" data-clarity-unmask="true">
-        <div className="flex items-center gap-2">
-          <Sparkles size={14} className="text-gold" />
-          <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">
-            {t("bundles.title")}
+      <section className="mt-8 space-y-4" data-clarity-unmask="true">
+        <div className="flex items-center gap-2 mb-2">
+          <Sparkles size={18} className="text-gold" />
+          <h3 className="font-serif text-sm font-bold uppercase tracking-[0.15em] text-dark-blue">
+            {t("bundles.ritualHeader")}
           </h3>
         </div>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {available.map(({ key, pillowCount, tagLabel, tagColor }) => {
             const product = products[key]!;
             const variant = product.node.variants.edges[0]?.node;
             const price = variant ? parseFloat(variant.price.amount) : 0;
             const oldPrice = price * 2;
             const isSelected = selectedBundle === key;
+            const isFamily = key === "family";
+
+            const cardBase = "relative cursor-pointer rounded-xl p-5 transition-all text-left w-full overflow-hidden";
+            const cardSkin = isFamily
+              ? `border-2 ${isSelected ? "border-gold shadow-xl shadow-dark-blue/10" : "border-gold/70 hover:border-gold"} bg-dark-blue text-primary-foreground`
+              : `border ${isSelected ? "border-gold shadow-md" : "border-border hover:border-gold/50"} bg-card`;
+
             return (
               <button
                 key={key}
                 onClick={() => setSelectedBundle(selectedBundle === key ? null : key)}
-                className={`w-full rounded-xl p-4 border-2 transition-all text-left relative ${
-                  isSelected
-                    ? "border-gold bg-gold/5 shadow-md"
-                    : "border-border bg-card hover:border-gold/40"
-                }`}
+                className={`${cardBase} ${cardSkin}`}
               >
-                {isSelected && (
-                  <span className="absolute -top-2.5 left-4 bg-gold text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded">
-                    ✓ {t("product.selected")}
+                {/* Top-right corner badge */}
+                {isFamily ? (
+                  <span className="absolute -top-2 -right-2 bg-gold text-dark-blue text-[9px] font-bold px-2 py-0.5 rounded tracking-widest uppercase">
+                    {t("bundles.tag.family")}
+                  </span>
+                ) : (
+                  <span className="absolute -top-2 -right-2 bg-dark-blue text-primary-foreground text-[9px] font-bold px-2 py-0.5 rounded tracking-widest uppercase">
+                    {t(`bundles.tag.${key}`)}
                   </span>
                 )}
-                <span
-                  className={`absolute -top-2.5 right-4 ${tagColor} text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider`}
-                >
-                  {tagLabel}
-                </span>
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all shrink-0 ${
-                        isSelected ? "border-gold bg-gold" : "border-muted-foreground/30"
-                      }`}
-                    >
-                      {isSelected && <Check size={12} className="text-primary-foreground" />}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-semibold text-foreground text-sm flex items-center gap-2">
-                        {t(`bundles.${key}.name`)}
-                        <span className="bg-gold/20 text-gold text-[10px] font-bold px-1.5 py-0.5 rounded">
-                          -50%
-                        </span>
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {pillowCount} × {t("bundles.item.pillow")} · {t("bundles.item.mask")} · {t("bundles.item.earplugs")}
-                      </p>
-                    </div>
+
+                {/* Family card subtle gold glow */}
+                {isFamily && (
+                  <div className="pointer-events-none absolute top-0 right-0 w-32 h-32 bg-gold/10 blur-3xl rounded-full -mr-16 -mt-16" />
+                )}
+
+                <div className="relative z-10 flex items-start gap-4">
+                  <div
+                    className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                      isSelected
+                        ? "border-gold bg-gold"
+                        : isFamily
+                          ? "border-primary-foreground/30"
+                          : "border-muted-foreground/30"
+                    }`}
+                  >
+                    {isSelected && (
+                      <div className={`w-2 h-2 rounded-full ${isFamily ? "bg-dark-blue" : "bg-primary-foreground"}`} />
+                    )}
                   </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className={`font-serif text-lg font-bold leading-tight ${isFamily ? "text-gold" : "text-dark-blue"}`}>
+                        {t(`bundles.${key}.ritual`)}
+                      </h3>
+                      <span
+                        className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
+                          isFamily ? "bg-gold text-dark-blue" : "bg-muted text-dark-blue"
+                        }`}
+                      >
+                        -50%
+                      </span>
+                    </div>
+                    <p className={`text-xs italic mt-1 leading-relaxed ${isFamily ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                      {pillowCount} × {t("bundles.item.pillow")} · {t("bundles.item.mask")} · {t("bundles.item.earplugs")}
+                    </p>
+                  </div>
+
                   <div className="text-right shrink-0 font-numeric-safe" data-clarity-unmask="true">
-                    <p className="text-lg font-bold text-foreground">{formatPrice(price)}</p>
-                    <p className="text-xs text-muted-foreground line-through">{formatPrice(oldPrice)}</p>
+                    <p className={`text-lg font-bold ${isFamily ? "text-primary-foreground" : "text-dark-blue"}`}>
+                      {formatPrice(price)}
+                    </p>
+                    <p className={`text-[11px] line-through ${isFamily ? "text-primary-foreground/40" : "text-muted-foreground"}`}>
+                      {formatPrice(oldPrice)}
+                    </p>
                   </div>
                 </div>
               </button>

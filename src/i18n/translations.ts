@@ -392,6 +392,26 @@ export const translations = {
   "bundles.solo.name": { en: "Solo Sleep Bundle", fr: "Solo Sleep Bundle", es: "Solo Sleep Bundle" },
   "bundles.duo.name": { en: "Duo Sleep Bundle", fr: "Duo Sleep Bundle", es: "Duo Sleep Bundle" },
   "bundles.family.name": { en: "Family Sleep Bundle", fr: "Family Sleep Bundle", es: "Family Sleep Bundle" },
+  "bundles.ritualHeader": {
+    en: "Sleep&zy Signature Rituals",
+    fr: "Rituels Signature Sleep&zy",
+    es: "Rituales Firma Sleep&zy",
+  },
+  "bundles.solo.ritual": {
+    en: "Solo Signature Ritual",
+    fr: "Rituel Signature Solo",
+    es: "Ritual Firma Solo",
+  },
+  "bundles.duo.ritual": {
+    en: "Duo Shared Sanctuary",
+    fr: "Duo Sanctuaire Partagé",
+    es: "Dúo Santuario Compartido",
+  },
+  "bundles.family.ritual": {
+    en: "Grand Family Collection",
+    fr: "Grande Collection Famille",
+    es: "Gran Colección Familiar",
+  },
   "bundles.solo.tagline": {
     en: "For the solo traveler who refuses to compromise.",
     fr: "Pour le voyageur solo qui refuse de transiger.",
