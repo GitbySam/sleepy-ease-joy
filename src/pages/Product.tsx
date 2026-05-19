@@ -599,6 +599,28 @@ const Product = () => {
         </Suspense>
       </div>
 
+      {/* Sticky mobile CTA — single global CTA driven by current selection */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-card/95 backdrop-blur-md border-t border-border px-4 pt-2 pb-3 shadow-[0_-4px_20px_rgba(0,0,0,0.15)]">
+        <motion.button
+          whileTap={{ scale: hasSelection ? 0.97 : 1 }}
+          onClick={handleUnifiedAdd}
+          disabled={isLoading || !product || !hasSelection}
+          className="w-full bg-gold text-primary-foreground py-3 rounded-full text-sm font-bold uppercase tracking-wider shadow-gold-glow flex items-center justify-center gap-2 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed"
+        >
+          {isLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : !hasSelection ? (
+            <>{t("product.chooseFormat")}</>
+          ) : (
+            <span className="flex items-center gap-2 truncate">
+              <span className="truncate">{ctaLabel}</span>
+              {ctaPrice !== null && <span className="font-numeric-safe">· {formatPrice(ctaPrice)}</span>}
+            </span>
+          )}
+        </motion.button>
+      </div>
+      <div className="md:hidden h-20" aria-hidden="true" />
+
       {/* Image lightbox */}
       <AnimatePresence>
         {lightboxSrc && (
