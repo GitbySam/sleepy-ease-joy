@@ -49,6 +49,7 @@ const SleepBundles = ({ compact = false }: SleepBundlesProps) => {
   const [loading, setLoading] = useState(true);
   const [soloColor, setSoloColor] = useState<string>("GREY");
   const [adding, setAdding] = useState<BundleKey | null>(null);
+  const [selectedBundle, setSelectedBundle] = useState<BundleKey>("family");
 
   useEffect(() => {
     fetchProducts(10, `product_type:"Sleep Kit Bundle"`, country)
@@ -138,6 +139,7 @@ const SleepBundles = ({ compact = false }: SleepBundlesProps) => {
 
   // Compact mode: mirror the Sleep&zy pack selector style (no images)
   if (compact) {
+    const selectedProduct = products[selectedBundle];
     return (
       <section className="mt-6 space-y-3" data-clarity-unmask="true">
         <div className="flex items-center gap-2">
@@ -152,40 +154,47 @@ const SleepBundles = ({ compact = false }: SleepBundlesProps) => {
             const variant = product.node.variants.edges[0]?.node;
             const price = variant ? parseFloat(variant.price.amount) : 0;
             const oldPrice = price * 2;
-            const isFeatured = key === "family";
-            const isAdding = adding === key;
+            const isSelected = selectedBundle === key;
             return (
               <button
                 key={key}
-                onClick={() => handleAdd(key, product)}
-                disabled={isLoading || isAdding}
-                className={`w-full rounded-xl p-4 border-2 transition-all text-left relative disabled:opacity-60 ${
-                  isFeatured
+                onClick={() => setSelectedBundle(key)}
+                className={`w-full rounded-xl p-4 border-2 transition-all text-left relative ${
+                  isSelected
                     ? "border-gold bg-gold/5 shadow-md"
                     : "border-border bg-card hover:border-gold/40"
                 }`}
               >
+                {isSelected && (
+                  <span className="absolute -top-2.5 left-4 bg-gold text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded">
+                    ✓ {t("product.selected")}
+                  </span>
+                )}
                 <span
                   className={`absolute -top-2.5 right-4 ${tagColor} text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider`}
                 >
                   {tagLabel}
                 </span>
                 <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="font-semibold text-foreground text-sm flex items-center gap-2">
-                      {t(`bundles.${key}.name`)}
-                      <span className="bg-gold/20 text-gold text-[10px] font-bold px-1.5 py-0.5 rounded">
-                        -50%
-                      </span>
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {pillowCount} × {t("bundles.item.pillow")} · {t("bundles.item.mask")} · {t("bundles.item.earplugs")}
-                    </p>
-                    {isAdding && (
-                      <p className="text-[11px] text-gold mt-1 flex items-center gap-1">
-                        <Loader2 className="w-3 h-3 animate-spin" /> {t("product.addedToCart")}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all shrink-0 ${
+                        isSelected ? "border-gold bg-gold" : "border-muted-foreground/30"
+                      }`}
+                    >
+                      {isSelected && <Check size={12} className="text-primary-foreground" />}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-foreground text-sm flex items-center gap-2">
+                        {t(`bundles.${key}.name`)}
+                        <span className="bg-gold/20 text-gold text-[10px] font-bold px-1.5 py-0.5 rounded">
+                          -50%
+                        </span>
                       </p>
-                    )}
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {pillowCount} × {t("bundles.item.pillow")} · {t("bundles.item.mask")} · {t("bundles.item.earplugs")}
+                      </p>
+                    </div>
                   </div>
                   <div className="text-right shrink-0 font-numeric-safe" data-clarity-unmask="true">
                     <p className="text-lg font-bold text-foreground">{formatPrice(price)}</p>
@@ -196,6 +205,19 @@ const SleepBundles = ({ compact = false }: SleepBundlesProps) => {
             );
           })}
         </div>
+        <motion.button
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => selectedProduct && handleAdd(selectedBundle, selectedProduct)}
+          disabled={isLoading || adding !== null || !selectedProduct}
+          className="w-full bg-foreground text-background py-3 rounded-xl text-sm font-bold uppercase tracking-wider disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+          {adding ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <>🛒 {t("product.addToCart")} — {t(`bundles.${selectedBundle}.name`)}</>
+          )}
+        </motion.button>
       </section>
     );
   }
