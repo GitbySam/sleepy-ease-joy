@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Trash2, Loader2, ShieldCheck, Truck, RotateCcw, Lock, Star, CheckCircle, Minus, Plus } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
+import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useMarket } from "@/i18n/MarketContext";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
@@ -27,28 +28,74 @@ const COLOR_IMAGES: Record<string, string> = {
 const TESTIMONIAL_KEYS = ["cart.testimonial1", "cart.testimonial2", "cart.testimonial3"] as const;
 
 export const ShopifyCartDrawer = () => {
-  const { items, isLoading, isSyncing, isDrawerOpen, setDrawerOpen, updateQuantity, removeItem, getCheckoutUrl, syncCart } = useCartStore();
+  const { items, isLoading, isSyncing, isDrawerOpen, setDrawerOpen, updateQuantity, removeItem, addItem, getCheckoutUrl, syncCart } = useCartStore();
   const { t } = useLanguage();
-  const { currency, formatPrice, prices } = useMarket();
-  const totalItems = items.length;
-  const itemsTotal = items.reduce((sum, item) => sum + (item.bundlePrice ? item.bundlePrice : parseFloat(item.price.amount) * item.quantity), 0);
+  const { country, currency, formatPrice, prices } = useMarket();
 
   // Sleep Kit upsell — only when cart has a Sleep&zy pack (no Sleep Bundle)
   const PACK_LABELS = ["SOLO TRAVELERS", "DUO PACK", "FAMILY PACK"];
+  const SLEEP_KIT_LABEL = "Sleep Kit";
+  const SLEEP_KIT_MAX = 5;
+  const kitPrice = prices.sleepKit;
+
   const hasSleepzyPack = items.some(
-    (i) => !i.bundleLabel || PACK_LABELS.includes((i.bundleLabel || "").toUpperCase())
+    (i) => i.bundleLabel !== SLEEP_KIT_LABEL && (!i.bundleLabel || PACK_LABELS.includes((i.bundleLabel || "").toUpperCase()))
   );
   const hasSleepBundle = items.some((i) => (i.bundleLabel || "").toLowerCase().includes("bundle"));
   const showSleepKit = hasSleepzyPack && !hasSleepBundle;
-  const SLEEP_KIT_MAX = 5;
-  const [sleepKits, setSleepKits] = useState(0);
-  const kitPrice = prices.sleepKit;
-  const kitTotal = sleepKits * kitPrice;
-  // Reset kit counter if the upsell becomes irrelevant
+
+  const sleepKitItem = items.find((i) => i.bundleLabel === SLEEP_KIT_LABEL);
+  const sleepKits = sleepKitItem?.quantity ?? 0;
+
+  // Render items list without the Sleep Kit (it's shown via the upsell card)
+  const displayItems = items.filter((i) => i.bundleLabel !== SLEEP_KIT_LABEL);
+  const totalItems = displayItems.length + (sleepKits > 0 ? 1 : 0);
+  const totalPrice = items.reduce(
+    (sum, item) => sum + (item.bundlePrice ? item.bundlePrice : parseFloat(item.price.amount) * item.quantity),
+    0
+  );
+
+  // Fetch Sleep Kit product (once per market) so we can add it as a real Shopify line
+  const [sleepKitProduct, setSleepKitProduct] = useState<ShopifyProduct | null>(null);
   useEffect(() => {
-    if (!showSleepKit && sleepKits !== 0) setSleepKits(0);
-  }, [showSleepKit, sleepKits]);
-  const totalPrice = itemsTotal + kitTotal;
+    if (!showSleepKit || sleepKitProduct) return;
+    let cancelled = false;
+    fetchProducts(1, 'product_type:"Sleep Kit"', country)
+      .then((res) => { if (!cancelled && res.length > 0) setSleepKitProduct(res[0]); })
+      .catch((e) => console.error("Sleep Kit fetch error", e));
+    return () => { cancelled = true; };
+  }, [showSleepKit, sleepKitProduct, country]);
+
+  const sleepKitVariant = sleepKitProduct?.node.variants.edges[0]?.node;
+
+  const handleKitIncrease = async () => {
+    if (!sleepKitProduct || !sleepKitVariant) return;
+    if (sleepKits >= SLEEP_KIT_MAX) return;
+    if (sleepKitItem) {
+      await updateQuantity(sleepKitItem.variantId, sleepKits + 1, SLEEP_KIT_LABEL);
+    } else {
+      await addItem({
+        product: sleepKitProduct,
+        variantId: sleepKitVariant.id,
+        variantTitle: sleepKitVariant.title,
+        price: sleepKitVariant.price,
+        quantity: 1,
+        selectedOptions: sleepKitVariant.selectedOptions || [],
+        bundleLabel: SLEEP_KIT_LABEL,
+      }, country);
+    }
+  };
+
+  const handleKitDecrease = async () => {
+    if (!sleepKitItem) return;
+    if (sleepKits <= 1) {
+      await removeItem(sleepKitItem.variantId, SLEEP_KIT_LABEL);
+    } else {
+      await updateQuantity(sleepKitItem.variantId, sleepKits - 1, SLEEP_KIT_LABEL);
+    }
+  };
+
+  const kitTotal = sleepKits * kitPrice;
 
   const [testimonialIndex, setTestimonialIndex] = useState(0);
 
@@ -274,7 +321,7 @@ export const ShopifyCartDrawer = () => {
             <>
               <div className="flex-1 overflow-y-auto pr-2 min-h-0">
                 <div className="space-y-4">
-                  {items.map((item) => (
+                  {displayItems.map((item) => (
                     <div key={`${item.variantId}__${item.bundleLabel || 'single'}`} className="flex gap-4 p-3 bg-muted/30 rounded-xl border border-border">
                       {(() => {
                         const colorOption = item.selectedOptions.find(o => o.name?.toLowerCase() === "color")?.value;
@@ -383,8 +430,8 @@ export const ShopifyCartDrawer = () => {
                       <div className="flex items-center gap-1 border border-border rounded-full bg-background">
                         <button
                           type="button"
-                          onClick={() => setSleepKits((n) => Math.max(0, n - 1))}
-                          disabled={sleepKits === 0}
+                          onClick={handleKitDecrease}
+                          disabled={sleepKits === 0 || isLoading}
                           className="w-7 h-7 rounded-full flex items-center justify-center text-foreground disabled:opacity-30 hover:bg-muted transition-colors"
                           aria-label="Decrease Sleep Kit"
                         >
@@ -393,8 +440,8 @@ export const ShopifyCartDrawer = () => {
                         <span className="font-numeric-safe text-sm font-bold w-5 text-center tracking-normal">{sleepKits}</span>
                         <button
                           type="button"
-                          onClick={() => setSleepKits((n) => Math.min(SLEEP_KIT_MAX, n + 1))}
-                          disabled={sleepKits >= SLEEP_KIT_MAX}
+                          onClick={handleKitIncrease}
+                          disabled={sleepKits >= SLEEP_KIT_MAX || isLoading || !sleepKitVariant}
                           className="w-7 h-7 rounded-full flex items-center justify-center text-foreground disabled:opacity-30 hover:bg-muted transition-colors"
                           aria-label="Increase Sleep Kit"
                         >
