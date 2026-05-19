@@ -418,8 +418,6 @@ const SleepBundles = forwardRef<SleepBundlesHandle, SleepBundlesProps>(({
       </div>
     </section>
   );
-};
-
 });
 
 SleepBundles.displayName = "SleepBundles";
