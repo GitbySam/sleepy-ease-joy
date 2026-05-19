@@ -22,7 +22,6 @@ import inUsePlane from "@/assets/lifestyle-plane.webp";
 import inUsePlane2 from "@/assets/lifestyle-plane2.webp";
 import inUseCar2 from "@/assets/lifestyle-car2.webp";
 import inUsePlane3 from "@/assets/lifestyle-plane3.webp";
-import sleepMaskImg from "@/assets/sleep-mask.png";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchProducts, type ShopifyProduct, applyDiscountToCart } from "@/lib/shopify";
 import { toast } from "sonner";
@@ -86,8 +85,6 @@ const Product = () => {
   const [selectedQty, setSelectedQty] = useState<number | null>(initialQty);
   const [selectedBundleKey, setSelectedBundleKey] = useState<BundleSelectionSummary["key"] | null>(null);
   const [bundleSummary, setBundleSummary] = useState<BundleSelectionSummary | null>(null);
-  const [selectedKits, setSelectedKits] = useState(0);
-  const SLEEP_KIT_MAX = 5;
   const bundlesRef = useRef<SleepBundlesHandle>(null);
   const [selectedColor, setSelectedColor] = useState(initialColor);
   const [galleryOffset, setGalleryOffset] = useState(0);
@@ -244,8 +241,6 @@ const Product = () => {
   }, []);
 
   const hasSelection = selectedQty !== null || (selectedBundleKey !== null && bundleSummary !== null);
-  const kitPrice = prices.sleepKit;
-  const kitTotal = selectedKits * kitPrice;
 
   const handleUnifiedAdd = async () => {
     if (selectedQty) {
@@ -262,10 +257,8 @@ const Product = () => {
       : t("product.addToCart");
 
   const ctaPrice = selectedQty
-    ? bundlePrices[selectedQty] + kitTotal
-    : bundleSummary?.price !== undefined
-      ? bundleSummary.price + kitTotal
-      : null;
+    ? bundlePrices[selectedQty]
+    : bundleSummary?.price ?? null;
 
   if (loading) {
     return (
@@ -533,60 +526,6 @@ const Product = () => {
               onSelectBundle={handleSelectBundle}
               onSelectionChange={handleBundleSummary}
             />
-
-            {/* Sleep Kit add-on */}
-            <div className="rounded-xl border-2 border-dashed border-gold/40 bg-gold/5 p-4 space-y-3">
-              <div className="flex items-start gap-2">
-                <span className="text-gold text-lg leading-none">✨</span>
-                <div className="flex-1">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-gold">
-                    {t("product.sleepKit.title")}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {t("product.sleepKit.subtitle")} ({formatPrice(kitPrice)} {t("product.sleepKit.each")})
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 bg-card rounded-lg p-3 border border-border">
-                <div className="w-16 h-16 rounded-md bg-muted/40 flex items-center justify-center overflow-hidden flex-shrink-0">
-                  <img src={sleepMaskImg} alt="Sleep Kit" className="w-full h-full object-contain" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-foreground text-sm">{t("product.sleepKit.name")}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {selectedKits > 0
-                      ? `+ ${formatPrice(kitTotal)}`
-                      : formatPrice(kitPrice)}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 border border-border rounded-full bg-background">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedKits((n) => Math.max(0, n - 1))}
-                    disabled={selectedKits === 0}
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-foreground disabled:opacity-30 hover:bg-muted transition-colors"
-                    aria-label="Decrease"
-                  >
-                    −
-                  </button>
-                  <span className="text-sm font-bold w-5 text-center font-numeric-safe">{selectedKits}</span>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedKits((n) => Math.min(SLEEP_KIT_MAX, n + 1))}
-                    disabled={selectedKits >= SLEEP_KIT_MAX}
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-foreground disabled:opacity-30 hover:bg-muted transition-colors"
-                    aria-label="Increase"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-              {selectedKits >= SLEEP_KIT_MAX && (
-                <p className="text-xs font-semibold text-gold text-center">
-                  ⭐ {t("product.sleepKit.maxReached")}
-                </p>
-              )}
-            </div>
 
             {/* Price summary — only when a selection is active */}
             {hasSelection && ctaPrice !== null && (
