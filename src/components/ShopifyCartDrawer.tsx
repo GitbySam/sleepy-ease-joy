@@ -321,7 +321,7 @@ export const ShopifyCartDrawer = () => {
             <>
               <div className="flex-1 overflow-y-auto pr-2 min-h-0">
                 <div className="space-y-4">
-                  {items.map((item) => (
+                  {displayItems.map((item) => (
                     <div key={`${item.variantId}__${item.bundleLabel || 'single'}`} className="flex gap-4 p-3 bg-muted/30 rounded-xl border border-border">
                       {(() => {
                         const colorOption = item.selectedOptions.find(o => o.name?.toLowerCase() === "color")?.value;
@@ -430,8 +430,8 @@ export const ShopifyCartDrawer = () => {
                       <div className="flex items-center gap-1 border border-border rounded-full bg-background">
                         <button
                           type="button"
-                          onClick={() => setSleepKits((n) => Math.max(0, n - 1))}
-                          disabled={sleepKits === 0}
+                          onClick={handleKitDecrease}
+                          disabled={sleepKits === 0 || isLoading}
                           className="w-7 h-7 rounded-full flex items-center justify-center text-foreground disabled:opacity-30 hover:bg-muted transition-colors"
                           aria-label="Decrease Sleep Kit"
                         >
@@ -440,8 +440,8 @@ export const ShopifyCartDrawer = () => {
                         <span className="font-numeric-safe text-sm font-bold w-5 text-center tracking-normal">{sleepKits}</span>
                         <button
                           type="button"
-                          onClick={() => setSleepKits((n) => Math.min(SLEEP_KIT_MAX, n + 1))}
-                          disabled={sleepKits >= SLEEP_KIT_MAX}
+                          onClick={handleKitIncrease}
+                          disabled={sleepKits >= SLEEP_KIT_MAX || isLoading || !sleepKitVariant}
                           className="w-7 h-7 rounded-full flex items-center justify-center text-foreground disabled:opacity-30 hover:bg-muted transition-colors"
                           aria-label="Increase Sleep Kit"
                         >
