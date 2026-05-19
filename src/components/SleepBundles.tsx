@@ -205,7 +205,7 @@ const SleepBundles = forwardRef<SleepBundlesHandle, SleepBundlesProps>(({
             return (
               <button
                 key={key}
-                onClick={() => setSelectedBundle((prev) => (prev === key ? null : key))}
+                onClick={() => setSelectedBundle(selectedBundle === key ? null : key)}
                 className={`w-full rounded-xl p-4 border-2 transition-all text-left relative ${
                   isSelected
                     ? "border-gold bg-gold/5 shadow-md"
