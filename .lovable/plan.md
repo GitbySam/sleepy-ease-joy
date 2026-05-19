@@ -1,19 +1,14 @@
-## Problème
+## Changements sur SleepBundles
 
-L'affichage des chiffres dans la landing page a été corrigé en ajoutant `data-clarity-unmask="true"` sur le wrapper `<div>` de `src/pages/Index.tsx`. Mais le panier (`ShopifyCartDrawer`) est rendu via un **portal Radix Sheet**, donc il sort du DOM de Index.tsx et l'attribut Clarity ne s'y applique pas. Résultat : Clarity continue de masquer les chiffres (prix, quantités, total) dans les enregistrements du panier.
+**Objectif** : aucun bundle pré-sélectionné, et clic sur un bundle déjà sélectionné = désélection.
 
-La classe `font-numeric-safe` est déjà appliquée sur les prix du panier — le rendu est OK pour les vrais utilisateurs, c'est uniquement Clarity (et donc tes screenshots de session) qui voit des blocs/tirets à la place des chiffres.
+### Modifications dans `src/components/SleepBundles.tsx`
 
-## Correctif
+1. **État initial** : `selectedBundle` passe de `"family"` à `null` (type `string | null`).
+2. **Toggle** : au clic sur une carte, si `selectedBundle === bundle.id` → repasser à `null`, sinon sélectionner ce bundle.
+3. **CTA "Add to Cart"** :
+   - Désactivé tant que `selectedBundle === null`.
+   - Libellé adapté quand rien n'est sélectionné (ex. "Choisis un pack" / "Select a bundle", via les traductions existantes ou texte neutre).
+4. **Visuel** : la bordure dorée / glow / checkmark ne s'affichent que si un bundle est réellement sélectionné (aucun état "famille" par défaut au chargement).
 
-Ajouter `data-clarity-unmask="true"` sur le contenu portalé du panier :
-
-1. **`src/components/ShopifyCartDrawer.tsx`** — ajouter `data-clarity-unmask="true"` sur `<SheetContent>` (panier principal utilisé sur landing + page produit).
-2. **`src/components/CartDrawer.tsx`** — ajouter `data-clarity-unmask="true"` sur le `motion.div` du drawer (panier legacy, par sécurité au cas où il est encore monté quelque part).
-3. **`src/components/UpsellPopup.tsx`** (si présent en portal) — vérifier et appliquer le même attribut sur son conteneur racine pour que les prix d'upsell soient aussi visibles dans Clarity.
-
-Aucune modification de logique, de prix ou de style — uniquement l'attribut d'unmask Clarity.
-
-## Vérification
-
-Après publication, contrôler dans un nouvel enregistrement Clarity que les chiffres du panier (prix unitaire, quantité, total) sont lisibles au lieu d'être masqués.
+Aucun changement de logique métier, de prix ou d'intégration Shopify.
