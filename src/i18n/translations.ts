@@ -368,6 +368,52 @@ export const translations = {
   "product.tag.duo": { en: "DUO PACK", fr: "PACK DUO", es: "PACK DÚO" },
   "product.tag.family": { en: "FAMILY PACK", fr: "PACK FAMILLE", es: "PACK FAMILIA" },
 
+  // Sleep Bundles section
+  "bundles.eyebrow": { en: "Premium Sleep Kits", fr: "Kits Sommeil Premium", es: "Kits de Sueño Premium" },
+  "bundles.title": {
+    en: "Sleep&zy Sleep Bundles",
+    fr: "Sleep&zy Sleep Bundles",
+    es: "Sleep&zy Sleep Bundles",
+  },
+  "bundles.subtitle": {
+    en: "The full ritual: pillow, silk mask and pressure-sensitive earplugs. Disappear in transit, arrive restored.",
+    fr: "Le rituel complet : oreiller, masque en soie et bouchons d'oreilles sensibles à la pression. Disparaissez en transit, arrivez reposé.",
+    es: "El ritual completo: almohada, antifaz de seda y tapones sensibles a la presión. Desaparece en tránsito, llega descansado.",
+  },
+  "bundles.tag.solo": { en: "SOLO BUNDLE", fr: "BUNDLE SOLO", es: "BUNDLE SOLO" },
+  "bundles.tag.duo": { en: "DUO BUNDLE", fr: "BUNDLE DUO", es: "BUNDLE DÚO" },
+  "bundles.tag.family": { en: "BEST VALUE", fr: "MEILLEURE OFFRE", es: "MEJOR OFERTA" },
+  "bundles.solo.name": { en: "Solo Sleep Bundle", fr: "Solo Sleep Bundle", es: "Solo Sleep Bundle" },
+  "bundles.duo.name": { en: "Duo Sleep Bundle", fr: "Duo Sleep Bundle", es: "Duo Sleep Bundle" },
+  "bundles.family.name": { en: "Family Sleep Bundle", fr: "Family Sleep Bundle", es: "Family Sleep Bundle" },
+  "bundles.solo.tagline": {
+    en: "For the solo traveler who refuses to compromise.",
+    fr: "Pour le voyageur solo qui refuse de transiger.",
+    es: "Para el viajero solo que no acepta compromisos.",
+  },
+  "bundles.duo.tagline": {
+    en: "Two complete kits — for couples and frequent flyers.",
+    fr: "Deux kits complets — pour les couples et grands voyageurs.",
+    es: "Dos kits completos — para parejas y viajeros frecuentes.",
+  },
+  "bundles.family.tagline": {
+    en: "Three rituals. The best value in our range.",
+    fr: "Trois rituels. La meilleure offre de notre gamme.",
+    es: "Tres rituales. La mejor oferta de nuestra gama.",
+  },
+  "bundles.item.pillow": {
+    en: "Sleep&zy ergonomic travel pillow",
+    fr: "Oreiller de voyage ergonomique Sleep&zy",
+    es: "Almohada de viaje ergonómica Sleep&zy",
+  },
+  "bundles.item.mask": { en: "Silk sleep mask", fr: "Masque de sommeil en soie", es: "Antifaz de seda" },
+  "bundles.item.earplugs": {
+    en: "Pressure-sensitive earplug set",
+    fr: "Bouchons d'oreilles sensibles à la pression",
+    es: "Tapones sensibles a la presión",
+  },
+  "bundles.item.pouch": { en: "Cotton storage pouch", fr: "Pochette de rangement en coton", es: "Bolsa de algodón" },
+
   // Product Benefits section
   "product.benefits.eyebrow": { en: "Designed to actually sleep", fr: "Conçu pour vraiment dormir", es: "Diseñado para dormir de verdad" },
   "product.benefits.title": {
