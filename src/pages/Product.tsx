@@ -534,6 +534,60 @@ const Product = () => {
               onSelectionChange={handleBundleSummary}
             />
 
+            {/* Sleep Kit add-on */}
+            <div className="rounded-xl border-2 border-dashed border-gold/40 bg-gold/5 p-4 space-y-3">
+              <div className="flex items-start gap-2">
+                <span className="text-gold text-lg leading-none">✨</span>
+                <div className="flex-1">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-gold">
+                    {t("product.sleepKit.title")}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {t("product.sleepKit.subtitle")} ({formatPrice(kitPrice)} {t("product.sleepKit.each")})
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 bg-card rounded-lg p-3 border border-border">
+                <div className="w-16 h-16 rounded-md bg-muted/40 flex items-center justify-center overflow-hidden flex-shrink-0">
+                  <img src={sleepMaskImg} alt="Sleep Kit" className="w-full h-full object-contain" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-foreground text-sm">{t("product.sleepKit.name")}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {selectedKits > 0
+                      ? `+ ${formatPrice(kitTotal)}`
+                      : formatPrice(kitPrice)}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 border border-border rounded-full bg-background">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedKits((n) => Math.max(0, n - 1))}
+                    disabled={selectedKits === 0}
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-foreground disabled:opacity-30 hover:bg-muted transition-colors"
+                    aria-label="Decrease"
+                  >
+                    −
+                  </button>
+                  <span className="text-sm font-bold w-5 text-center font-numeric-safe">{selectedKits}</span>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedKits((n) => Math.min(SLEEP_KIT_MAX, n + 1))}
+                    disabled={selectedKits >= SLEEP_KIT_MAX}
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-foreground disabled:opacity-30 hover:bg-muted transition-colors"
+                    aria-label="Increase"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              {selectedKits >= SLEEP_KIT_MAX && (
+                <p className="text-xs font-semibold text-gold text-center">
+                  ⭐ {t("product.sleepKit.maxReached")}
+                </p>
+              )}
+            </div>
+
             {/* Price summary — only when a selection is active */}
             {hasSelection && ctaPrice !== null && (
               <div className="flex items-center gap-3 bg-muted/30 rounded-lg px-4 py-3">
