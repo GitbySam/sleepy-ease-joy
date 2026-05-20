@@ -498,6 +498,9 @@ export const ShopifyCartDrawer = () => {
                   <p className="font-numeric-safe flex items-center justify-center gap-1 text-xs text-muted-foreground tracking-normal">
                     <Lock className="w-3 h-3" /> {t("product.sslEncryption")}
                   </p>
+                  <p className="text-[11px] text-muted-foreground text-center leading-snug px-2">
+                    {t("product.shopifyRedirect")}
+                  </p>
                 </div>
               </div>
             </>
