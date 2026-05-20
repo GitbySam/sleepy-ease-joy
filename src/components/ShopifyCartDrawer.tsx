@@ -275,7 +275,7 @@ export const ShopifyCartDrawer = () => {
       </SheetTrigger>
       <SheetContent data-clarity-unmask="true" className="w-full sm:max-w-lg flex flex-col h-full p-0 bg-cream">
         <SheetHeader className="flex-shrink-0 px-5 pt-5 pb-3 border-b border-border/60">
-          <SheetTitle className="font-serif-display text-2xl text-foreground">
+          <SheetTitle className="text-2xl text-foreground">
             {t("cart.title")} <span className="font-numeric-safe text-foreground/80">({totalItems})</span>
           </SheetTitle>
           <SheetDescription className="sr-only">
@@ -311,7 +311,7 @@ export const ShopifyCartDrawer = () => {
                         );
                       })()}
                       <div className="flex-1 min-w-0 pr-6">
-                        <h4 className="font-serif-display text-[15px] leading-tight text-foreground truncate">
+                        <h4 className="text-[15px] leading-tight text-foreground truncate">
                           {item.product.node.title}
                         </h4>
                         <p className="text-xs text-muted-foreground mt-0.5 truncate">
@@ -355,7 +355,7 @@ export const ShopifyCartDrawer = () => {
                         >
                           <X className="h-4 w-4" />
                         </button>
-                        <p className="font-serif-display text-base text-foreground tracking-normal">
+                        <p className="text-base text-foreground tracking-normal">
                           {formatPrice(item.bundlePrice ? item.bundlePrice : parseFloat(item.price.amount) * item.quantity)}
                         </p>
                       </div>
@@ -377,7 +377,7 @@ export const ShopifyCartDrawer = () => {
                         <img src={sleepMaskImg} alt="Sleep Kit" className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-serif-display text-[15px] leading-tight text-foreground truncate">
+                        <p className="text-[15px] leading-tight text-foreground truncate">
                           {t("product.sleepKit.name")}
                         </p>
                         <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
@@ -405,7 +405,7 @@ export const ShopifyCartDrawer = () => {
                           </button>
                         </div>
                       </div>
-                      <p className="font-serif-display text-base text-foreground self-end">
+                      <p className="text-base text-foreground self-end">
                         {sleepKits > 0 ? formatPrice(kitTotal) : formatPrice(kitPrice)}
                       </p>
                     </div>
@@ -415,8 +415,8 @@ export const ShopifyCartDrawer = () => {
 
               <div className="flex-shrink-0 px-5 pt-4 pb-5 border-t border-border/60 bg-cream space-y-3">
                 <div className="flex justify-between items-baseline">
-                  <span className="font-serif-display text-2xl text-foreground">{t("cart.total")}</span>
-                  <span className="font-serif-display text-2xl text-foreground tracking-normal">
+                  <span className="text-2xl text-foreground">{t("cart.total")}</span>
+                  <span className="text-2xl text-foreground tracking-normal">
                     {formatPrice(totalPrice)}
                   </span>
                 </div>
