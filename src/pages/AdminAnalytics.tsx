@@ -511,7 +511,7 @@ function CartEventsTab({ days }: { days: number }) {
 
     const { data, error } = await supabase
       .from('cart_events')
-      .select('created_at, bundle_label, quantity, source')
+      .select('created_at, bundle_label, quantity, source, user_agent, referrer')
       .gte('created_at', queryStart.toISOString())
       .order('created_at', { ascending: true });
 
@@ -547,7 +547,18 @@ function CartEventsTab({ days }: { days: number }) {
       return `${y}-${m}-${day}`;
     };
 
-    data.forEach((row: { created_at: string; bundle_label: string | null; quantity: number; source: string | null }) => {
+    // Exclude internal preview traffic (Lovable editor) and known bot UAs
+    const BOT_UA_RE = /bot|crawl|spider|slurp|bingpreview|facebookexternalhit|headlesschrome|phantomjs|puppeteer|playwright|lighthouse|pingdom|gtmetrix|uptimerobot|ahrefs|semrush|petalbot/i;
+    const isInternalOrBot = (row: { user_agent?: string | null; referrer?: string | null }) => {
+      const ref = (row.referrer || '').toLowerCase();
+      if (ref.includes('lovable.dev') || ref.includes('lovable.app')) return true;
+      const ua = row.user_agent || '';
+      if (BOT_UA_RE.test(ua)) return true;
+      return false;
+    };
+
+    data.forEach((row: { created_at: string; bundle_label: string | null; quantity: number; source: string | null; user_agent: string | null; referrer: string | null }) => {
+      if (isInternalOrBot(row)) return;
       const createdAt = new Date(row.created_at);
       const localDay = localDayKey(createdAt);
       dayLocalMap[localDay] = (dayLocalMap[localDay] || 0) + 1;
