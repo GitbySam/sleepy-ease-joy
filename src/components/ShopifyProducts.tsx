@@ -143,7 +143,15 @@ const ShopifyProducts = () => {
 
   useEffect(() => {
     fetchProducts(20, undefined, country)
-      .then(setProducts)
+      .then((all) => {
+        // Landing page: keep ONLY the basic Sleep&zy pillow.
+        // Exclude any kit / bundle product.
+        const filtered = all.filter((p) => {
+          const t = `${p.node.title} ${p.node.handle}`.toLowerCase();
+          return !/(kit|bundle)/.test(t);
+        });
+        setProducts(filtered);
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [country]);
