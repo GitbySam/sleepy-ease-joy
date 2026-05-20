@@ -1359,6 +1359,8 @@ function SalesTab({ days }: { days: number }) {
       const json = await res.json().catch(() => ({} as ShopifyAnalyticsError));
       if (!res.ok) {
         setError(formatShopifyAnalyticsError(json, res.status));
+      } else if (!json || !(json as Partial<ShopifyResult>).summary) {
+        setError(formatShopifyAnalyticsError(json as ShopifyAnalyticsError));
       } else {
         setData(json as ShopifyResult);
       }

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Trash2, Loader2, ShieldCheck, Truck, RotateCcw, Lock, Star, CheckCircle, Minus, Plus } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
-import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
+import { fetchProducts, formatCheckoutUrl, type ShopifyProduct } from "@/lib/shopify";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useMarket } from "@/i18n/MarketContext";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
@@ -192,14 +192,7 @@ export const ShopifyCartDrawer = () => {
       } catch (e) {
         console.error('Failed to prepare checkout event', e);
       }
-      let finalUrl = checkoutUrl;
-      try {
-        const u = new URL(checkoutUrl);
-        if (u.hostname.endsWith('.myshopify.com')) {
-          u.hostname = 'checkout.sleepenzy.com';
-          finalUrl = u.toString();
-        }
-      } catch {}
+      const finalUrl = formatCheckoutUrl(checkoutUrl);
       if (popup && !popup.closed) {
         // Popup was successfully opened synchronously — just navigate it.
         try {
