@@ -394,9 +394,9 @@ export const translations = {
   "bundles.tag.solo": { en: "SOLO BUNDLE", fr: "BUNDLE SOLO", es: "BUNDLE SOLO" },
   "bundles.tag.duo": { en: "DUO BUNDLE", fr: "BUNDLE DUO", es: "BUNDLE DÚO" },
   "bundles.tag.family": { en: "BEST VALUE", fr: "MEILLEURE OFFRE", es: "MEJOR OFERTA" },
-  "bundles.solo.name": { en: "Solo Sleep Bundle", fr: "Solo Sleep Bundle", es: "Solo Sleep Bundle" },
-  "bundles.duo.name": { en: "Duo Sleep Bundle", fr: "Duo Sleep Bundle", es: "Duo Sleep Bundle" },
-  "bundles.family.name": { en: "Family Sleep Bundle", fr: "Family Sleep Bundle", es: "Family Sleep Bundle" },
+  "bundles.solo.name": { en: "Sleep&zy Solo Sleep Bundle", fr: "Sleep&zy Solo Sleep Bundle", es: "Sleep&zy Solo Sleep Bundle" },
+  "bundles.duo.name": { en: "Sleep&zy Duo Sleep Bundle", fr: "Sleep&zy Duo Sleep Bundle", es: "Sleep&zy Duo Sleep Bundle" },
+  "bundles.family.name": { en: "Sleep&zy Family Sleep Bundle", fr: "Sleep&zy Family Sleep Bundle", es: "Sleep&zy Family Sleep Bundle" },
   "bundles.solo.tagline": {
     en: "For the solo traveler who refuses to compromise.",
     fr: "Pour le voyageur solo qui refuse de transiger.",
