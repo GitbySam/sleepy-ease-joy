@@ -21,9 +21,9 @@ const MESSAGES: Record<string, { title: string; sub: string }> = {
 const CheckoutRedirectOverlay = () => {
   const isRedirecting = useCartStore((s) => s.isRedirecting);
   const setRedirecting = useCartStore((s) => s.setRedirecting);
-  const { language } = useLanguage() as { language?: string };
-  const lang = (language && MESSAGES[language]) ? language : "en";
-  const { title, sub } = MESSAGES[lang];
+  const { lang } = useLanguage();
+  const key = MESSAGES[lang] ? lang : "en";
+  const { title, sub } = MESSAGES[key];
 
   // Failsafe: auto-hide after 12s in case the user returns to the tab
   useEffect(() => {
