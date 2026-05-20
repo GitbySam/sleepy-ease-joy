@@ -293,7 +293,7 @@ const Product = () => {
             <div className="absolute top-3 left-3 z-10 bg-gold text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1">
               {t("product.winterSaleTag")}
             </div>
-            <div className="bg-gradient-to-br from-muted/50 to-background rounded-2xl p-8 flex items-center justify-center aspect-square border border-border overflow-hidden">
+            <div className="bg-gradient-to-br from-muted/50 to-background rounded-2xl p-8 flex items-center justify-center min-h-[350px] md:min-h-[450px] border border-border">
               <AnimatePresence mode="wait">
                 <motion.img
                   key={selectedColor}
@@ -304,7 +304,7 @@ const Product = () => {
                   src={COLOR_IMAGES[selectedColor] || pillowGrey}
                   alt={`Sleep&zy Cervical Pillow - ${selectedColor}`}
                   onClick={() => setLightboxSrc(COLOR_IMAGES[selectedColor] || pillowGrey)}
-                  className="w-full max-w-[78%] object-contain drop-shadow-xl animate-float cursor-zoom-in"
+                  className="w-full max-w-sm drop-shadow-xl animate-float cursor-zoom-in"
                 />
               </AnimatePresence>
             </div>
@@ -312,17 +312,17 @@ const Product = () => {
             {/* In-use photos carousel */}
             {(() => {
               const allPhotos = [inUse1, inUse2, inUse3, inUseCar, inUsePlane, inUsePlane2, inUseCar2, inUsePlane3];
-              const visibleCount = 4;
+              const visibleCount = 5;
               const maxOffset = allPhotos.length - visibleCount;
               return (
-                <div className="relative mt-3 group">
+                <div className="relative mt-4 group">
                   <div className="overflow-hidden rounded-xl">
                     <div
-                      className="flex gap-3 transition-transform duration-300 ease-in-out"
+                      className="flex gap-2 transition-transform duration-300 ease-in-out"
                       style={{ transform: `translateX(-${(galleryOffset / visibleCount) * 100}%)` }}
                     >
                       {allPhotos.map((src, i) => (
-                        <div key={i} className="shrink-0 rounded-xl overflow-hidden border border-border aspect-square" style={{ width: `calc((100% - ${(visibleCount - 1) * 12}px) / ${visibleCount})` }}>
+                        <div key={i} className="shrink-0 rounded-xl overflow-hidden border border-border aspect-square" style={{ width: `calc((100% - ${(visibleCount - 1) * 8}px) / ${visibleCount})` }}>
                           <img
                             src={src}
                             alt={`Sleep&zy in use ${i + 1}`}
@@ -359,13 +359,13 @@ const Product = () => {
             })()}
 
             {/* Sleep Kit bundle showcase */}
-            <div className="mt-3 relative rounded-2xl overflow-hidden border border-gold/30 bg-gradient-to-br from-cream/40 to-background shadow-lg group aspect-[4/3]">
+            <div className="mt-4 relative rounded-2xl overflow-hidden border border-gold/30 bg-gradient-to-br from-cream/40 to-background shadow-lg group">
               <img
                 src={sleepKitPremium}
                 alt="Sleep Kit — neck pillow, sleep mask & earplugs"
                 loading="lazy"
                 onClick={() => setLightboxSrc(sleepKitPremium)}
-                className="w-full h-full object-cover cursor-zoom-in transition-transform duration-500 group-hover:scale-[1.02]"
+                className="w-full h-auto object-cover cursor-zoom-in transition-transform duration-500 group-hover:scale-[1.02]"
               />
               <div className="absolute top-3 left-3 bg-gold text-primary-foreground text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded">
                 Sleep Kit
