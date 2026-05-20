@@ -273,7 +273,7 @@ export const ShopifyCartDrawer = () => {
           )}
         </button>
       </SheetTrigger>
-      <SheetContent data-clarity-unmask="true" className="w-full sm:max-w-lg flex flex-col h-full">
+      <SheetContent data-clarity-unmask="true" className="w-full sm:max-w-lg flex flex-col h-full p-4 sm:p-6">
         <SheetHeader className="flex-shrink-0">
           <SheetTitle className="font-serif-display">{t("cart.title")}</SheetTitle>
             <SheetDescription className="font-numeric-safe text-sm tracking-normal">
@@ -281,8 +281,8 @@ export const ShopifyCartDrawer = () => {
           </SheetDescription>
         </SheetHeader>
 
-        {/* Trust badges image */}
-        <div className="flex-shrink-0 pt-3">
+        {/* Trust badges image — hidden on mobile to keep cart items visible */}
+        <div className="flex-shrink-0 pt-3 hidden sm:block">
           <img src={cartTrustBadges} alt="Secure Payments · Free Shipping · 30 Days Satisfied or Refunded · Customer Service 7/7" className="w-full rounded-lg" />
         </div>
 
@@ -293,7 +293,7 @@ export const ShopifyCartDrawer = () => {
               <CheckCircle className="w-4 h-4 text-gold flex-shrink-0" />
               <span className="font-numeric-safe text-[13px] leading-snug font-semibold text-foreground tracking-normal">{t("cart.trustBanner")}</span>
             </div>
-            <div className="flex items-center justify-center gap-1.5 py-1">
+            <div className="hidden sm:flex items-center justify-center gap-1.5 py-1">
               {[...Array(5)].map((_, i) => (
                 <Star key={i} className="w-3.5 h-3.5 fill-gold text-gold" />
               ))}
@@ -451,9 +451,9 @@ export const ShopifyCartDrawer = () => {
                 )}
               </div>
 
-              <div className="flex-shrink-0 space-y-4 pt-4 border-t border-border bg-background">
-                {/* Rotating testimonial */}
-                <div className="text-center py-2 bg-muted/40 rounded-lg px-3">
+              <div className="flex-shrink-0 space-y-3 pt-3 border-t border-border bg-background">
+                {/* Rotating testimonial — hidden on mobile to save space */}
+                <div className="hidden sm:block text-center py-2 bg-muted/40 rounded-lg px-3">
                   <p className="text-xs italic text-muted-foreground transition-opacity duration-500">
                     {t(TESTIMONIAL_KEYS[testimonialIndex])}
                   </p>
@@ -475,7 +475,7 @@ export const ShopifyCartDrawer = () => {
                     </>
                   )}
                 </Button>
-                <div className="space-y-3 pt-2">
+                <div className="space-y-3 pt-2 hidden sm:block">
                   <div className="font-numeric-safe flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-muted-foreground tracking-normal">
                     <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5" /> {t("product.securePayment")}</span>
                     <span className="flex items-center gap-1"><Truck className="w-3.5 h-3.5" /> {t("product.freeShipping")}</span>
