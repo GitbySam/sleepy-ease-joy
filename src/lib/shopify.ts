@@ -217,8 +217,8 @@ function formatCheckoutUrl(checkoutUrl: string): string {
   try {
     const url = new URL(checkoutUrl);
     url.searchParams.set('channel', 'online_store');
-    if (url.hostname.endsWith('.myshopify.com')) {
-      url.hostname = 'sleepenzy.myshopify.com';
+    if (url.hostname.endsWith('.myshopify.com') || url.hostname === 'checkout.sleepenzy.com') {
+      url.hostname = 'kdpwn5-0h.myshopify.com';
     }
     return url.toString();
   } catch {
