@@ -375,24 +375,6 @@ const Product = () => {
                 <p className="text-white/80 text-xs mt-0.5">Pillow + Sleep mask + Earplugs</p>
               </div>
             </div>
-
-            {/* Mobile-only Sleep Kit divider — sits between standard packs and Sleep Kit bundles */}
-            <div className="md:hidden mt-6 relative rounded-2xl overflow-hidden border border-gold/30 bg-gradient-to-br from-cream/40 to-background shadow-lg">
-              <img
-                src={sleepKitPremium}
-                alt="Sleep Kit — neck pillow, sleep mask & earplugs"
-                loading="lazy"
-                onClick={() => setLightboxSrc(sleepKitPremium)}
-                className="w-full h-auto object-cover cursor-zoom-in"
-              />
-              <div className="absolute top-3 left-3 bg-gold text-primary-foreground text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded">
-                Sleep Kit
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-4">
-                <p className="text-white font-serif text-lg leading-tight">Complete your sleep experience</p>
-                <p className="text-white/80 text-xs mt-0.5">Pillow + Sleep mask + Earplugs</p>
-              </div>
-            </div>
           </motion.div>
 
 
@@ -552,6 +534,24 @@ const Product = () => {
                   </div>
                 </button>
               ))}
+            </div>
+
+            {/* Mobile-only Sleep Kit divider — between standard packs and Sleep Kit bundles */}
+            <div className="md:hidden relative rounded-2xl overflow-hidden border border-gold/30 bg-gradient-to-br from-cream/40 to-background shadow-lg">
+              <img
+                src={sleepKitPremium}
+                alt="Sleep Kit — neck pillow, sleep mask & earplugs"
+                loading="lazy"
+                onClick={() => setLightboxSrc(sleepKitPremium)}
+                className="w-full h-auto object-cover cursor-zoom-in"
+              />
+              <div className="absolute top-3 left-3 bg-gold text-primary-foreground text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded">
+                Sleep Kit
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-4">
+                <p className="text-white font-serif text-lg leading-tight">Complete your sleep experience</p>
+                <p className="text-white/80 text-xs mt-0.5">Pillow + Sleep mask + Earplugs</p>
+              </div>
             </div>
 
             {/* Sleep Bundles — shown right under the first offers */}
