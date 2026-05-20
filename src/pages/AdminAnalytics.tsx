@@ -892,7 +892,7 @@ function FunnelTab({ days }: { days: number }) {
     startOfToday.setHours(0, 0, 0, 0);
 
     const [cartRes, checkoutRes] = await Promise.all([
-      supabase.from('cart_events').select('created_at, visitor_id').gte('created_at', since.toISOString()),
+      supabase.from('cart_events').select('created_at, visitor_id, user_agent, referrer').gte('created_at', since.toISOString()),
       supabase.from('checkout_events').select('*').gte('created_at', since.toISOString()),
     ]);
 
@@ -903,10 +903,21 @@ function FunnelTab({ days }: { days: number }) {
       return;
     }
 
-    const cartData = cartRes.data || [];
+    // Filter out internal preview traffic (Lovable editor/preview) and
+    // known bot user-agents so admin counts reflect real visitors only.
+    const BOT_UA_RE = /bot|crawl|spider|slurp|bingpreview|facebookexternalhit|headlesschrome|phantomjs|puppeteer|playwright|lighthouse|pingdom|gtmetrix|uptimerobot|ahrefs|semrush|petalbot/i;
+    const isInternalOrBot = (row: { user_agent?: string | null; referrer?: string | null }) => {
+      const ref = (row.referrer || '').toLowerCase();
+      if (ref.includes('lovable.dev') || ref.includes('lovable.app')) return true;
+      const ua = row.user_agent || '';
+      if (BOT_UA_RE.test(ua)) return true;
+      return false;
+    };
+
+    const cartData = (cartRes.data || []).filter((r) => !isInternalOrBot(r));
     // Source of truth = every recorded checkout click. `displayed` is an
     // opportunistic desktop-only signal kept ONLY for latency stats below.
-    const checkoutData = checkoutRes.data || [];
+    const checkoutData = (checkoutRes.data || []).filter((r) => !isInternalOrBot(r));
 
     setCartCount(cartData.length);
     setCheckoutCount(checkoutData.length);
