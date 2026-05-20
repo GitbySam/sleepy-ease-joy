@@ -349,6 +349,11 @@ export const translations = {
     fr: "Paiement sécurisé avec chiffrement SSL",
     es: "Pago seguro con cifrado SSL",
   },
+  "product.shopifyRedirect": {
+    en: "You will be redirected to our secure checkout page powered by Shopify, the world leader in e-commerce.",
+    fr: "Vous serez redirigé vers notre page de paiement sécurisée propulsée par Shopify, leader mondial du e-commerce.",
+    es: "Serás redirigido a nuestra página de pago segura impulsada por Shopify, líder mundial del comercio electrónico.",
+  },
   "product.promoApplied": {
     en: "🎁 EXTRA 10% OFF APPLIED — Code SLEEPZY10",
     fr: "🎁 -10% SUPPLÉMENTAIRES APPLIQUÉS — Code SLEEPZY10",
