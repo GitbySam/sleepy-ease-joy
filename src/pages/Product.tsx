@@ -22,7 +22,7 @@ import inUsePlane from "@/assets/lifestyle-plane.webp";
 import inUsePlane2 from "@/assets/lifestyle-plane2.webp";
 import inUseCar2 from "@/assets/lifestyle-car2.webp";
 import inUsePlane3 from "@/assets/lifestyle-plane3.webp";
-import sleepKitPremium from "@/assets/sleep-kit-premium.jpg";
+import sleepKitPremium from "@/assets/sleep-kit-three-essentials.png";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchProducts, type ShopifyProduct, applyDiscountToCart } from "@/lib/shopify";
 import { toast } from "sonner";
