@@ -273,36 +273,17 @@ export const ShopifyCartDrawer = () => {
           )}
         </button>
       </SheetTrigger>
-      <SheetContent data-clarity-unmask="true" className="w-full sm:max-w-lg flex flex-col h-full p-4 sm:p-6">
-        <SheetHeader className="flex-shrink-0">
-          <SheetTitle className="font-serif-display">{t("cart.title")}</SheetTitle>
-            <SheetDescription className="font-numeric-safe text-sm tracking-normal">
+      <SheetContent data-clarity-unmask="true" className="w-full sm:max-w-lg flex flex-col h-full p-0 bg-cream">
+        <SheetHeader className="flex-shrink-0 px-5 pt-5 pb-3 border-b border-border/60">
+          <SheetTitle className="font-serif-display text-2xl text-foreground">
+            {t("cart.title")} <span className="font-numeric-safe text-foreground/80">({totalItems})</span>
+          </SheetTitle>
+          <SheetDescription className="sr-only">
             {totalItems === 0 ? t("cart.empty") : `${totalItems} ${t("cart.items")}`}
           </SheetDescription>
         </SheetHeader>
 
-        {/* Trust badges image — hidden on mobile to keep cart items visible */}
-        <div className="flex-shrink-0 pt-3 hidden sm:block">
-          <img src={cartTrustBadges} alt="Secure Payments · Free Shipping · 30 Days Satisfied or Refunded · Customer Service 7/7" className="w-full rounded-lg" />
-        </div>
-
-        {/* Trust banner + social proof */}
-        {items.length > 0 && (
-          <div className="flex-shrink-0 space-y-2 pt-2">
-            <div className="flex items-center gap-2 bg-gold/10 border border-gold/20 rounded-lg px-3 py-2">
-              <CheckCircle className="w-4 h-4 text-gold flex-shrink-0" />
-              <span className="font-numeric-safe text-[13px] leading-snug font-semibold text-foreground tracking-normal">{t("cart.trustBanner")}</span>
-            </div>
-            <div className="hidden sm:flex items-center justify-center gap-1.5 py-1">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-3.5 h-3.5 fill-gold text-gold" />
-              ))}
-              <span className="font-numeric-safe text-[13px] font-medium text-muted-foreground ml-1 tracking-normal">{t("cart.socialProof")}</span>
-            </div>
-          </div>
-        )}
-
-        <div className="flex flex-col flex-1 pt-4 min-h-0">
+        <div className="flex flex-col flex-1 min-h-0">
           {items.length === 0 ? (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
@@ -312,160 +293,143 @@ export const ShopifyCartDrawer = () => {
             </div>
           ) : (
             <>
-              <div className="flex-1 overflow-y-auto pr-2 min-h-0">
-                <div className="space-y-4">
+              <div className="flex-1 overflow-y-auto px-5 pt-4 pb-3 min-h-0">
+                <div className="space-y-3">
                   {displayItems.map((item) => (
-                    <div key={`${item.variantId}__${item.bundleLabel || 'single'}`} className="flex gap-4 p-3 bg-muted/30 rounded-xl border border-border">
+                    <div key={`${item.variantId}__${item.bundleLabel || 'single'}`} className="relative flex gap-3 p-3 bg-cream-light rounded-2xl">
                       {(() => {
                         const colorOption = item.selectedOptions.find(o => o.name?.toLowerCase() === "color")?.value;
                         const colorImage = colorOption ? COLOR_IMAGES[colorOption] : undefined;
                         const fallback = item.product.node.images?.edges?.[0]?.node?.url;
                         const imgSrc = colorImage || fallback;
                         return (
-                          <div className="w-16 h-16 bg-background rounded-md overflow-hidden flex-shrink-0 border border-border">
+                          <div className="w-20 h-20 bg-background rounded-xl overflow-hidden flex-shrink-0">
                             {imgSrc && (
                               <img src={imgSrc} alt={`${item.product.node.title}${colorOption ? ` - ${colorOption}` : ''}`} className="w-full h-full object-cover" />
                             )}
                           </div>
                         );
                       })()}
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-foreground truncate text-sm">{item.product.node.title}</h4>
-                        {item.bundleLabel && (
-                          <span className="inline-flex items-center gap-1.5 text-xs font-bold bg-gold/20 text-gold px-2 py-1 rounded-md mt-1">
-                            {item.bundleLabel}
-                            <span className="bg-gold text-primary-foreground px-1.5 py-0.5 rounded text-xs font-numeric-safe font-extrabold tracking-normal">
-                              ×{item.bundleUnitSize ? Math.round(item.quantity / item.bundleUnitSize) : item.quantity}
-                            </span>
-                          </span>
-                        )}
-                        {!item.bundleLabel && item.quantity > 1 && (
-                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground mt-1">
-                            Qty: <span className="font-numeric-safe font-bold text-foreground tracking-normal">{item.quantity}</span>
-                          </span>
-                        )}
-                        <p className="text-xs text-muted-foreground">{item.selectedOptions.map(o => o.value).join(' • ')}</p>
-                        <p className="text-xs text-muted-foreground">
-                          <span className="font-numeric-safe tracking-normal">+ {item.quantity}×</span> {t("cart.transportBag")}
+                      <div className="flex-1 min-w-0 pr-6">
+                        <h4 className="font-serif-display text-[15px] leading-tight text-foreground truncate">
+                          {item.product.node.title}
+                        </h4>
+                        <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                          {item.bundleLabel
+                            ? `${item.bundleLabel} · ${item.selectedOptions.map(o => o.value).join(' · ')}`
+                            : item.selectedOptions.map(o => o.value).join(' · ')}
                         </p>
-                        <p className="font-numeric-safe text-[15px] font-semibold text-foreground mt-1 tracking-normal">
-                          {formatPrice(item.bundlePrice ? item.bundlePrice : parseFloat(item.price.amount) * item.quantity)}
-                        </p>
-                      </div>
-                      <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                        <button onClick={() => removeItem(item.variantId, item.bundleLabel)} className="text-muted-foreground hover:text-destructive transition-colors">
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
                         {(() => {
                           const step = item.bundleUnitSize && item.bundleUnitSize > 0 ? item.bundleUnitSize : 1;
                           const packs = Math.max(1, Math.round(item.quantity / step));
                           const decrease = () => updateQuantity(item.variantId, Math.max(step, item.quantity - step), item.bundleLabel);
                           const increase = () => updateQuantity(item.variantId, item.quantity + step, item.bundleLabel);
                           return (
-                            <div className="flex items-center gap-1 border border-border rounded-md bg-background">
+                            <div className="mt-2 inline-flex items-center gap-3 bg-background rounded-full pl-2 pr-2 py-1 shadow-sm">
                               <button
                                 onClick={decrease}
                                 disabled={isLoading || packs <= 1}
                                 aria-label="Decrease quantity"
-                                className="p-1.5 hover:bg-muted transition-colors rounded-l-md disabled:opacity-40 disabled:cursor-not-allowed"
+                                className="w-6 h-6 flex items-center justify-center rounded-full text-foreground disabled:opacity-30"
                               >
-                                <Minus className="h-3 w-3" />
+                                <Minus className="h-3.5 w-3.5" />
                               </button>
-                              <span className="font-numeric-safe text-sm font-semibold w-5 text-center text-foreground tracking-normal">{packs}</span>
+                              <span className="font-numeric-safe text-sm font-semibold w-4 text-center text-foreground tracking-normal">{packs}</span>
                               <button
                                 onClick={increase}
                                 disabled={isLoading}
                                 aria-label="Increase quantity"
-                                className="p-1.5 hover:bg-muted transition-colors rounded-r-md disabled:opacity-40 disabled:cursor-not-allowed"
+                                className="w-6 h-6 flex items-center justify-center rounded-full text-foreground disabled:opacity-30"
                               >
-                                <Plus className="h-3 w-3" />
+                                <Plus className="h-3.5 w-3.5" />
                               </button>
                             </div>
                           );
                         })()}
                       </div>
+                      <div className="flex flex-col items-end justify-between flex-shrink-0">
+                        <button
+                          onClick={() => removeItem(item.variantId, item.bundleLabel)}
+                          aria-label="Remove item"
+                          className="text-muted-foreground/70 hover:text-destructive transition-colors -mr-1 -mt-1 p-1"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                        <p className="font-serif-display text-base text-foreground tracking-normal">
+                          {formatPrice(item.bundlePrice ? item.bundlePrice : parseFloat(item.price.amount) * item.quantity)}
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>
 
-                {/* Free shipping bar */}
-                <div className="mt-4 bg-gold/10 border border-gold/20 rounded-lg px-3 py-2 text-center">
-                  <div className="w-full bg-gold/20 rounded-full h-1.5 mb-1.5">
-                    <div className="bg-gold h-1.5 rounded-full w-full" />
-                  </div>
-                  <span className="text-xs font-bold text-gold">{t("cart.freeShippingQualified")}</span>
-                </div>
-
                 {/* Sleep Kit upsell — only when cart has Sleep&zy pack(s), not Sleep Bundle */}
                 {showSleepKit && (
-                  <div className="mt-4 rounded-xl border-2 border-dashed border-gold/40 bg-gold/5 p-3 space-y-3">
-                    <div className="flex items-start gap-2">
-                      <span className="text-gold text-base leading-none">✨</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[11px] font-bold uppercase tracking-wider text-gold">
-                          {t("product.sleepKit.title")}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {t("product.sleepKit.subtitle")} ({formatPrice(kitPrice)} {t("product.sleepKit.each")})
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 bg-card rounded-lg p-2.5 border border-border">
-                      <div className="w-14 h-14 rounded-md bg-muted/40 flex items-center justify-center overflow-hidden flex-shrink-0">
-                        <img src={sleepMaskImg} alt="Sleep Kit" className="w-full h-full object-contain" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-foreground text-sm truncate">{t("product.sleepKit.name")}</p>
-                        <p className="text-xs text-muted-foreground font-numeric-safe tracking-normal">
-                          {sleepKits > 0 ? `+ ${formatPrice(kitTotal)}` : formatPrice(kitPrice)}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1 border border-border rounded-full bg-background">
-                        <button
-                          type="button"
-                          onClick={handleKitDecrease}
-                          disabled={sleepKits === 0 || isLoading}
-                          className="w-7 h-7 rounded-full flex items-center justify-center text-foreground disabled:opacity-30 hover:bg-muted transition-colors"
-                          aria-label="Decrease Sleep Kit"
-                        >
-                          <Minus className="h-3 w-3" />
-                        </button>
-                        <span className="font-numeric-safe text-sm font-bold w-5 text-center tracking-normal">{sleepKits}</span>
-                        <button
-                          type="button"
-                          onClick={handleKitIncrease}
-                          disabled={sleepKits >= SLEEP_KIT_MAX || isLoading || !sleepKitVariant}
-                          className="w-7 h-7 rounded-full flex items-center justify-center text-foreground disabled:opacity-30 hover:bg-muted transition-colors"
-                          aria-label="Increase Sleep Kit"
-                        >
-                          <Plus className="h-3 w-3" />
-                        </button>
-                      </div>
-                    </div>
-                    {sleepKits >= SLEEP_KIT_MAX && (
-                      <p className="text-xs font-semibold text-gold text-center">
-                        ⭐ {t("product.sleepKit.maxReached")}
+                  <div className="mt-4 rounded-2xl border border-dashed border-gold/50 bg-gold/5 p-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-gold">✨</span>
+                      <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gold">
+                        {t("product.sleepKit.title")}
                       </p>
-                    )}
+                    </div>
+                    <div className="flex gap-3 items-center">
+                      <div className="w-20 h-20 rounded-xl bg-background overflow-hidden flex-shrink-0">
+                        <img src={sleepMaskImg} alt="Sleep Kit" className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-serif-display text-[15px] leading-tight text-foreground truncate">
+                          {t("product.sleepKit.name")}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                          {t("product.sleepKit.subtitle")}
+                        </p>
+                        <div className="mt-2 inline-flex items-center gap-3 bg-background rounded-full pl-2 pr-2 py-1 shadow-sm">
+                          <button
+                            type="button"
+                            onClick={handleKitDecrease}
+                            disabled={sleepKits === 0 || isLoading}
+                            className="w-6 h-6 flex items-center justify-center rounded-full text-foreground disabled:opacity-30"
+                            aria-label="Decrease Sleep Kit"
+                          >
+                            <Minus className="h-3.5 w-3.5" />
+                          </button>
+                          <span className="font-numeric-safe text-sm font-semibold w-4 text-center tracking-normal">{sleepKits}</span>
+                          <button
+                            type="button"
+                            onClick={handleKitIncrease}
+                            disabled={sleepKits >= SLEEP_KIT_MAX || isLoading || !sleepKitVariant}
+                            className="w-6 h-6 flex items-center justify-center rounded-full text-foreground disabled:opacity-30"
+                            aria-label="Increase Sleep Kit"
+                          >
+                            <Plus className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                      <p className="font-serif-display text-base text-foreground self-end">
+                        {sleepKits > 0 ? formatPrice(kitTotal) : formatPrice(kitPrice)}
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
 
-              <div className="flex-shrink-0 space-y-3 pt-3 border-t border-border bg-background">
-                {/* Rotating testimonial — hidden on mobile to save space */}
-                <div className="hidden sm:block text-center py-2 bg-muted/40 rounded-lg px-3">
-                  <p className="text-xs italic text-muted-foreground transition-opacity duration-500">
-                    {t(TESTIMONIAL_KEYS[testimonialIndex])}
-                  </p>
-                </div>
-
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold text-foreground">{t("cart.total")}</span>
-                  <span className="font-numeric-safe text-xl font-bold text-foreground tracking-normal">
+              <div className="flex-shrink-0 px-5 pt-4 pb-5 border-t border-border/60 bg-cream space-y-3">
+                <div className="flex justify-between items-baseline">
+                  <span className="font-serif-display text-2xl text-foreground">{t("cart.total")}</span>
+                  <span className="font-serif-display text-2xl text-foreground tracking-normal">
                     {formatPrice(totalPrice)}
                   </span>
                 </div>
-                <Button onClick={handleCheckout} className="w-full bg-gold hover:bg-gold/90 text-primary-foreground shadow-gold-glow" size="lg" disabled={items.length === 0 || isLoading || isSyncing}>
+                <p className="text-xs text-muted-foreground text-center">
+                  <Truck className="inline w-3.5 h-3.5 mr-1 -mt-0.5" />
+                  {t("cart.freeShippingQualified")}
+                </p>
+                <Button
+                  onClick={handleCheckout}
+                  className="w-full bg-dark hover:bg-dark/90 text-primary-foreground rounded-full h-12 text-base"
+                  size="lg"
+                  disabled={items.length === 0 || isLoading || isSyncing}
+                >
                   {isLoading || isSyncing ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
@@ -475,25 +439,24 @@ export const ShopifyCartDrawer = () => {
                     </>
                   )}
                 </Button>
-                <div className="space-y-3 pt-2 hidden sm:block">
-                  <div className="font-numeric-safe flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-muted-foreground tracking-normal">
-                    <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5" /> {t("product.securePayment")}</span>
-                    <span className="flex items-center gap-1"><Truck className="w-3.5 h-3.5" /> {t("product.freeShipping")}</span>
-                    <span className="flex items-center gap-1"><RotateCcw className="w-3.5 h-3.5" /> {t("product.guarantee90")}</span>
+
+                <div className="rounded-xl bg-background/70 border border-border/60 px-3 py-2 text-center">
+                  <p className="text-xs text-foreground/80">
+                    {t("product.shopifyRedirect")}
+                  </p>
+                  <div className="font-numeric-safe mt-1 flex items-center justify-center gap-3 text-[11px] text-muted-foreground tracking-normal">
+                    <span className="inline-flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-emerald-600" />SSL</span>
+                    <span className="inline-flex items-center gap-1"><CheckCircle className="w-3 h-3 text-emerald-600" />3D Secure</span>
+                    <span className="inline-flex items-center gap-1"><RotateCcw className="w-3 h-3 text-emerald-600" />{t("product.guarantee90")}</span>
                   </div>
-                  <div className="flex items-center justify-center gap-3">
+                </div>
+
+                <div className="flex items-center justify-center gap-2 flex-wrap">
                     <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#1A1F71"/><text x="24" y="20" textAnchor="middle" fill="#fff" fontSize="11" fontWeight="bold" fontFamily="Arial">VISA</text></svg>
                     <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#EB001B" opacity="0.15"/><circle cx="18" cy="16" r="10" fill="#EB001B"/><circle cx="30" cy="16" r="10" fill="#F79E1B"/><path d="M24 8.5a10 10 0 010 15 10 10 0 010-15z" fill="#FF5F00"/></svg>
                     <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#016FD0"/><text x="24" y="20" textAnchor="middle" fill="#fff" fontSize="8" fontWeight="bold" fontFamily="Arial">AMEX</text></svg>
                     <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#F5F5F5" stroke="#ddd" strokeWidth="0.5"/><text x="24" y="18" textAnchor="middle" fill="#3C4043" fontSize="7" fontWeight="bold" fontFamily="Arial">G Pay</text></svg>
                     <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#F5F5F5" stroke="#ddd" strokeWidth="0.5"/><text x="24" y="19" textAnchor="middle" fill="#003087" fontSize="7" fontWeight="bold" fontFamily="Arial">PayPal</text></svg>
-                  </div>
-                  <p className="font-numeric-safe flex items-center justify-center gap-1 text-xs text-muted-foreground tracking-normal">
-                    <Lock className="w-3 h-3" /> {t("product.sslEncryption")}
-                  </p>
-                  <p className="text-[11px] text-muted-foreground text-center leading-snug px-2">
-                    {t("product.shopifyRedirect")}
-                  </p>
                 </div>
               </div>
             </>
