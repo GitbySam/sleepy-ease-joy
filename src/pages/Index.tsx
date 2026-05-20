@@ -12,7 +12,6 @@ const ShopifyProducts = lazy(() => import("@/components/ShopifyProducts"));
 const Benefits = lazy(() => import("@/components/Benefits"));
 const Testimonials = lazy(() => import("@/components/Testimonials"));
 const CtaBridge = lazy(() => import("@/components/CtaBridge"));
-const BundleOffer = lazy(() => import("@/components/BundleOffer"));
 const FAQ = lazy(() => import("@/components/FAQ"));
 const Footer = lazy(() => import("@/components/Footer"));
 const SocialProofToasts = lazy(() => import("@/components/SocialProofToasts"));
@@ -41,9 +40,6 @@ const Index = () => (
       </Suspense>
       <Suspense fallback={<Placeholder />}>
         <Testimonials />
-      </Suspense>
-      <Suspense fallback={<Placeholder />}>
-        <BundleOffer />
       </Suspense>
       <Suspense fallback={<Placeholder height="600px" />}>
         <ComparisonSlider />
