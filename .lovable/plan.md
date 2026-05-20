@@ -1,83 +1,69 @@
-# Plan d'implémentation — Comportement page produit
+# Test Option D — Quantity Stepper sur /product
 
-## Décisions validées
-1. **Philosophie A** : sélection exclusive entre pack Sleep&zy et bundle Sleep Kit.
-2. **Un seul CTA global sticky** qui suit la sélection active.
-3. **Landing page (`/`) : retirer complètement les Sleep Kit Bundles**. On garde uniquement l'offre Sleep&zy de base (`BundleOffer`).
+## Objectif
+Remplacer le bloc actuel "3 cartes empilées" (1 Sleep&zy / 2 Sleep&zy / 3 Sleep&zy) par **une seule carte produit** avec un **stepper de quantité** qui mappe automatiquement vers le bon variant Shopify (Single / Duo / Family). Page produit uniquement, landing intacte.
 
----
+## Comportement cible
 
-## 1. Landing page (`src/pages/Index.tsx`)
+```text
+┌─────────────────────────────────────────┐
+│  [photo] Sleep&zy™ Travel Pillow        │
+│                                         │
+│  Quantity:                              │
+│  ┌────┬────┬────┐                       │
+│  │ 1  │ 2  │ 3  │   ← segmented buttons │
+│  └────┴────┴────┘                       │
+│  $29.95 │ $29.97 │ $21.65  ← prix/unité │
+│         │  -50%  │  -64%   ← badge      │
+│                                         │
+│  Total: $64.95                          │
+│  You save: $114.05 (vs $179.85)         │
+│                                         │
+│  [Selected badge selon qty: SOLO/DUO/FAMILY] │
+└─────────────────────────────────────────┘
+```
 
-- **Aucun changement** : `SleepBundles` n'y est pas monté actuellement → rien à retirer côté Index.
-- Vérification : confirmer qu'aucun autre composant de la home n'importe `SleepBundles`. Si oui, supprimer l'import et l'usage.
+- **Pré-sélection** : qty=3 par défaut (équivalent Family pack, AOV max), sauf si `?bundle=1|2|3` en URL.
+- **Click sur 1/2/3** → met à jour `selectedQty`, recalcule prix/unité, total, savings, et change le variant ciblé pour `addItem`.
+- **Cliquer à nouveau sur la qty active ne désélectionne pas** (différent du comportement actuel) — on garde toujours une qty active pour que le CTA soit toujours actif. C'est l'esprit du quantity stepper.
+- **Sleep Bundles (Sleep Kit)** : si l'utilisateur sélectionne un Sleep Kit, le quantity stepper passe en visuel "non actif" (opacité réduite, pas de badge "Selected"), comme aujourd'hui avec la sélection mutuellement exclusive.
 
----
+## Calculs affichés
 
-## 2. Page Produit (`src/pages/Product.tsx`)
+Pour chaque option du stepper :
+- Prix unitaire = `bundlePrices[qty] / qty` (arrondi 2 décimales)
+- Badge `-50%` / `-64%` (inchangé) à côté de la qty 2 et 3
+- Total = `bundlePrices[qty]` (logique existante préservée)
+- Savings = `bundleOldPrices[qty] - bundlePrices[qty]`
 
-### Architecture cible
-- **Lifting state up** : `Product.tsx` détient l'état de sélection global :
-  ```ts
-  type Selection =
-    | { kind: 'pack', packKey: 'single'|'duo'|'family', color: string }
-    | { kind: 'bundle', bundleKey: 'solo'|'duo'|'family' }
-    | null;
-  ```
-- Initial : `null` (rien de pré-sélectionné nulle part).
-- Sélectionner un pack Sleep&zy → **désélectionne** automatiquement le bundle.
-- Sélectionner un bundle → **désélectionne** automatiquement le pack Sleep&zy.
-- Recliquer sur l'élément actif → repasse à `null`.
-
-### Composants à adapter
-- **`ShopifyProducts`** (ou le sélecteur de pack utilisé sur `/product`) : passe en mode "contrôlé" via props `selectedPack` / `onSelectPack`. Plus de state local de sélection ni de CTA interne.
-- **`SleepBundles` (mode `compact`)** : passe en mode contrôlé via `selectedBundle` / `onSelectBundle`. Le CTA interne actuel est **retiré**.
-- **Nouveau CTA sticky global** (sur la page produit uniquement) :
-  - Position : sticky en bas sur mobile, encart fixe ou inline pour desktop.
-  - Désactivé tant que `selection === null` avec libellé "Choisissez un format ci-dessus".
-  - Actif : "🛒 Ajouter au panier — {nom du pack/bundle} · {prix}".
-  - Au clic : déclenche `addItem` (logique déjà présente dans `ShopifyProducts.handleAdd` / `SleepBundles.handleAdd`) puis ouverture du Cart Drawer après 500ms.
-
-### Logique d'ajout centralisée
-- Déplacer le `handleAdd` de `SleepBundles` (compact) et l'équivalent côté pack Sleep&zy dans une fonction unique `handleAddSelection(selection)` dans `Product.tsx`.
-- Conserve tracking Meta Pixel + funnelTracking + toast existants.
-
----
-
-## 3. Sticky Mobile CTA
-
-- Le `StickyMobileCTA` actuel n'existe que sur la landing (`Index.tsx`). Sur `/product`, on crée un sticky dédié piloté par la sélection (et non par scroll/inactivité). Pas de réutilisation pour éviter de casser le comportement de la home.
-
----
-
-## 4. Désélection et UX
-
-- Bordure gold + checkmark uniquement si l'élément est l'élément actif de `selection`.
-- Quand l'utilisateur change de catégorie (pack ↔ bundle), l'ancienne carte se désélectionne visuellement et la nouvelle s'allume — comportement instantané, sans animation lourde.
-- Toast et auto-ouverture du Cart Drawer : inchangés.
-
----
-
-## 5. Hors-scope (intentionnel)
-
-- Pas de cross-sell automatique dans le Cart Drawer dans ce ticket (peut être un suivi).
-- Pas de changement de prix, de variants Shopify ou de tracking.
-- `BundleOffer` sur la landing reste inchangé.
-
----
+## Sticky CTA (mobile + desktop)
+Inchangé dans sa structure. Label devient :
+- `🛒 Add to cart — {qty} Sleep&zy · {total}`
 
 ## Fichiers touchés
-- `src/pages/Product.tsx` — state de sélection global + CTA sticky + handler centralisé.
-- `src/components/SleepBundles.tsx` — mode compact contrôlé, suppression du CTA interne.
-- `src/components/ShopifyProducts.tsx` — sélecteur de pack contrôlé, suppression du CTA interne (sur `/product` uniquement, garder le comportement actuel sur la home si le composant y est utilisé — sinon ajouter une prop `controlled?: boolean`).
-- `src/pages/Index.tsx` — vérification, aucune modif a priori.
+- **`src/pages/Product.tsx`** :
+  - Supprimer le bloc `bundles.map((b) => …)` (lignes 486-537).
+  - Le remplacer par un nouveau composant inline `<QuantityStepper>` (3 boutons segmentés + prix unitaire + badge économie + savings line).
+  - Garder la logique `handleAddToCart`, `bundles`, `bundlePrices`, `bundleOldPrices`, `singleVariant/duoVariant/familyVariant` — déjà compatible.
+  - Ajuster `initialQty` → `bundleParam ?? 3` (au lieu de `null`) pour pré-sélection Family.
+  - Ajuster `handleSelectPack(qty)` → ne plus désélectionner sur reclick (`setSelectedQty(qty)` simple).
+  - `hasSelection` reste basé sur `selectedQty !== null || selectedBundleKey`.
+- **Aucun autre fichier touché** (SleepBundles, ShopifyProducts, cartStore, Shopify config : zéro changement).
 
----
+## Tracking
+- `trackFunnelStep('select_bundle', …)` continue à se déclencher à chaque changement de qty.
+- Meta Pixel `AddToCart` inchangé (utilise `selectedQty` final au click).
 
 ## Critères d'acceptation
-- À l'arrivée sur `/product` : aucun pack ni bundle sélectionné, CTA grisé.
-- Sélectionner un pack Sleep&zy : seule cette carte est en gold, CTA actif au bon prix.
-- Sélectionner ensuite un bundle : le pack se désélectionne, le bundle s'allume, CTA mis à jour.
-- Recliquer sur l'élément actif : tout se désélectionne, CTA grisé.
-- Ajout au panier : un seul item ajouté (jamais les deux), drawer s'ouvre.
-- Landing page (`/`) : aucun Sleep Kit Bundle visible.
+- À l'arrivée sur `/product` : qty=3 pré-sélectionné, total $64.95 affiché, CTA actif.
+- Cliquer sur "1" : prix unitaire $29.95, total $29.95, CTA "Add to cart — 1 Sleep&zy · $29.95".
+- Cliquer sur "2" : prix unitaire ~$29.97, total $59.95, badge -50%.
+- Cliquer sur "3" : prix unitaire ~$21.65, total $64.95, badge -64%, savings $114.90.
+- Sélectionner un Sleep Kit → stepper devient inactif visuellement, CTA suit le Sleep Kit.
+- Add to cart → ajoute le bon variant Shopify selon qty (Single/Duo/Family).
+- Landing `/` : aucun changement visible.
+
+## Hors-scope
+- Pas de A/B test technique (on bascule directement, on observe la conversion via funnel tracking).
+- Pas de traductions nouvelles à ajouter (les libellés "Quantity", "Total", "You save" peuvent passer par les keys existantes `product.yourPrice` ou être ajoutées si besoin — à voir au build).
+- Pas de modification des prix ni des variants Shopify.
