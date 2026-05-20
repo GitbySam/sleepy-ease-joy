@@ -80,7 +80,7 @@ const Product = () => {
   const promoCode = searchParams.get("promo") || null;
   const hasPromo = promoCode === "SLEEPZY10";
   const promoMultiplier = hasPromo ? 0.9 : 1;
-  const initialQty = bundleParam && [1, 2, 3].includes(bundleParam) ? bundleParam : null;
+  const initialQty = bundleParam && [1, 2, 3].includes(bundleParam) ? bundleParam : 3;
   const [product, setProduct] = useState<ShopifyProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedQty, setSelectedQty] = useState<number | null>(initialQty);
@@ -223,7 +223,7 @@ const Product = () => {
   };
 
   const handleSelectPack = (qty: number) => {
-    setSelectedQty(prev => (prev === qty ? null : qty));
+    setSelectedQty(qty);
     setSelectedBundleKey(null);
     trackFunnelStep('select_bundle', {
       step_value: bundles.find(b => b.qty === qty)?.tag || `pack-${qty}`,
