@@ -482,59 +482,77 @@ const Product = () => {
               </div>
             )}
 
-            {/* Bundle selection */}
-            <div className="space-y-3">
-              {bundles.map((b) => (
-                <button
-                  key={b.qty}
-                  onClick={() => handleSelectPack(b.qty)}
-                  className={`w-full rounded-xl p-4 border-2 transition-all text-left relative ${
-                    selectedQty === b.qty
-                      ? "border-gold bg-gold/5 shadow-md"
-                      : "border-border bg-card hover:border-gold/40"
-                  }`}
-                >
-                  {selectedQty === b.qty && (
-                    <span className="absolute -top-2.5 left-4 bg-gold text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded">
-                      ✓ {t("product.selected")}
-                    </span>
-                  )}
-                  {b.tag && (
-                    <span className={`absolute -top-2.5 right-4 ${b.tagColor} text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded`}>
-                      {b.tagLabel}
-                    </span>
-                  )}
+            {/* Quantity stepper — option D test */}
+            {(() => {
+              const stepperDimmed = selectedBundleKey !== null;
+              const activeQty = selectedQty ?? 0;
+              const activeBundle = activeQty ? bundles.find(b => b.qty === activeQty) : null;
+              const activeTotal = activeQty ? bundlePrices[activeQty] : 0;
+              const activeOld = activeQty ? bundleOldPrices[activeQty] : 0;
+              const activeSavings = activeOld - activeTotal;
+              return (
+                <div className={`rounded-2xl border-2 border-gold/40 bg-gradient-to-br from-gold/5 to-card p-4 md:p-5 space-y-4 transition-opacity ${stepperDimmed ? "opacity-50" : "opacity-100"}`}>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                        selectedQty === b.qty ? "border-gold bg-gold" : "border-muted-foreground/30"
-                      }`}>
-                        <AnimatePresence>
-                          {selectedQty === b.qty && (
-                            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
-                              <Check size={12} className="text-primary-foreground" />
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground text-sm flex items-center gap-2">
-                          {b.label}
-                          <span className="bg-gold/20 text-gold text-[10px] font-bold px-1.5 py-0.5 rounded">
-                            {b.discount}
-                          </span>
-                        </p>
-                        <p className="text-xs text-muted-foreground">{b.desc}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-foreground">{formatPrice(bundlePrices[b.qty])}</p>
-                      <p className="text-xs text-muted-foreground line-through">{formatPrice(bundleOldPrices[b.qty])}</p>
-                    </div>
+                    <p className="text-sm font-semibold text-foreground">{t("product.quantity")}</p>
+                    {activeBundle?.tag && !stepperDimmed && (
+                      <span className={`${activeBundle.tagColor} text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded`}>
+                        {activeBundle.tagLabel}
+                      </span>
+                    )}
                   </div>
-                </button>
-              ))}
-            </div>
+
+                  {/* Segmented quantity buttons */}
+                  <div className="grid grid-cols-3 gap-2">
+                    {bundles.map((b) => {
+                      const isActive = !stepperDimmed && selectedQty === b.qty;
+                      const unitPrice = bundlePrices[b.qty] / b.qty;
+                      return (
+                        <button
+                          key={b.qty}
+                          onClick={() => handleSelectPack(b.qty)}
+                          className={`relative rounded-xl py-3 px-2 border-2 transition-all text-center ${
+                            isActive
+                              ? "border-gold bg-gold text-primary-foreground shadow-md scale-[1.02]"
+                              : "border-border bg-card text-foreground hover:border-gold/50"
+                          }`}
+                        >
+                          {b.qty > 1 && (
+                            <span className={`absolute -top-2 left-1/2 -translate-x-1/2 text-[9px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap ${
+                              isActive ? "bg-destructive text-primary-foreground" : "bg-gold/20 text-gold"
+                            }`}>
+                              {b.discount}
+                            </span>
+                          )}
+                          <div className="text-2xl font-bold leading-none">{b.qty}</div>
+                          <div className={`text-[10px] mt-1 font-medium ${isActive ? "text-primary-foreground/90" : "text-muted-foreground"}`}>
+                            {formatPrice(unitPrice)}<span className="opacity-70"> {t("product.perPillow")}</span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Total + savings */}
+                  {activeQty > 0 && !stepperDimmed && (
+                    <div className="flex items-end justify-between pt-2 border-t border-border/60">
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wider">{t("product.total")}</p>
+                        <div className="flex items-baseline gap-2 mt-0.5">
+                          <span className="text-2xl font-bold text-foreground">{formatPrice(activeTotal)}</span>
+                          <span className="text-sm text-muted-foreground line-through">{formatPrice(activeOld)}</span>
+                        </div>
+                      </div>
+                      {activeSavings > 0 && (
+                        <div className="text-right">
+                          <p className="text-xs text-muted-foreground">{t("product.youSave")}</p>
+                          <p className="text-lg font-bold text-destructive">{formatPrice(activeSavings)} 🔥</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             {/* Mobile-only Sleep Kit divider — between standard packs and Sleep Kit bundles */}
             <div className="md:hidden relative rounded-2xl overflow-hidden border border-gold/30 bg-gradient-to-br from-cream/40 to-background shadow-lg">
