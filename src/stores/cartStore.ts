@@ -26,6 +26,8 @@ interface CartStore {
   isSyncing: boolean;
   isDrawerOpen: boolean;
   setDrawerOpen: (open: boolean) => void;
+  isRedirecting: boolean;
+  setRedirecting: (v: boolean) => void;
   addItem: (item: Omit<CartItemData, 'lineId'>, country?: CountryCode) => Promise<void>;
   updateQuantity: (variantId: string, quantity: number, bundleLabel?: string) => Promise<void>;
   removeItem: (variantId: string, bundleLabel?: string) => Promise<void>;
@@ -45,6 +47,8 @@ export const useCartStore = create<CartStore>()(
       isSyncing: false,
       isDrawerOpen: false,
       setDrawerOpen: (open) => set({ isDrawerOpen: open }),
+      isRedirecting: false,
+      setRedirecting: (v) => set({ isRedirecting: v }),
 
       addItem: async (item, country) => {
         const requestedCountry: CountryCode = country ?? 'CA';

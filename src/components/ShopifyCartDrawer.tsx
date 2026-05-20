@@ -28,7 +28,7 @@ const COLOR_IMAGES: Record<string, string> = {
 const TESTIMONIAL_KEYS = ["cart.testimonial1", "cart.testimonial2", "cart.testimonial3"] as const;
 
 export const ShopifyCartDrawer = () => {
-  const { items, isLoading, isSyncing, isDrawerOpen, setDrawerOpen, updateQuantity, removeItem, addItem, getCheckoutUrl, syncCart } = useCartStore();
+  const { items, isLoading, isSyncing, isDrawerOpen, setDrawerOpen, updateQuantity, removeItem, addItem, getCheckoutUrl, syncCart, setRedirecting } = useCartStore();
   const { t } = useLanguage();
   const { country, currency, formatPrice, prices } = useMarket();
 
@@ -193,6 +193,8 @@ export const ShopifyCartDrawer = () => {
         console.error('Failed to prepare checkout event', e);
       }
       const finalUrl = formatCheckoutUrl(checkoutUrl);
+      // Show fullscreen redirect overlay so the user knows something is happening
+      setRedirecting(true);
       if (popup && !popup.closed) {
         // Popup was successfully opened synchronously — just navigate it.
         try {
