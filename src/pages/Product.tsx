@@ -582,28 +582,13 @@ const Product = () => {
               onSelectionChange={handleBundleSummary}
             />
 
-            {/* Price summary — only when a selection is active */}
-            {hasSelection && ctaPrice !== null && (
+            {/* Price summary — only for Sleep Kit bundles (quantity stepper already shows total) */}
+            {hasSelection && ctaPrice !== null && selectedBundleKey && (
               <div className="flex items-center gap-3 bg-muted/30 rounded-lg px-4 py-3">
                 <span className="text-sm text-muted-foreground font-sans-body">{t("product.yourPrice")}</span>
                 <span className="text-2xl font-bold text-foreground">{formatPrice(ctaPrice)}</span>
-                {selectedQty && currentOldPrice !== null && (
-                  <>
-                    {hasPromo && (
-                      <span className="text-sm text-muted-foreground line-through">{formatPrice(ctaPrice / promoMultiplier)}</span>
-                    )}
-                    <span className="text-sm text-muted-foreground line-through">{formatPrice(currentOldPrice)}</span>
-                    {selectedBundle && (
-                      <span className="bg-gold text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">{selectedBundle.discount}</span>
-                    )}
-                  </>
-                )}
-                {selectedBundleKey && (
-                  <>
-                    <span className="text-sm text-muted-foreground line-through">{formatPrice(ctaPrice * 2)}</span>
-                    <span className="bg-gold text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">-50%</span>
-                  </>
-                )}
+                <span className="text-sm text-muted-foreground line-through">{formatPrice(ctaPrice * 2)}</span>
+                <span className="bg-gold text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">-50%</span>
                 {hasPromo && (
                   <span className="bg-destructive text-primary-foreground text-xs font-bold px-2 py-0.5 rounded">-10% EXTRA</span>
                 )}
