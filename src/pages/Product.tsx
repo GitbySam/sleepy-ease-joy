@@ -609,6 +609,9 @@ const Product = () => {
                 <ShieldCheck size={12} className="text-success" />
                 {t("product.sslEncryption")}
               </p>
+              <p className="text-[11px] text-muted-foreground text-center leading-snug">
+                {t("product.shopifyRedirect")}
+              </p>
             </div>
           </motion.div>
         </div>
