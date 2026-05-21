@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import testimonialMike from "@/assets/testimonial-mike.webp";
 import testimonialJames from "@/assets/testimonial-james.webp";
 import testimonialAlex from "@/assets/testimonial-alex.webp";
+import testimonialSophie from "@/assets/testimonial-sophie.webp";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -20,6 +21,7 @@ const Testimonials = () => {
     { name: "Mike D.", role: t("testimonial.4.role"), text: t("testimonial.4.text"), stars: 5, image: testimonialMike },
     { name: "Jessica B.", role: t("testimonial.5.role"), text: t("testimonial.5.text"), stars: 5 },
     { name: "Alex T.", role: t("testimonial.6.role"), text: t("testimonial.6.text"), stars: 5, image: testimonialAlex },
+    { name: "Sophie K.", role: t("testimonial.7.role"), text: t("testimonial.7.text"), stars: 5, image: testimonialSophie },
   ];
 
   const titleParts = t("testimonials.title").split(/<gold>|<\/gold>/);
