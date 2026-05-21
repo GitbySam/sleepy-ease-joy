@@ -23,6 +23,7 @@ import inUsePlane2 from "@/assets/lifestyle-plane2.webp";
 import inUseCar2 from "@/assets/lifestyle-car2.webp";
 import inUsePlane3 from "@/assets/lifestyle-plane3.webp";
 import sleepKitPremium from "@/assets/sleep-kit-three-essentials.png";
+import bundleThreeItemsHero from "@/assets/bundle-three-items-hero.jpg";
 import { useCartStore } from "@/stores/cartStore";
 import { fetchProducts, type ShopifyProduct, applyDiscountToCart } from "@/lib/shopify";
 import { toast } from "sonner";
@@ -554,24 +555,6 @@ const Product = () => {
               );
             })()}
 
-            {/* Mobile-only Sleep Kit divider — between standard packs and Sleep Kit bundles */}
-            <div className="md:hidden relative rounded-2xl overflow-hidden border border-gold/30 bg-gradient-to-br from-cream/40 to-background shadow-lg">
-              <img
-                src={sleepKitPremium}
-                alt="Sleep Kit — neck pillow, sleep mask & earplugs"
-                loading="lazy"
-                onClick={() => setLightboxSrc(sleepKitPremium)}
-                className="w-full h-auto object-cover cursor-zoom-in"
-              />
-              <div className="absolute top-3 left-3 bg-gold text-primary-foreground text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded">
-                Sleep Kit
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-4">
-                <p className="text-white font-serif text-lg leading-tight">Complete your sleep experience</p>
-                <p className="text-white/80 text-xs mt-0.5">Pillow + Sleep mask + Earplugs</p>
-              </div>
-            </div>
-
             {/* Elegant intro to the all-in-one bundles */}
             <div className="relative text-center px-2 pt-4 pb-1">
               <div className="flex items-center justify-center gap-3 mb-3">
@@ -587,6 +570,22 @@ const Product = () => {
               <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
                 {t("product.bundles.introSubtitle")}
               </p>
+            </div>
+
+            {/* Bundle visual — compact hero showing the 3 items, anchors the offer right before the cards */}
+            <div className="md:hidden relative rounded-2xl overflow-hidden border border-gold/20 bg-cream/30 aspect-[5/3]">
+              <img
+                src={bundleThreeItemsHero}
+                alt="Sleep Kit bundle — ergonomic neck pillow, contoured sleep mask, noise-isolating earplugs"
+                loading="lazy"
+                width={1280}
+                height={768}
+                onClick={() => setLightboxSrc(bundleThreeItemsHero)}
+                className="absolute inset-0 w-full h-full object-cover object-center cursor-zoom-in"
+              />
+              <div className="absolute top-3 left-3 bg-gold text-primary-foreground text-[10px] font-bold tracking-[0.18em] uppercase px-2.5 py-1 rounded shadow-sm">
+                The Kit
+              </div>
             </div>
 
             {/* Sleep Bundles — shown right under the first offers */}
