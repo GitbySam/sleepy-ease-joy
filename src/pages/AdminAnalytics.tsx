@@ -262,6 +262,40 @@ function CheckoutFunnelTab({ days }: { days: number }) {
         </button>
       </div>
 
+      {/* Ouverture checkout (popup nouvel onglet vs blocage) */}
+      <div>
+        <h3 className="text-sm font-semibold text-gray-700 mb-3">🪟 Ouverture du checkout</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <Card className="bg-white border-2 border-emerald-200">
+            <CardContent className="p-4">
+              <p className="text-xs text-gray-500 uppercase tracking-wide">Popup ouvert (nouvel onglet)</p>
+              <p className="text-3xl font-bold text-emerald-700 mt-1">{opened}</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {stepClicks > 0 ? `${((opened / stepClicks) * 100).toFixed(1)} % des clics` : '—'}
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="bg-white border-2 border-amber-200">
+            <CardContent className="p-4">
+              <p className="text-xs text-gray-500 uppercase tracking-wide">Popup bloqué (fallback même onglet)</p>
+              <p className="text-3xl font-bold text-amber-700 mt-1">{blocked}</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {stepClicks > 0 ? `${((blocked / stepClicks) * 100).toFixed(1)} % des clics` : '—'}
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="bg-white border-2 border-gray-200">
+            <CardContent className="p-4">
+              <p className="text-xs text-gray-500 uppercase tracking-wide">Taux de blocage</p>
+              <p className="text-3xl font-bold text-gray-900 mt-1">
+                {opened + blocked > 0 ? `${((blocked / (opened + blocked)) * 100).toFixed(1)} %` : '—'}
+              </p>
+              <p className="text-xs text-gray-400 mt-1">blocked / (opened + blocked)</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
       {/* 4 étapes */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Card className="bg-white">
