@@ -572,6 +572,23 @@ const Product = () => {
               </div>
             </div>
 
+            {/* Elegant intro to the all-in-one bundles */}
+            <div className="relative text-center px-2 pt-4 pb-1">
+              <div className="flex items-center justify-center gap-3 mb-3">
+                <span className="h-px w-10 bg-gradient-to-r from-transparent to-gold/60" />
+                <span className="text-[10px] font-bold tracking-[0.18em] uppercase text-gold">
+                  {t("product.bundles.introEyebrow")}
+                </span>
+                <span className="h-px w-10 bg-gradient-to-l from-transparent to-gold/60" />
+              </div>
+              <h3 className="font-serif text-xl md:text-2xl leading-snug text-foreground italic">
+                {t("product.bundles.introTitle")}
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+                {t("product.bundles.introSubtitle")}
+              </p>
+            </div>
+
             {/* Sleep Bundles — shown right under the first offers */}
             <SleepBundles
               ref={bundlesRef}
