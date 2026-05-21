@@ -22,6 +22,7 @@ import inUsePlane from "@/assets/lifestyle-plane.webp";
 import inUsePlane2 from "@/assets/lifestyle-plane2.webp";
 import inUseCar2 from "@/assets/lifestyle-car2.webp";
 import inUsePlane3 from "@/assets/lifestyle-plane3.webp";
+import inUsePlane4 from "@/assets/lifestyle-plane4.webp";
 import sleepKitPremium from "@/assets/sleep-kit-three-essentials.png";
 import bundleThreeItemsHero from "@/assets/bundle-three-items-hero.jpg";
 import { useCartStore } from "@/stores/cartStore";
