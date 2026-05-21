@@ -317,6 +317,9 @@ const Product = () => {
               const maxOffset = allPhotos.length - visibleCount;
               return (
                 <div className="relative mt-4 group">
+                  <p className="text-center text-xs sm:text-sm uppercase tracking-[0.2em] text-muted-foreground font-sans-body mb-3">
+                    {t("product.customersSpeak") || "Nos clients parlent pour nous"}
+                  </p>
                   <div className="overflow-hidden rounded-xl">
                     <div
                       className="flex gap-2 transition-transform duration-300 ease-in-out"
