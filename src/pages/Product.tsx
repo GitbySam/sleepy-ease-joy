@@ -572,15 +572,20 @@ const Product = () => {
               </p>
             </div>
 
-            {/* Bundle visual — compact, anchors the offer right before the cards */}
-            <div className="md:hidden relative rounded-2xl overflow-hidden border border-gold/20 bg-cream/30 aspect-[4/3]">
+            {/* Bundle visual — compact hero showing the 3 items, anchors the offer right before the cards */}
+            <div className="md:hidden relative rounded-2xl overflow-hidden border border-gold/20 bg-cream/30 aspect-[5/3]">
               <img
-                src={sleepKitPremium}
-                alt="Sleep Kit — neck pillow, sleep mask & earplugs"
+                src={bundleThreeItemsHero}
+                alt="Sleep Kit bundle — ergonomic neck pillow, contoured sleep mask, noise-isolating earplugs"
                 loading="lazy"
-                onClick={() => setLightboxSrc(sleepKitPremium)}
+                width={1280}
+                height={768}
+                onClick={() => setLightboxSrc(bundleThreeItemsHero)}
                 className="absolute inset-0 w-full h-full object-cover object-center cursor-zoom-in"
               />
+              <div className="absolute top-3 left-3 bg-gold text-primary-foreground text-[10px] font-bold tracking-[0.18em] uppercase px-2.5 py-1 rounded shadow-sm">
+                The Kit
+              </div>
             </div>
 
             {/* Sleep Bundles — shown right under the first offers */}
