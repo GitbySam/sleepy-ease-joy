@@ -1,15 +1,16 @@
-## Objectif
-Associer chaque pastille de couleur à la bonne image bundle dans le panier :
-- Grey → bundle gris
-- Black → bundle noir (nouvelle image générée)
-- Red → bundle rouge
+## Goal
+Remove every reference to "silk" (and its translations "soie" / "seda") from the site copy.
 
-## Statut
-- Image `src/assets/bundle-three-items-black.jpg` **déjà générée** (oreiller noir + accessoires sur fond beige, identique en composition au bundle gris)
+## Changes — `src/i18n/translations.ts`
 
-## Changements
-**`src/components/ShopifyCartDrawer.tsx`**
-- Importer `bundleBlackImg from "@/assets/bundle-three-items-black.jpg"`
-- Dans `BUNDLE_COLOR_IMAGES`, remplacer `black: bundleGreyImg` par `black: bundleBlackImg`
+1. **Line 409-411** (bundle description):
+   - EN: "The full ritual: pillow, **sleep** mask and pressure-sensitive earplugs..."
+   - FR: "Le rituel complet : oreiller, **masque de sommeil** et bouchons d'oreilles..."
+   - ES: "El ritual completo: almohada, **antifaz** y tapones..."
 
-Aucun autre fichier impacté — la logique de détection de couleur existante (`colorKey` en lowercase) gère déjà le mapping.
+2. **Line 439** (`bundles.item.mask`):
+   - EN: "Sleep mask"
+   - FR: "Masque de sommeil"
+   - ES: "Antifaz para dormir"
+
+No other files contain the term.
