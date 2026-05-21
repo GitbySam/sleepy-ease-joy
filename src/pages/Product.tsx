@@ -248,6 +248,7 @@ const Product = () => {
   const { t } = useLanguage();
   const { country, currency, prices, formatPrice } = useMarket();
   const clientReviews = country === "US" || country === "CA" ? CLIENT_REVIEWS_EN : CLIENT_REVIEWS_FR;
+  const reviewsHeading = country === "US" || country === "CA" ? "Our customers speak for us" : "Nos clients parlent pour nous";
 
   const addItem = useCartStore((s) => s.addItem);
   const isLoading = useCartStore((s) => s.isLoading);
