@@ -90,7 +90,6 @@ const Product = () => {
   const [bundleSummary, setBundleSummary] = useState<BundleSelectionSummary | null>(null);
   const bundlesRef = useRef<SleepBundlesHandle>(null);
   const [selectedColor, setSelectedColor] = useState(initialColor);
-  const [userPickedColor, setUserPickedColor] = useState(false);
   const [galleryOffset, setGalleryOffset] = useState(0);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const countdown = useCountdown(15);
@@ -139,18 +138,6 @@ const Product = () => {
 
   const colorOption = product?.node.options?.find(o => o.name === "Color");
   const availableColors = colorOption?.values || ["Grey"];
-
-  // Auto-cycle through colors until user manually picks one
-  useEffect(() => {
-    if (userPickedColor || availableColors.length <= 1) return;
-    const id = setInterval(() => {
-      setSelectedColor((current) => {
-        const idx = availableColors.indexOf(current);
-        return availableColors[(idx + 1) % availableColors.length];
-      });
-    }, 2200);
-    return () => clearInterval(id);
-  }, [userPickedColor, availableColors]);
 
   const variants = product?.node.variants.edges || [];
   const coloredVariants = variants.filter(v =>
@@ -446,24 +433,15 @@ const Product = () => {
             {/* Color selector */}
             {availableColors.length > 1 && (
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold text-foreground">
-                    {t("product.color")}: <span className="text-muted-foreground font-normal">{selectedColor}</span>
-                  </p>
-                  {!userPickedColor && (
-                    <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-sans-body">
-                      <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
-                      Aperçu live
-                    </span>
-                  )}
-                </div>
+                <p className="text-sm font-semibold text-foreground">
+                  {t("product.color")}: <span className="text-muted-foreground font-normal">{selectedColor}</span>
+                </p>
                 <div className="flex items-center gap-3">
                   {availableColors.map((color) => (
                     <button
                       key={color}
                       onClick={() => {
                         setSelectedColor(color);
-                        setUserPickedColor(true);
                         trackFunnelStep('select_color', { step_value: color });
                       }}
                       className={`relative w-9 h-9 rounded-full transition-all duration-200 ${
