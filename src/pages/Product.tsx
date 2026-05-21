@@ -407,6 +407,9 @@ const Product = () => {
               );
             })()}
 
+            {/* Client reviews — desktop & tablet only (mobile shown before benefits) */}
+            <ClientReviewsBlock className="hidden md:grid" />
+
           </motion.div>
 
 
@@ -685,6 +688,8 @@ const Product = () => {
         </div>
 
         <Suspense fallback={null}>
+          {/* Client reviews — mobile only, before benefits */}
+          <ClientReviewsBlock className="md:hidden px-4" />
           <ProductBenefits />
         </Suspense>
       </div>
