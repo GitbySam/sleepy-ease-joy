@@ -163,7 +163,7 @@ const SleepBundles = forwardRef<SleepBundlesHandle, SleepBundlesProps>(({
       if (!product) return;
       await handleAdd(selectedBundle, product);
     },
-  }), [selectedBundle, products, soloColor]);
+  }), [selectedBundle, products, soloColor, selectedColor]);
 
   // Notify parent of selection summary changes
   useEffect(() => {
