@@ -1,7 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Menu, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 const ShopifyCartDrawer = lazy(() => import("./ShopifyCartDrawer"));
 import { useLanguage } from "@/i18n/LanguageContext";
 import CountrySelector from "./CountrySelector";
