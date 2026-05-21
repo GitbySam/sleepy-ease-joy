@@ -20,6 +20,8 @@ export type FunnelStep =
   | 'add_to_cart'
   | 'open_cart'
   | 'click_checkout'
+  | 'checkout_opened'
+  | 'checkout_popup_blocked'
   | 'return_from_checkout';
 
 export type FrictionType =
