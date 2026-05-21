@@ -18,6 +18,7 @@ import pillowRed from "@/assets/product-pillow-red.webp";
 import sleepMaskImg from "@/assets/sleep-kit-bundle.jpg";
 import bundleGreyImg from "@/assets/bundle-three-items-hero.jpg";
 import bundleRedImg from "@/assets/bundle-three-items-red.jpg";
+import bundleBlackImg from "@/assets/bundle-three-items-black.jpg";
 
 const COLOR_IMAGES: Record<string, string> = {
   Grey: pillowGrey,
@@ -29,7 +30,7 @@ const COLOR_IMAGES: Record<string, string> = {
 const BUNDLE_COLOR_IMAGES: Record<string, string> = {
   grey: bundleGreyImg,
   gray: bundleGreyImg,
-  black: bundleGreyImg,
+  black: bundleBlackImg,
   red: bundleRedImg,
 };
 
