@@ -109,6 +109,8 @@ function CheckoutFunnelTab({ days }: { days: number }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [clicks, setClicks] = useState<number>(0);
+  const [opened, setOpened] = useState<number>(0);
+  const [blocked, setBlocked] = useState<number>(0);
   const [shopify, setShopify] = useState<ShopifyResult | null>(null);
 
   const fetchAll = useCallback(async () => {
@@ -117,8 +119,8 @@ function CheckoutFunnelTab({ days }: { days: number }) {
     try {
       const sinceISO = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
 
-      // Fetch Shopify analytics + funnel clicks in parallel
-      const [shopifyRes, clicksRes] = await Promise.all([
+      // Fetch Shopify analytics + funnel clicks/opens/blocks in parallel
+      const [shopifyRes, clicksRes, openedRes, blockedRes] = await Promise.all([
         fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/shopify-analytics?days=${days}`, {
           headers: {
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
@@ -133,6 +135,16 @@ function CheckoutFunnelTab({ days }: { days: number }) {
           .select('id', { count: 'exact', head: true })
           .eq('step', 'click_checkout')
           .gte('created_at', sinceISO),
+        supabase
+          .from('funnel_events')
+          .select('id', { count: 'exact', head: true })
+          .eq('step', 'checkout_opened')
+          .gte('created_at', sinceISO),
+        supabase
+          .from('funnel_events')
+          .select('id', { count: 'exact', head: true })
+          .eq('step', 'checkout_popup_blocked')
+          .gte('created_at', sinceISO),
       ]);
 
       if (shopifyRes.error) {
@@ -141,6 +153,8 @@ function CheckoutFunnelTab({ days }: { days: number }) {
         setShopify(shopifyRes as ShopifyResult);
       }
       setClicks(clicksRes.count ?? 0);
+      setOpened(openedRes.count ?? 0);
+      setBlocked(blockedRes.count ?? 0);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Erreur réseau');
     }
