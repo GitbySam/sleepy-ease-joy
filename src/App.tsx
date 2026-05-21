@@ -21,6 +21,26 @@ import CheckoutRedirectOverlay from "./components/CheckoutRedirectOverlay";
 
 const queryClient = new QueryClient();
 
+const ScrollToHash = () => {
+  const { hash, pathname } = useLocation();
+
+  useEffect(() => {
+    if (hash && pathname === "/") {
+      // Wait for DOM to settle after route change
+      const id = hash.replace("#", "");
+      const timer = setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [hash, pathname]);
+
+  return null;
+};
+
 const RouteTracker = () => {
   const location = useLocation();
   useEffect(() => {
@@ -45,6 +65,7 @@ const AppRoutes = () => {
           <CartSyncWrapper />
           <CheckoutRedirectOverlay />
           <BrowserRouter>
+            <ScrollToHash />
             <RouteTracker />
             <Routes>
               <Route path="/" element={<Index />} />
