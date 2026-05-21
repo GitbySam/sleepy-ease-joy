@@ -47,6 +47,7 @@ interface SleepBundlesProps {
   onSelectBundle?: (key: BundleKey | null) => void;
   hideCta?: boolean;
   onSelectionChange?: (summary: BundleSelectionSummary | null) => void;
+  selectedColor?: string;
 }
 
 const SleepBundles = forwardRef<SleepBundlesHandle, SleepBundlesProps>(({
@@ -55,6 +56,7 @@ const SleepBundles = forwardRef<SleepBundlesHandle, SleepBundlesProps>(({
   onSelectBundle,
   hideCta = false,
   onSelectionChange,
+  selectedColor,
 }, ref) => {
   const { t } = useLanguage();
   const { country, currency, formatPrice } = useMarket();
@@ -68,6 +70,8 @@ const SleepBundles = forwardRef<SleepBundlesHandle, SleepBundlesProps>(({
   });
   const [loading, setLoading] = useState(true);
   const [soloColor, setSoloColor] = useState<string>("GREY");
+  // External color (from product page) overrides the internal solo color picker
+  const effectiveColor = (selectedColor || soloColor || "GREY").toUpperCase();
   const [adding, setAdding] = useState<BundleKey | null>(null);
   const [internalSelected, setInternalSelected] = useState<BundleKey | null>(null);
   const isControlled = controlledSelected !== undefined;
@@ -104,12 +108,13 @@ const SleepBundles = forwardRef<SleepBundlesHandle, SleepBundlesProps>(({
       return;
     }
     let chosen = variants[0].node;
-    if (key === "solo") {
-      const match = variants.find((v) =>
-        v.node.selectedOptions?.some((o) => o.name === "Color" && o.value.toUpperCase() === soloColor)
-      );
-      if (match) chosen = match.node;
-    }
+    // Match color for all bundle types (solo, duo, family)
+    const colorMatch = variants.find((v) =>
+      v.node.selectedOptions?.some(
+        (o) => o.name === "Color" && o.value.toUpperCase() === effectiveColor
+      )
+    );
+    if (colorMatch) chosen = colorMatch.node;
 
     setAdding(key);
     try {
