@@ -90,6 +90,7 @@ const Product = () => {
   const [bundleSummary, setBundleSummary] = useState<BundleSelectionSummary | null>(null);
   const bundlesRef = useRef<SleepBundlesHandle>(null);
   const [selectedColor, setSelectedColor] = useState(initialColor);
+  const [userPickedColor, setUserPickedColor] = useState(false);
   const [galleryOffset, setGalleryOffset] = useState(0);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const countdown = useCountdown(15);
