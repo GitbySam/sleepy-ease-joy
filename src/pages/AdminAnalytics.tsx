@@ -443,6 +443,7 @@ function CheckoutFunnelTab({ days }: { days: number }) {
         <p className="font-semibold mb-1 text-gray-700">📐 Méthodologie</p>
         <ul className="space-y-1 list-disc pl-5">
           <li><strong>Clics checkout</strong> = événements <code className="bg-white px-1 rounded">funnel_events.step = 'click_checkout'</code> sur le site.</li>
+          <li><strong>Popup ouvert</strong> = <code className="bg-white px-1 rounded">checkout_opened</code> (nouvel onglet OK) — <strong>Popup bloqué</strong> = <code className="bg-white px-1 rounded">checkout_popup_blocked</code> (fallback même onglet). Métadonnée <code className="bg-white px-1 rounded">latencyMs</code> disponible par événement.</li>
           <li><strong>Page Shopify atteinte</strong> = abandoned_checkouts + commandes payées (Shopify ne crée un checkout que si la page se charge).</li>
           <li><strong>Email saisi</strong> = abandons avec email + commandes payées.</li>
           <li><strong>Paiement réussi</strong> = commandes au statut <code className="bg-white px-1 rounded">paid</code>.</li>
