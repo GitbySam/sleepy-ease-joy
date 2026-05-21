@@ -140,6 +140,18 @@ const Product = () => {
   const colorOption = product?.node.options?.find(o => o.name === "Color");
   const availableColors = colorOption?.values || ["Grey"];
 
+  // Auto-cycle through colors until user manually picks one
+  useEffect(() => {
+    if (userPickedColor || availableColors.length <= 1) return;
+    const id = setInterval(() => {
+      setSelectedColor((current) => {
+        const idx = availableColors.indexOf(current);
+        return availableColors[(idx + 1) % availableColors.length];
+      });
+    }, 2200);
+    return () => clearInterval(id);
+  }, [userPickedColor, availableColors]);
+
   const variants = product?.node.variants.edges || [];
   const coloredVariants = variants.filter(v =>
     v.node.selectedOptions?.some(o => o.name === "Color" && o.value === selectedColor)
