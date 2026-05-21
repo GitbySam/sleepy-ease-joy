@@ -27,9 +27,10 @@ const COLOR_IMAGES: Record<string, string> = {
 };
 
 const BUNDLE_COLOR_IMAGES: Record<string, string> = {
-  Grey: bundleGreyImg,
-  Gray: bundleGreyImg,
-  Red: bundleRedImg,
+  grey: bundleGreyImg,
+  gray: bundleGreyImg,
+  black: bundleGreyImg,
+  red: bundleRedImg,
 };
 
 
@@ -324,11 +325,15 @@ export const ShopifyCartDrawer = () => {
                   {displayItems.map((item) => (
                     <div key={`${item.variantId}__${item.bundleLabel || 'single'}`} className="relative flex gap-3 p-3 bg-cream-light rounded-2xl">
                       {(() => {
-                        const colorOption = item.selectedOptions.find(o => o.name?.toLowerCase() === "color")?.value;
                         const isBundle = (item.bundleLabel || "").toLowerCase().includes("bundle");
-                        const colorImage = colorOption
-                          ? (isBundle ? BUNDLE_COLOR_IMAGES[colorOption] : undefined) || COLOR_IMAGES[colorOption]
-                          : undefined;
+                        const colorOption = item.selectedOptions.find(o => o.name?.toLowerCase() === "color")?.value;
+                        const colorKey = (colorOption || "").toLowerCase();
+                        let colorImage: string | undefined;
+                        if (isBundle) {
+                          colorImage = BUNDLE_COLOR_IMAGES[colorKey] || bundleGreyImg;
+                        } else if (colorOption) {
+                          colorImage = COLOR_IMAGES[colorOption] || COLOR_IMAGES[colorOption.charAt(0).toUpperCase() + colorOption.slice(1).toLowerCase()];
+                        }
                         const fallback = item.product.node.images?.edges?.[0]?.node?.url;
                         const imgSrc = colorImage || fallback;
                         return (
