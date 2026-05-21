@@ -59,6 +59,51 @@ const CLIENT_REVIEWS = [
     role: "Road-trip en famille",
     text: "Mes enfants l'adorent autant que moi. Qualité au rendez-vous, livraison rapide.",
   },
+  {
+    name: "Thomas L.",
+    role: "Backpacker en Asie",
+    text: "Indispensable dans mon sac à dos. Les nuits en bus sont devenues supportables.",
+  },
+  {
+    name: "Claire B.",
+    role: "Consultante en déplacement",
+    text: "J'ai testé des dizaines d'oreillers de voyage. Celui-ci est le seul qui tient vraiment la tête.",
+  },
+  {
+    name: "Julien P.",
+    role: "Train Paris-Lyon quotidien",
+    text: "Je fais 2h de train tous les matins. Fini les torticolis à l'arrivée au bureau.",
+  },
+  {
+    name: "Amélie S.",
+    role: "Voyageuse solo",
+    text: "Léger, compact et vraiment utile. Je l'ai offert à toute ma famille depuis.",
+  },
+  {
+    name: "Nicolas G.",
+    role: "Père de 3 enfants",
+    text: "On en a pris 3 pour les vacances. Les enfants dorment enfin pendant les longs trajets.",
+  },
+  {
+    name: "Laura F.",
+    role: "Stewardesse",
+    text: "Je vois des passagers avec toutes sortes d'oreillers. Celui-là est clairement le plus efficace.",
+  },
+  {
+    name: "Antoine K.",
+    role: "Campeur amateur",
+    text: "Utilisé aussi bien dans la tente qu'en avion. Le support du menton change tout.",
+  },
+  {
+    name: "Camille D.",
+    role: "Étudiante en échange",
+    text: "Mes vols retour étaient un enfer avant. Maintenant j'arrive reposée à chaque fois.",
+  },
+  {
+    name: "Romain V.",
+    role: "Consultant IT",
+    text: "La qualité est là, le tissu respire bien et le maintien est parfait. Recommandé à 100%.",
+  },
 ];
 
 const ClientReviewsBlock = ({ className = "" }: { className?: string }) => (
