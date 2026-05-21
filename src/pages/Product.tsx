@@ -248,7 +248,7 @@ const Product = () => {
   const { t } = useLanguage();
   const { country, currency, prices, formatPrice } = useMarket();
   const clientReviews = country === "US" || country === "CA" ? CLIENT_REVIEWS_EN : CLIENT_REVIEWS_FR;
-  const reviewsHeading = country === "US" || country === "CA" ? "Our customers speak for us" : "Nos clients parlent pour nous";
+  const reviewsHeading = country === "US" || country === "CA" ? "Our customers speak for us" : "{reviewsHeading}";
 
   const addItem = useCartStore((s) => s.addItem);
   const isLoading = useCartStore((s) => s.isLoading);
@@ -474,7 +474,7 @@ const Product = () => {
               return (
                 <div className="relative mt-4 group">
                   <p className="text-center text-xs sm:text-sm uppercase tracking-[0.2em] text-muted-foreground font-sans-body mb-3">
-                    Nos clients parlent pour nous
+                    {reviewsHeading}
                   </p>
                   <div className="overflow-hidden rounded-xl">
                     <div
@@ -810,7 +810,7 @@ const Product = () => {
               return (
                 <div className="relative group">
                   <p className="text-center text-xs uppercase tracking-[0.2em] text-muted-foreground font-sans-body mb-3">
-                    Nos clients parlent pour nous
+                    {reviewsHeading}
                   </p>
                   <div className="overflow-hidden rounded-xl">
                     <div
