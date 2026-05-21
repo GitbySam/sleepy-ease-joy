@@ -16,12 +16,20 @@ import pillowGrey from "@/assets/product-pillow-grey-new.webp";
 import pillowBlack from "@/assets/product-pillow-black.webp";
 import pillowRed from "@/assets/product-pillow-red.webp";
 import sleepMaskImg from "@/assets/sleep-kit-bundle.jpg";
+import bundleGreyImg from "@/assets/bundle-three-items-hero.jpg";
+import bundleRedImg from "@/assets/bundle-three-items-red.jpg";
 
 const COLOR_IMAGES: Record<string, string> = {
   Grey: pillowGrey,
   Gray: pillowGrey,
   Black: pillowBlack,
   Red: pillowRed,
+};
+
+const BUNDLE_COLOR_IMAGES: Record<string, string> = {
+  Grey: bundleGreyImg,
+  Gray: bundleGreyImg,
+  Red: bundleRedImg,
 };
 
 
@@ -317,7 +325,10 @@ export const ShopifyCartDrawer = () => {
                     <div key={`${item.variantId}__${item.bundleLabel || 'single'}`} className="relative flex gap-3 p-3 bg-cream-light rounded-2xl">
                       {(() => {
                         const colorOption = item.selectedOptions.find(o => o.name?.toLowerCase() === "color")?.value;
-                        const colorImage = colorOption ? COLOR_IMAGES[colorOption] : undefined;
+                        const isBundle = (item.bundleLabel || "").toLowerCase().includes("bundle");
+                        const colorImage = colorOption
+                          ? (isBundle ? BUNDLE_COLOR_IMAGES[colorOption] : undefined) || COLOR_IMAGES[colorOption]
+                          : undefined;
                         const fallback = item.product.node.images?.edges?.[0]?.node?.url;
                         const imgSrc = colorImage || fallback;
                         return (
