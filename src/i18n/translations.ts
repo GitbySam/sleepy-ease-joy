@@ -406,9 +406,9 @@ export const translations = {
     es: "Sleep&zy Sleep Bundles",
   },
   "bundles.subtitle": {
-    en: "The full ritual: pillow, silk mask and pressure-sensitive earplugs. Disappear in transit, arrive restored.",
-    fr: "Le rituel complet : oreiller, masque en soie et bouchons d'oreilles sensibles à la pression. Disparaissez en transit, arrivez reposé.",
-    es: "El ritual completo: almohada, antifaz de seda y tapones sensibles a la presión. Desaparece en tránsito, llega descansado.",
+    en: "The full ritual: pillow, sleep mask and pressure-sensitive earplugs. Disappear in transit, arrive restored.",
+    fr: "Le rituel complet : oreiller, masque de sommeil et bouchons d'oreilles sensibles à la pression. Disparaissez en transit, arrivez reposé.",
+    es: "El ritual completo: almohada, antifaz y tapones sensibles a la presión. Desaparece en tránsito, llega descansado.",
   },
   "bundles.tag.solo": { en: "SOLO BUNDLE", fr: "BUNDLE SOLO", es: "BUNDLE SOLO" },
   "bundles.tag.duo": { en: "DUO BUNDLE", fr: "BUNDLE DUO", es: "BUNDLE DÚO" },
@@ -436,7 +436,7 @@ export const translations = {
     fr: "Oreiller de voyage ergonomique Sleep&zy",
     es: "Almohada de viaje ergonómica Sleep&zy",
   },
-  "bundles.item.mask": { en: "Silk sleep mask", fr: "Masque de sommeil en soie", es: "Antifaz de seda" },
+  "bundles.item.mask": { en: "Sleep mask", fr: "Masque de sommeil", es: "Antifaz para dormir" },
   "bundles.item.earplugs": {
     en: "Pressure-sensitive earplug set",
     fr: "Bouchons d'oreilles sensibles à la pression",
