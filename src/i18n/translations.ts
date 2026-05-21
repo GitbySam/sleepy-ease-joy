@@ -194,6 +194,12 @@ export const translations = {
     fr: "Une hôtesse a dû me réveiller parce que je ronflais la tête en arrière. Mon voisin me filmait. Sleep&zy a tout réglé.",
     es: "Una azafata tuvo que despertarme porque roncaba con la cabeza hacia atrás. Mi compañero de asiento me grababa. Sleep&zy lo arregló todo.",
   },
+  "testimonial.7.role": { en: "Yoga instructor", fr: "Professeure de yoga", es: "Profesora de yoga" },
+  "testimonial.7.text": {
+    en: "I travel constantly for retreats. Sleep&zy is the only pillow that actually holds my head — no more waking up with neck pain after a long flight.",
+    fr: "Je voyage sans arrêt pour des retraites. Sleep&zy est le seul oreiller qui tient vraiment ma tête — fini les douleurs au cou après un long vol.",
+    es: "Viajo constantemente para retiros. Sleep&zy es la única almohada que realmente sostiene mi cabeza — se acabaron los dolores de cuello tras un vuelo largo.",
+  },
   "testimonial.6.role": { en: "Business traveler", fr: "Voyageur d'affaires", es: "Viajero de negocios" },
   "testimonial.6.text": {
     en: "Long-haul flights used to wreck me. Now I just wrap Sleep&zy around my neck, close my eyes and I'm out. I land rested and ready to work.",
