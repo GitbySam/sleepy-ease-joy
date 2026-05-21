@@ -464,7 +464,8 @@ const Product = () => {
               </AnimatePresence>
             </div>
 
-            {/* In-use photos carousel */}
+            {/* In-use photos carousel — desktop only */}
+            <div className="hidden md:block">
             {(() => {
               const allPhotos = [inUse1, inUsePlane4, inUse2, inUse3, inUseCar, inUsePlane, inUsePlane2, inUseCar2, inUsePlane3];
               const visibleCount = 5;
@@ -515,6 +516,7 @@ const Product = () => {
                 </div>
               );
             })()}
+            </div>
 
             {/* Client reviews — desktop & tablet only (mobile shown before benefits) */}
             <ClientReviewsBlock className="hidden md:grid" reviews={clientReviews} />
