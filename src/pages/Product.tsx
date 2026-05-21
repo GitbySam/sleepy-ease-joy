@@ -359,23 +359,6 @@ const Product = () => {
               );
             })()}
 
-            {/* Sleep Kit bundle showcase (desktop only — mobile version is inserted between offers) */}
-            <div className="mt-4 hidden md:block relative rounded-2xl overflow-hidden border border-gold/30 bg-gradient-to-br from-cream/40 to-background shadow-lg group">
-              <img
-                src={sleepKitPremium}
-                alt="Sleep Kit — neck pillow, sleep mask & earplugs"
-                loading="lazy"
-                onClick={() => setLightboxSrc(sleepKitPremium)}
-                className="w-full h-auto object-cover cursor-zoom-in transition-transform duration-500 group-hover:scale-[1.02]"
-              />
-              <div className="absolute top-3 left-3 bg-gold text-primary-foreground text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded">
-                Sleep Kit
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-4">
-                <p className="text-white font-serif text-lg leading-tight">Complete your sleep experience</p>
-                <p className="text-white/80 text-xs mt-0.5">Pillow + Sleep mask + Earplugs</p>
-              </div>
-            </div>
           </motion.div>
 
 
@@ -573,7 +556,7 @@ const Product = () => {
             </div>
 
             {/* Bundle visual — compact hero showing the 3 items, anchors the offer right before the cards */}
-            <div className="md:hidden relative rounded-2xl overflow-hidden border border-gold/20 bg-cream/30 aspect-[5/3]">
+            <div className="relative rounded-2xl overflow-hidden border border-gold/20 bg-cream/30 aspect-[5/3]">
               <img
                 src={bundleThreeItemsHero}
                 alt="Sleep Kit bundle — ergonomic neck pillow, contoured sleep mask, noise-isolating earplugs"
