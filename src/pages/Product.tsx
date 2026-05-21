@@ -43,7 +43,7 @@ const COLOR_MAP: Record<string, string> = {
   Red: "#DC2626",
 };
 
-const CLIENT_REVIEWS = [
+const CLIENT_REVIEWS_FR = [
   {
     name: "Sophie M.",
     role: "Vol Paris → Montréal",
@@ -106,9 +106,72 @@ const CLIENT_REVIEWS = [
   },
 ];
 
-const ClientReviewsBlock = ({ className = "" }: { className?: string }) => (
+const CLIENT_REVIEWS_EN = [
+  {
+    name: "Sophie M.",
+    role: "Flight Toronto → Paris",
+    text: "First flight where I didn't arrive with a sore neck. I never travel without it now.",
+  },
+  {
+    name: "Mark D.",
+    role: "Business traveler",
+    text: "Discreet, comfortable, genuinely effective. My head doesn't drop to the side anymore.",
+  },
+  {
+    name: "Emily R.",
+    role: "Family road trip",
+    text: "My kids love it as much as I do. Great quality and fast shipping.",
+  },
+  {
+    name: "Thomas L.",
+    role: "Backpacker in Asia",
+    text: "A must-have in my backpack. Overnight bus rides are finally bearable.",
+  },
+  {
+    name: "Claire B.",
+    role: "Traveling consultant",
+    text: "I've tried dozens of travel pillows. This is the only one that actually holds my head.",
+  },
+  {
+    name: "Julien P.",
+    role: "Daily commuter",
+    text: "I commute 2 hours by train every morning. No more stiff neck at the office.",
+  },
+  {
+    name: "Amelia S.",
+    role: "Solo traveler",
+    text: "Light, compact and genuinely useful. I've gifted it to my whole family since.",
+  },
+  {
+    name: "Nicholas G.",
+    role: "Dad of 3",
+    text: "We got 3 for vacation. The kids finally sleep during long road trips.",
+  },
+  {
+    name: "Laura F.",
+    role: "Flight attendant",
+    text: "I see passengers with all kinds of pillows. This one is clearly the most effective.",
+  },
+  {
+    name: "Anthony K.",
+    role: "Weekend camper",
+    text: "Used it in the tent as much as on planes. The chin support changes everything.",
+  },
+  {
+    name: "Camille D.",
+    role: "Exchange student",
+    text: "My return flights used to be a nightmare. Now I land rested every single time.",
+  },
+  {
+    name: "Ryan V.",
+    role: "IT consultant",
+    text: "Solid quality, breathable fabric, perfect support. 100% recommended.",
+  },
+];
+
+const ClientReviewsBlock = ({ className = "", reviews }: { className?: string; reviews: typeof CLIENT_REVIEWS_EN }) => (
   <div className={`mt-6 grid grid-cols-1 md:grid-cols-3 gap-3 ${className}`}>
-    {CLIENT_REVIEWS.map((r, i) => (
+    {reviews.map((r, i) => (
       <div
         key={i}
         className="rounded-xl border border-border bg-card p-4 flex flex-col"
@@ -184,6 +247,7 @@ const Product = () => {
   const countdown = useCountdown(15);
   const { t } = useLanguage();
   const { country, currency, prices, formatPrice } = useMarket();
+  const clientReviews = country === "US" || country === "CA" ? CLIENT_REVIEWS_EN : CLIENT_REVIEWS_FR;
 
   const addItem = useCartStore((s) => s.addItem);
   const isLoading = useCartStore((s) => s.isLoading);
@@ -453,7 +517,7 @@ const Product = () => {
             })()}
 
             {/* Client reviews — desktop & tablet only (mobile shown before benefits) */}
-            <ClientReviewsBlock className="hidden md:grid" />
+            <ClientReviewsBlock className="hidden md:grid" reviews={clientReviews} />
 
           </motion.div>
 
@@ -735,7 +799,7 @@ const Product = () => {
 
         <Suspense fallback={null}>
           {/* Client reviews — mobile only, before benefits */}
-          <ClientReviewsBlock className="md:hidden px-4" />
+            <ClientReviewsBlock className="md:hidden px-4" reviews={clientReviews} />
           <ProductBenefits />
         </Suspense>
       </div>
