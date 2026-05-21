@@ -800,8 +800,61 @@ const Product = () => {
         </div>
 
         <Suspense fallback={null}>
+          {/* Photo carousel — mobile only, between Shopify redirect and text reviews */}
+          <div className="md:hidden mt-8 px-4">
+            {(() => {
+              const allPhotos = [inUse1, inUsePlane4, inUse2, inUse3, inUseCar, inUsePlane, inUsePlane2, inUseCar2, inUsePlane3];
+              const visibleCount = 5;
+              const maxOffset = allPhotos.length - visibleCount;
+              return (
+                <div className="relative group">
+                  <p className="text-center text-xs uppercase tracking-[0.2em] text-muted-foreground font-sans-body mb-3">
+                    Nos clients parlent pour nous
+                  </p>
+                  <div className="overflow-hidden rounded-xl">
+                    <div
+                      className="flex gap-2 transition-transform duration-300 ease-in-out"
+                      style={{ transform: `translateX(-${(galleryOffset / visibleCount) * 100}%)` }}
+                    >
+                      {allPhotos.map((src, i) => (
+                        <div key={i} className="shrink-0 rounded-xl overflow-hidden border border-border aspect-square" style={{ width: `calc((100% - ${(visibleCount - 1) * 8}px) / ${visibleCount})` }}>
+                          <img
+                            src={src}
+                            alt={`Sleep&zy in use ${i + 1}`}
+                            loading="lazy"
+                            width={640}
+                            height={640}
+                            onClick={() => setLightboxSrc(src)}
+                            className="w-full h-full object-cover cursor-zoom-in hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {galleryOffset > 0 && (
+                    <button
+                      onClick={() => setGalleryOffset(Math.max(0, galleryOffset - 1))}
+                      className="absolute left-1 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm border border-border rounded-full w-7 h-7 flex items-center justify-center shadow-md hover:bg-background transition-colors z-10"
+                      aria-label="Previous photos"
+                    >
+                      <ChevronLeft size={16} className="text-foreground" />
+                    </button>
+                  )}
+                  {galleryOffset < maxOffset && (
+                    <button
+                      onClick={() => setGalleryOffset(Math.min(maxOffset, galleryOffset + 1))}
+                      className="absolute right-1 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm border border-border rounded-full w-7 h-7 flex items-center justify-center shadow-md hover:bg-background transition-colors z-10"
+                      aria-label="Next photos"
+                    >
+                      <ChevronRight size={16} className="text-foreground" />
+                    </button>
+                  )}
+                </div>
+              );
+            })()}
+          </div>
           {/* Client reviews — mobile only, before benefits */}
-            <ClientReviewsBlock className="md:hidden px-4" reviews={clientReviews} />
+          <ClientReviewsBlock className="md:hidden px-4" reviews={clientReviews} />
           <ProductBenefits />
         </Suspense>
       </div>
