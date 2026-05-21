@@ -189,65 +189,55 @@ const SleepBundles = forwardRef<SleepBundlesHandle, SleepBundlesProps>(({
     const selectedProduct = selectedBundle ? products[selectedBundle] : null;
     return (
       <section className="mt-6 space-y-3" data-clarity-unmask="true">
-        <div className="flex items-center gap-2">
-          <Sparkles size={14} className="text-gold" />
-          <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">
-            {t("bundles.title")}
-          </h3>
-        </div>
-        <div className="space-y-3">
-          {available.map(({ key, pillowCount, tagLabel, tagColor }) => {
+        <div className="grid grid-cols-3 gap-2">
+          {available.map(({ key, pillowCount }) => {
             const product = products[key]!;
             const variant = product.node.variants.edges[0]?.node;
             const price = variant ? parseFloat(variant.price.amount) : 0;
             const oldPrice = price * 2;
             const isSelected = selectedBundle === key;
+            const isFeatured = key === "family";
             return (
               <button
                 key={key}
                 onClick={() => setSelectedBundle(selectedBundle === key ? null : key)}
-                className={`w-full rounded-xl p-4 border-2 transition-all text-left relative ${
-                  isSelected
-                    ? "border-gold bg-gold/5 shadow-md"
-                    : "border-border bg-card hover:border-gold/40"
+                className={`relative flex flex-col items-center p-3 pt-6 rounded-xl border-2 transition-all text-center ${
+                  isFeatured
+                    ? `bg-dark-blue border-gold shadow-xl ${isSelected ? "ring-2 ring-gold ring-offset-2 ring-offset-background" : ""}`
+                    : `bg-card ${isSelected ? "border-gold ring-2 ring-gold/30" : "border-border hover:border-gold/50"}`
                 }`}
               >
-                {isSelected && (
-                  <span className="absolute -top-2.5 left-4 bg-gold text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded">
-                    ✓ {t("product.selected")}
+                {isFeatured && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gold text-primary-foreground text-[9px] font-black px-2 py-1 rounded shadow-sm whitespace-nowrap tracking-wider">
+                    {t("bundles.tag.family") || "BEST VALUE"}
                   </span>
                 )}
                 <span
-                  className={`absolute -top-2.5 right-4 ${tagColor} text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider`}
+                  className={`absolute top-0 right-0 text-[9px] font-bold px-1.5 py-0.5 rounded-bl-lg rounded-tr-[10px] ${
+                    isFeatured ? "bg-gold text-primary-foreground" : "bg-gold/15 text-gold"
+                  }`}
                 >
-                  {tagLabel}
+                  -50%
                 </span>
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all shrink-0 ${
-                        isSelected ? "border-gold bg-gold" : "border-muted-foreground/30"
-                      }`}
-                    >
-                      {isSelected && <Check size={12} className="text-primary-foreground" />}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-semibold text-foreground text-sm flex items-center gap-2">
-                        {t(`bundles.${key}.name`)}
-                        <span className="bg-gold/20 text-gold text-[10px] font-bold px-1.5 py-0.5 rounded">
-                          -50%
-                        </span>
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {pillowCount} × {t("bundles.item.pillow")} · {t("bundles.item.mask")} · {t("bundles.item.earplugs")}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right shrink-0 font-numeric-safe" data-clarity-unmask="true">
-                    <p className="text-lg font-bold text-foreground">{formatPrice(price)}</p>
-                    <p className="text-xs text-muted-foreground line-through">{formatPrice(oldPrice)}</p>
-                  </div>
+                <span className={`text-[11px] font-bold uppercase tracking-wider mb-1 ${isFeatured ? "text-white" : "text-foreground"}`}>
+                  {t(`bundles.${key}.name`)}
+                </span>
+                <div className="flex flex-col items-center mb-2 font-numeric-safe" data-clarity-unmask="true">
+                  <span className={`text-[10px] line-through ${isFeatured ? "text-white/40" : "text-muted-foreground"}`}>
+                    {formatPrice(oldPrice)}
+                  </span>
+                  <span className={`text-base font-bold ${isFeatured ? "text-gold" : "text-foreground"}`}>
+                    {formatPrice(price)}
+                  </span>
                 </div>
+                <p className={`text-[9px] leading-tight ${isFeatured ? "text-white/70" : "text-muted-foreground"}`}>
+                  {pillowCount}× {t("bundles.item.pillow")} + {t("bundles.item.mask")} + {t("bundles.item.earplugs")}
+                </p>
+                {isSelected && (
+                  <span className={`absolute bottom-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center ${isFeatured ? "bg-gold" : "bg-gold"}`}>
+                    <Check size={10} className="text-primary-foreground" />
+                  </span>
+                )}
               </button>
             );
           })}
