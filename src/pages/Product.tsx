@@ -675,6 +675,7 @@ const Product = () => {
               selectedBundle={selectedBundleKey}
               onSelectBundle={handleSelectBundle}
               onSelectionChange={handleBundleSummary}
+              selectedColor={selectedColor}
             />
 
             {/* Price summary — only for Sleep Kit bundles (quantity stepper already shows total) */}
