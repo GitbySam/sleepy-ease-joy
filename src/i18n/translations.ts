@@ -194,6 +194,12 @@ export const translations = {
     fr: "Une hôtesse a dû me réveiller parce que je ronflais la tête en arrière. Mon voisin me filmait. Sleep&zy a tout réglé.",
     es: "Una azafata tuvo que despertarme porque roncaba con la cabeza hacia atrás. Mi compañero de asiento me grababa. Sleep&zy lo arregló todo.",
   },
+  "testimonial.6.role": { en: "Business traveler", fr: "Voyageur d'affaires", es: "Viajero de negocios" },
+  "testimonial.6.text": {
+    en: "Long-haul flights used to wreck me. Now I just wrap Sleep&zy around my neck, close my eyes and I'm out. I land rested and ready to work.",
+    fr: "Les vols long-courriers me détruisaient. Maintenant j'enroule Sleep&zy autour du cou, je ferme les yeux et je dors. J'atterris reposé et prêt à bosser.",
+    es: "Los vuelos largos me destrozaban. Ahora me pongo Sleep&zy en el cuello, cierro los ojos y caigo dormido. Aterrizo descansado y listo para trabajar.",
+  },
 
   // BundleOffer
   "bundle.subtitle": {
