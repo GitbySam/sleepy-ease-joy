@@ -344,6 +344,21 @@ export const translations = {
 "product.sleepKit.each": { en: "each", fr: "l'unité", es: "c/u" },
 "product.sleepKit.name": { en: "Sleep Kit", fr: "Sleep Kit", es: "Sleep Kit" },
 "product.sleepKit.maxReached": { en: "Maximum reached — enjoy your premium sleep set", fr: "Maximum atteint — profitez de votre kit sommeil premium", es: "Máximo alcanzado — disfruta tu kit premium" },
+  "product.bundles.introEyebrow": {
+    en: "Or go further",
+    fr: "Ou allez plus loin",
+    es: "O ve más allá",
+  },
+  "product.bundles.introTitle": {
+    en: "Why not treat yourself to one of our all-in-one sleep solutions?",
+    fr: "Et si vous vous laissiez séduire par une de nos solutions sommeil tout compris ?",
+    es: "¿Y si te dejas seducir por una de nuestras soluciones de sueño todo incluido?",
+  },
+  "product.bundles.introSubtitle": {
+    en: "Hand-picked sets that combine the pillow with our most-loved sleep essentials — for a deeper rest, at a sweeter price.",
+    fr: "Des ensembles soigneusement composés qui associent l'oreiller à nos essentiels du sommeil les plus aimés — pour un repos plus profond, à un prix plus doux.",
+    es: "Conjuntos cuidadosamente elegidos que combinan la almohada con nuestros esenciales del sueño favoritos — para un descanso más profundo, a un precio más dulce.",
+  },
   "product.addedToCart": { en: "added to cart", fr: "ajouté au panier", es: "añadido al carrito" },
   "product.securePayment": { en: "Secure payment", fr: "Paiement sécurisé", es: "Pago seguro" },
   "product.freeShipping": { en: "Free shipping", fr: "Livraison gratuite", es: "Envío gratis" },
