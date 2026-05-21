@@ -43,6 +43,50 @@ const COLOR_MAP: Record<string, string> = {
   Red: "#DC2626",
 };
 
+const CLIENT_REVIEWS = [
+  {
+    name: "Sophie M.",
+    role: "Vol Paris → Montréal",
+    text: "Premier vol où je n'ai pas eu mal au cou en arrivant. Je ne voyage plus sans.",
+  },
+  {
+    name: "Marc D.",
+    role: "Voyageur d'affaires",
+    text: "Discret, confortable, vraiment efficace. La tête ne tombe plus sur le côté.",
+  },
+  {
+    name: "Émilie R.",
+    role: "Road-trip en famille",
+    text: "Mes enfants l'adorent autant que moi. Qualité au rendez-vous, livraison rapide.",
+  },
+];
+
+const ClientReviewsBlock = ({ className = "" }: { className?: string }) => (
+  <div className={`mt-6 grid grid-cols-1 md:grid-cols-3 gap-3 ${className}`}>
+    {CLIENT_REVIEWS.map((r, i) => (
+      <div
+        key={i}
+        className="rounded-xl border border-border bg-card p-4 flex flex-col"
+      >
+        <div className="flex gap-0.5 mb-2">
+          {[...Array(5)].map((_, j) => (
+            <span key={j} className="inline-flex items-center justify-center w-5 h-5 bg-success rounded-[3px]">
+              <svg viewBox="0 0 24 24" className="w-3 h-3 fill-white">
+                <path d="M12 2l2.9 6.3L22 9.2l-5 4.6 1.3 6.9L12 17.3 5.7 20.7 7 13.8 2 9.2l7.1-.9L12 2z" />
+              </svg>
+            </span>
+          ))}
+        </div>
+        <p className="text-sm text-foreground leading-relaxed font-sans-body flex-1">"{r.text}"</p>
+        <div className="mt-3">
+          <p className="text-sm font-semibold text-foreground font-sans-body">{r.name}</p>
+          <p className="text-xs text-muted-foreground font-sans-body">{r.role}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
 function useCountdown(minutes: number) {
   const [seconds, setSeconds] = useState(() => {
     const saved = sessionStorage.getItem("bundle-countdown");
@@ -363,6 +407,9 @@ const Product = () => {
               );
             })()}
 
+            {/* Client reviews — desktop & tablet only (mobile shown before benefits) */}
+            <ClientReviewsBlock className="hidden md:grid" />
+
           </motion.div>
 
 
@@ -641,6 +688,8 @@ const Product = () => {
         </div>
 
         <Suspense fallback={null}>
+          {/* Client reviews — mobile only, before benefits */}
+          <ClientReviewsBlock className="md:hidden px-4" />
           <ProductBenefits />
         </Suspense>
       </div>
