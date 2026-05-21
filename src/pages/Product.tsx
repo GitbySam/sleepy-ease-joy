@@ -516,7 +516,7 @@ const Product = () => {
             })()}
 
             {/* Client reviews — desktop & tablet only (mobile shown before benefits) */}
-            <ClientReviewsBlock className="hidden md:grid" />
+            <ClientReviewsBlock className="hidden md:grid" reviews={clientReviews} />
 
           </motion.div>
 
