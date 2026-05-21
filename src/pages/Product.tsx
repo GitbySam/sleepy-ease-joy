@@ -313,7 +313,7 @@ const Product = () => {
 
             {/* In-use photos carousel */}
             {(() => {
-              const allPhotos = [inUse1, inUse2, inUse3, inUseCar, inUsePlane, inUsePlane2, inUseCar2, inUsePlane3];
+              const allPhotos = [inUse1, inUsePlane4, inUse2, inUse3, inUseCar, inUsePlane, inUsePlane2, inUseCar2, inUsePlane3];
               const visibleCount = 5;
               const maxOffset = allPhotos.length - visibleCount;
               return (
