@@ -247,6 +247,7 @@ const Product = () => {
   const countdown = useCountdown(15);
   const { t } = useLanguage();
   const { country, currency, prices, formatPrice } = useMarket();
+  const clientReviews = country === "US" || country === "CA" ? CLIENT_REVIEWS_EN : CLIENT_REVIEWS_FR;
 
   const addItem = useCartStore((s) => s.addItem);
   const isLoading = useCartStore((s) => s.isLoading);
@@ -798,7 +799,7 @@ const Product = () => {
 
         <Suspense fallback={null}>
           {/* Client reviews — mobile only, before benefits */}
-          <ClientReviewsBlock className="md:hidden px-4" />
+            <ClientReviewsBlock className="md:hidden px-4" reviews={clientReviews} />
           <ProductBenefits />
         </Suspense>
       </div>
