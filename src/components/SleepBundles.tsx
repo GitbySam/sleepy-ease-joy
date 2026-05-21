@@ -212,15 +212,13 @@ const SleepBundles = forwardRef<SleepBundlesHandle, SleepBundlesProps>(({
                     {t("bundles.tag.family") || "BEST VALUE"}
                   </span>
                 )}
-                <span
-                  className={`absolute top-0 right-0 text-[9px] font-bold px-1.5 py-0.5 rounded-bl-lg rounded-tr-[10px] ${
-                    isFeatured ? "bg-gold text-primary-foreground" : "bg-gold/15 text-gold"
-                  }`}
-                >
-                  -50%
-                </span>
+                {!isFeatured && (
+                  <span className="absolute top-0 right-0 text-[9px] font-bold px-1.5 py-0.5 rounded-bl-lg rounded-tr-[10px] bg-gold/15 text-gold">
+                    -50%
+                  </span>
+                )}
                 <span className={`text-[11px] font-bold uppercase tracking-wider mb-1 ${isFeatured ? "text-white" : "text-foreground"}`}>
-                  {t(`bundles.${key}.name`)}
+                  {key === "solo" ? "SOLO" : key === "duo" ? "DUO" : "FAMILY"}
                 </span>
                 <div className="flex flex-col items-center mb-2 font-numeric-safe" data-clarity-unmask="true">
                   <span className={`text-[10px] line-through ${isFeatured ? "text-white/40" : "text-muted-foreground"}`}>
