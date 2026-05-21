@@ -136,6 +136,7 @@ export const ShopifyCartDrawer = () => {
       });
       return;
     }
+    const clickTs = Date.now();
     // CRITICAL: open the popup SYNCHRONOUSLY at the very top of the click
     // handler, BEFORE any await/Supabase call. Otherwise mobile Safari /
     // Chrome will treat it as a programmatic popup and block it silently
@@ -144,11 +145,22 @@ export const ShopifyCartDrawer = () => {
     try {
       popup = window.open('about:blank', '_blank');
     } catch {}
+    const popupOpened = !!(popup && !popup.closed);
+    const latencyMs = Date.now() - clickTs;
     if (checkoutUrl) {
       trackFunnelStep('click_checkout', {
         value: totalPrice,
         currency,
         metadata: { items: totalItems },
+      });
+      trackFunnelStep(popupOpened ? 'checkout_opened' : 'checkout_popup_blocked', {
+        value: totalPrice,
+        currency,
+        metadata: {
+          items: totalItems,
+          latencyMs,
+          mode: popupOpened ? 'new_tab' : 'same_tab_fallback',
+        },
       });
       trackInitiateCheckout({
         value: totalPrice,
@@ -195,10 +207,10 @@ export const ShopifyCartDrawer = () => {
       const finalUrl = formatCheckoutUrl(checkoutUrl);
       // Show fullscreen redirect overlay so the user knows something is happening
       setRedirecting(true);
-      if (popup && !popup.closed) {
+      if (popupOpened) {
         // Popup was successfully opened synchronously — just navigate it.
         try {
-          popup.location.href = finalUrl;
+          popup!.location.href = finalUrl;
         } catch {
           // Cross-origin lockdown shouldn't happen on about:blank, but fall
           // back to same-tab navigation just in case.

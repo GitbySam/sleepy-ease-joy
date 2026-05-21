@@ -109,6 +109,8 @@ function CheckoutFunnelTab({ days }: { days: number }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [clicks, setClicks] = useState<number>(0);
+  const [opened, setOpened] = useState<number>(0);
+  const [blocked, setBlocked] = useState<number>(0);
   const [shopify, setShopify] = useState<ShopifyResult | null>(null);
 
   const fetchAll = useCallback(async () => {
@@ -117,8 +119,8 @@ function CheckoutFunnelTab({ days }: { days: number }) {
     try {
       const sinceISO = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
 
-      // Fetch Shopify analytics + funnel clicks in parallel
-      const [shopifyRes, clicksRes] = await Promise.all([
+      // Fetch Shopify analytics + funnel clicks/opens/blocks in parallel
+      const [shopifyRes, clicksRes, openedRes, blockedRes] = await Promise.all([
         fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/shopify-analytics?days=${days}`, {
           headers: {
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
@@ -133,6 +135,16 @@ function CheckoutFunnelTab({ days }: { days: number }) {
           .select('id', { count: 'exact', head: true })
           .eq('step', 'click_checkout')
           .gte('created_at', sinceISO),
+        supabase
+          .from('funnel_events')
+          .select('id', { count: 'exact', head: true })
+          .eq('step', 'checkout_opened')
+          .gte('created_at', sinceISO),
+        supabase
+          .from('funnel_events')
+          .select('id', { count: 'exact', head: true })
+          .eq('step', 'checkout_popup_blocked')
+          .gte('created_at', sinceISO),
       ]);
 
       if (shopifyRes.error) {
@@ -141,6 +153,8 @@ function CheckoutFunnelTab({ days }: { days: number }) {
         setShopify(shopifyRes as ShopifyResult);
       }
       setClicks(clicksRes.count ?? 0);
+      setOpened(openedRes.count ?? 0);
+      setBlocked(blockedRes.count ?? 0);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Erreur réseau');
     }
@@ -246,6 +260,40 @@ function CheckoutFunnelTab({ days }: { days: number }) {
         >
           <RefreshCw className="h-3.5 w-3.5" /> Actualiser
         </button>
+      </div>
+
+      {/* Ouverture checkout (popup nouvel onglet vs blocage) */}
+      <div>
+        <h3 className="text-sm font-semibold text-gray-700 mb-3">🪟 Ouverture du checkout</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <Card className="bg-white border-2 border-emerald-200">
+            <CardContent className="p-4">
+              <p className="text-xs text-gray-500 uppercase tracking-wide">Popup ouvert (nouvel onglet)</p>
+              <p className="text-3xl font-bold text-emerald-700 mt-1">{opened}</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {stepClicks > 0 ? `${((opened / stepClicks) * 100).toFixed(1)} % des clics` : '—'}
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="bg-white border-2 border-amber-200">
+            <CardContent className="p-4">
+              <p className="text-xs text-gray-500 uppercase tracking-wide">Popup bloqué (fallback même onglet)</p>
+              <p className="text-3xl font-bold text-amber-700 mt-1">{blocked}</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {stepClicks > 0 ? `${((blocked / stepClicks) * 100).toFixed(1)} % des clics` : '—'}
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="bg-white border-2 border-gray-200">
+            <CardContent className="p-4">
+              <p className="text-xs text-gray-500 uppercase tracking-wide">Taux de blocage</p>
+              <p className="text-3xl font-bold text-gray-900 mt-1">
+                {opened + blocked > 0 ? `${((blocked / (opened + blocked)) * 100).toFixed(1)} %` : '—'}
+              </p>
+              <p className="text-xs text-gray-400 mt-1">blocked / (opened + blocked)</p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* 4 étapes */}
@@ -395,6 +443,7 @@ function CheckoutFunnelTab({ days }: { days: number }) {
         <p className="font-semibold mb-1 text-gray-700">📐 Méthodologie</p>
         <ul className="space-y-1 list-disc pl-5">
           <li><strong>Clics checkout</strong> = événements <code className="bg-white px-1 rounded">funnel_events.step = 'click_checkout'</code> sur le site.</li>
+          <li><strong>Popup ouvert</strong> = <code className="bg-white px-1 rounded">checkout_opened</code> (nouvel onglet OK) — <strong>Popup bloqué</strong> = <code className="bg-white px-1 rounded">checkout_popup_blocked</code> (fallback même onglet). Métadonnée <code className="bg-white px-1 rounded">latencyMs</code> disponible par événement.</li>
           <li><strong>Page Shopify atteinte</strong> = abandoned_checkouts + commandes payées (Shopify ne crée un checkout que si la page se charge).</li>
           <li><strong>Email saisi</strong> = abandons avec email + commandes payées.</li>
           <li><strong>Paiement réussi</strong> = commandes au statut <code className="bg-white px-1 rounded">paid</code>.</li>
