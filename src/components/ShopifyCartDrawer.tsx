@@ -42,10 +42,14 @@ export const ShopifyCartDrawer = () => {
     (i) => i.bundleLabel !== SLEEP_KIT_LABEL && (!i.bundleLabel || PACK_LABELS.includes((i.bundleLabel || "").toUpperCase()))
   );
   const hasSleepBundle = items.some((i) => (i.bundleLabel || "").toLowerCase().includes("bundle"));
-  const showSleepKit = hasSleepzyPack && !hasSleepBundle;
 
   const sleepKitItem = items.find((i) => i.bundleLabel === SLEEP_KIT_LABEL);
   const sleepKits = sleepKitItem?.quantity ?? 0;
+
+  // Show the Sleep Kit upsell card whenever the cart is eligible (has a single pack
+  // without a bundle) OR when the kit is already in the cart — so adding a bundle
+  // afterwards never makes a previously-added Sleep Kit disappear from the drawer.
+  const showSleepKit = (hasSleepzyPack && !hasSleepBundle) || sleepKits > 0;
 
   // Render items list without the Sleep Kit (it's shown via the upsell card)
   const displayItems = items.filter((i) => i.bundleLabel !== SLEEP_KIT_LABEL);
