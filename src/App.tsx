@@ -65,6 +65,7 @@ const AppRoutes = () => {
           <CartSyncWrapper />
           <CheckoutRedirectOverlay />
           <BrowserRouter>
+            <ScrollToHash />
             <RouteTracker />
             <Routes>
               <Route path="/" element={<Index />} />
