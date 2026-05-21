@@ -10,6 +10,7 @@ const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { t } = useLanguage();
+  const location = useLocation();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -26,12 +27,29 @@ const Header = () => {
   const marqueeText = `${t("header.marquee")} \u00a0•\u00a0 `;
 
   const navLinks = [
-    { to: "/product", label: t("nav.products"), isLink: true },
-    { to: "/#benefits", label: t("nav.benefits"), isLink: false },
-    { to: "/#results", label: t("nav.results"), isLink: false },
-    { to: "/#testimonials", label: t("nav.reviews"), isLink: false },
-    { to: "/#faq", label: t("nav.faq"), isLink: false },
+    { to: "/product", label: t("nav.products") },
+    { to: "/#benefits", label: t("nav.benefits") },
+    { to: "/#results", label: t("nav.results") },
+    { to: "/#testimonials", label: t("nav.reviews") },
+    { to: "/#faq", label: t("nav.faq") },
   ];
+
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    to: string
+  ) => {
+    setMenuOpen(false);
+    // If we're on the home page and the link is an anchor, smooth-scroll
+    if (location.pathname === "/" && to.includes("#")) {
+      const hash = to.split("#")[1];
+      const el = document.getElementById(hash);
+      if (el) {
+        e.preventDefault();
+        el.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+    // Otherwise let <Link> handle normal SPA navigation
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
@@ -58,13 +76,16 @@ const Header = () => {
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-8 font-sans-body text-sm text-muted-foreground">
-            {navLinks.map((link) =>
-              link.isLink ? (
-                <Link key={link.to} to={link.to} className="hover:text-foreground transition-colors">{link.label}</Link>
-              ) : (
-                <a key={link.to} href={link.to} className="hover:text-foreground transition-colors">{link.label}</a>
-              )
-            )}
+            {navLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                onClick={(e) => handleNavClick(e, link.to)}
+                className="hover:text-foreground transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
 
           <div className="flex items-center gap-3">
@@ -105,27 +126,16 @@ const Header = () => {
             className="md:hidden fixed inset-0 top-0 z-40 bg-card/98 backdrop-blur-xl flex flex-col pt-32"
           >
             <div className="flex flex-col items-center gap-6 py-8">
-              {navLinks.map((link) =>
-                link.isLink ? (
-                  <Link
-                    key={link.to}
-                    to={link.to}
-                    onClick={() => setMenuOpen(false)}
-                    className="text-xl font-serif font-semibold text-foreground hover:text-gold transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                ) : (
-                  <a
-                    key={link.to}
-                    href={link.to}
-                    onClick={() => setMenuOpen(false)}
-                    className="text-xl font-serif font-semibold text-foreground hover:text-gold transition-colors"
-                  >
-                    {link.label}
-                  </a>
-                )
-              )}
+              {navLinks.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  onClick={(e) => handleNavClick(e, link.to)}
+                  className="text-xl font-serif font-semibold text-foreground hover:text-gold transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
 
               {/* LanguageSwitcher hidden but system still active */}
 
