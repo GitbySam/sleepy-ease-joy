@@ -18,7 +18,8 @@ Deno.serve(async (req) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
-  const SHOPIFY_ACCESS_TOKEN = Deno.env.get('SHOPIFY_ACCESS_TOKEN');
+  const SHOPIFY_ACCESS_TOKEN =
+    Deno.env.get('SHOPIFY_ADMIN_API_TOKEN') ?? Deno.env.get('SHOPIFY_ACCESS_TOKEN');
   if (!SHOPIFY_ACCESS_TOKEN) {
     return jsonResponse({
       code: 'shopify_token_missing',
