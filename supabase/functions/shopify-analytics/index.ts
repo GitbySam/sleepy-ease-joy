@@ -23,8 +23,8 @@ Deno.serve(async (req) => {
   if (!SHOPIFY_ACCESS_TOKEN) {
     return jsonResponse({
       code: 'shopify_token_missing',
-      error: 'SHOPIFY_ACCESS_TOKEN is not configured.',
-      action: 'Add a permanent Shopify Admin API token that starts with shpat_.',
+      error: 'SHOPIFY_ADMIN_API_TOKEN is not configured.',
+      action: 'Ajoute un token Shopify Admin API permanent qui commence par shpat_.',
     });
   }
 
@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
         console.error('Shopify Admin API authentication failed:', errorText);
         return jsonResponse({
           code: 'shopify_admin_auth_failed',
-          error: 'Token Shopify Admin invalide ou expiré. Mets à jour SHOPIFY_ACCESS_TOKEN avec un token Admin API permanent commençant par shpat_.',
+          error: 'Token Shopify Admin invalide ou expiré. Mets à jour SHOPIFY_ADMIN_API_TOKEN avec un token Admin API permanent commençant par shpat_.',
           action: 'Scopes requis : read_orders, read_customers, read_checkouts.',
         });
       }
