@@ -125,16 +125,15 @@ const ProductCard = ({ product, selectedColor, t, lang }: ProductCardProps) => {
           <span className="text-xl font-bold text-foreground">
             {formatPrice(displayPrice)}
           </span>
-          <motion.button
-            type="button"
-            onClick={handleShopNow}
+          <motion.a
+            href={productUrl}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="bg-gold text-primary-foreground px-5 py-2 rounded-full text-sm font-semibold inline-flex items-center gap-2 shadow-gold-glow"
           >
             {t("products.shopNow")}
             <ArrowRight size={16} />
-          </motion.button>
+          </motion.a>
         </div>
       </div>
     </motion.div>
