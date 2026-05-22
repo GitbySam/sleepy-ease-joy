@@ -29,9 +29,10 @@ interface ProductCardProps {
   product: ShopifyProduct;
   selectedColor: string;
   t: (key: string) => string;
+  lang: string;
 }
 
-const ProductCard = ({ product, selectedColor, t }: ProductCardProps) => {
+const ProductCard = ({ product, selectedColor, t, lang }: ProductCardProps) => {
   const { country, currency, prices, formatPrice } = useMarket();
   const displayPrice = prices.single;
   const productUrl = `/product/${product.node.handle}?color=${selectedColor}`;
@@ -111,7 +112,9 @@ const ProductCard = ({ product, selectedColor, t }: ProductCardProps) => {
           </h3>
         </a>
         <p className="text-muted-foreground text-sm line-clamp-2">
-          {product.node.description}
+          {lang === "fr"
+            ? "Cette photo embarrassante ? Terminé. Bouche ouverte. Tête sur l'épaule du voisin. Bave sur la chemise. Ça vous parle ? Sleep&zy bloque votre tête en place. Vous dormez, vous gardez votre dignité."
+            : product.node.description}
         </p>
 
         <div className="flex items-center justify-between pt-2">
@@ -135,7 +138,7 @@ const ProductCard = ({ product, selectedColor, t }: ProductCardProps) => {
 };
 
 const ShopifyProducts = () => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { country } = useMarket();
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -216,6 +219,7 @@ const ShopifyProducts = () => {
               product={product}
               selectedColor={selectedColor}
               t={t}
+              lang={lang}
             />
           ))}
         </div>
