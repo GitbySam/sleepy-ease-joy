@@ -37,6 +37,7 @@ const ProductCard = ({ product, selectedColor, t, lang }: ProductCardProps) => {
   const displayPrice = prices.single;
   const productUrl = `/product/${product.node.handle}?color=${selectedColor}`;
   const { addItem, setDrawerOpen } = useCartStore();
+  const [expanded, setExpanded] = useState(false);
 
   const handleShopNow = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -111,7 +112,10 @@ const ProductCard = ({ product, selectedColor, t, lang }: ProductCardProps) => {
             {product.node.title}
           </h3>
         </a>
-        <p className="text-muted-foreground text-sm line-clamp-2">
+        <p
+          onClick={() => setExpanded((v) => !v)}
+          className={`text-muted-foreground text-sm cursor-pointer ${expanded ? "" : "line-clamp-2"}`}
+        >
           {lang === "fr"
             ? "Cette photo embarrassante ? Terminé. Bouche ouverte. Tête sur l'épaule du voisin. Bave sur la chemise. Ça vous parle ? Sleep&zy bloque votre tête en place. Vous dormez, vous gardez votre dignité."
             : product.node.description}
