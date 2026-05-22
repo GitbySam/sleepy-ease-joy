@@ -23,6 +23,11 @@ import inUsePlane2 from "@/assets/lifestyle-plane2.webp";
 import inUseCar2 from "@/assets/lifestyle-car2.webp";
 import inUsePlane3 from "@/assets/lifestyle-plane3.webp";
 import inUsePlane4 from "@/assets/lifestyle-plane4.webp";
+import customerPlaneWoman from "@/assets/customer-plane-woman.webp";
+import testimonialJames from "@/assets/testimonial-james.webp";
+import testimonialMike from "@/assets/testimonial-mike.webp";
+import testimonialAlex from "@/assets/testimonial-alex.webp";
+import testimonialSophie from "@/assets/testimonial-sophie.webp";
 import sleepKitPremium from "@/assets/sleep-kit-three-essentials.png";
 import bundleThreeItemsHero from "@/assets/bundle-three-items-hero.jpg";
 import { useCartStore } from "@/stores/cartStore";
@@ -468,7 +473,7 @@ const Product = () => {
             {/* In-use photos carousel — desktop only */}
             <div className="hidden md:block">
             {(() => {
-              const allPhotos = [inUse1, inUsePlane4, inUse2, inUse3, inUseCar, inUsePlane, inUsePlane2, inUseCar2, inUsePlane3];
+              const allPhotos = [inUse1, inUsePlane4, inUse2, customerPlaneWoman, inUse3, inUseCar, inUsePlane, inUsePlane2, inUseCar2, inUsePlane3, testimonialJames, testimonialMike, testimonialAlex, testimonialSophie];
               const visibleCount = 5;
               const maxOffset = allPhotos.length - visibleCount;
               return (
@@ -804,7 +809,7 @@ const Product = () => {
           {/* Photo carousel — mobile only, between Shopify redirect and text reviews */}
           <div className="md:hidden mt-8 px-4">
             {(() => {
-              const allPhotos = [inUse1, inUsePlane4, inUse2, inUse3, inUseCar, inUsePlane, inUsePlane2, inUseCar2, inUsePlane3];
+              const allPhotos = [inUse1, inUsePlane4, inUse2, customerPlaneWoman, inUse3, inUseCar, inUsePlane, inUsePlane2, inUseCar2, inUsePlane3, testimonialJames, testimonialMike, testimonialAlex, testimonialSophie];
               const visibleCount = 5;
               const maxOffset = allPhotos.length - visibleCount;
               return (
