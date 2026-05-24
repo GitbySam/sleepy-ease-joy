@@ -76,7 +76,7 @@ function getCommonContext() {
 /** Track a funnel step. Fire-and-forget. */
 export function trackFunnelStep(
   step: FunnelStep,
-  data: { step_value?: string; value?: number; currency?: string; metadata?: Record<string, unknown> } = {}
+  data: { step_value?: string; value?: number; currency?: string; metadata?: Record<string, unknown>; beacon?: boolean } = {}
 ) {
   if (typeof window === 'undefined') return;
   // Skip admin sessions
@@ -84,19 +84,42 @@ export function trackFunnelStep(
 
   try {
     const ctx = getCommonContext();
-    supabase
-      .from('funnel_events')
-      .insert([{
-        ...ctx,
-        step,
-        step_value: data.step_value ?? null,
-        value: data.value ?? null,
-        currency: data.currency ?? null,
-        metadata: (data.metadata ?? null) as never,
-      }])
-      .then(({ error }) => {
-        if (error) console.warn('[funnel] insert failed', error.message);
-      });
+    const row = {
+      ...ctx,
+      step,
+      step_value: data.step_value ?? null,
+      value: data.value ?? null,
+      currency: data.currency ?? null,
+      metadata: (data.metadata ?? null) as never,
+    };
+
+    // For critical pre-navigation events (checkout), use sendBeacon so the
+    // request survives the immediate tab/page change. Beacon hits the REST
+    // endpoint directly with the anon key.
+    let beaconSent = false;
+    if (data.beacon && typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+      try {
+        const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/funnel_events`;
+        const apiKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+        // sendBeacon requires a Blob with the right MIME; we also need the
+        // apikey, which Beacon can't send as a header. Workaround: encode
+        // it in the URL via the `apikey` query param — Supabase accepts it.
+        const blob = new Blob([JSON.stringify(row)], { type: 'application/json' });
+        const beaconUrl = `${url}?apikey=${encodeURIComponent(apiKey)}`;
+        beaconSent = navigator.sendBeacon(beaconUrl, blob);
+      } catch {
+        beaconSent = false;
+      }
+    }
+
+    if (!beaconSent) {
+      supabase
+        .from('funnel_events')
+        .insert([row])
+        .then(({ error }) => {
+          if (error) console.warn('[funnel] insert failed', error.message);
+        });
+    }
 
     // Also tag the Clarity session timeline
     clarityEvent(`funnel_${step}`);
