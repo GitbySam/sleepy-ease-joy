@@ -18,6 +18,7 @@ const Shipping = lazy(() => import("./pages/Shipping"));
 const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
 import { useCartSync } from "./hooks/useCartSync";
 import CheckoutRedirectOverlay from "./components/CheckoutRedirectOverlay";
+import InAppBrowserBanner from "./components/InAppBrowserBanner";
 
 const queryClient = new QueryClient();
 
@@ -64,6 +65,7 @@ const AppRoutes = () => {
           <Sonner />
           <CartSyncWrapper />
           <CheckoutRedirectOverlay />
+          <InAppBrowserBanner />
           <BrowserRouter>
             <ScrollToHash />
             <RouteTracker />
