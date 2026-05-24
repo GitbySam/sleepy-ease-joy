@@ -150,6 +150,23 @@ export const ShopifyCartDrawer = () => {
       });
       return;
     }
+    // Dedupe rapid double-clicks (< 1.5s) so they don't inflate metrics.
+    const now = Date.now();
+    const w = window as unknown as { __lastCheckoutClick?: number };
+    if (w.__lastCheckoutClick && now - w.__lastCheckoutClick < 1500) {
+      return;
+    }
+    w.__lastCheckoutClick = now;
+
+    // Detect in-app browsers (Instagram, TikTok, Facebook, Snapchat, Line,
+    // Messenger) — these often report popup-blocked even when the new tab
+    // actually opens. We log it as metadata so we can disambiguate later.
+    const ua = navigator.userAgent || '';
+    const inAppBrowser =
+      /Instagram|FBAN|FBAV|FB_IAB|Messenger|TikTok|musical_ly|Snapchat|Line\//i.test(ua)
+        ? ua.match(/Instagram|FBAN|FBAV|FB_IAB|Messenger|TikTok|musical_ly|Snapchat|Line\//i)?.[0] ?? 'unknown'
+        : null;
+
     const clickTs = Date.now();
     // CRITICAL: open the popup SYNCHRONOUSLY at the very top of the click
     // handler, BEFORE any await/Supabase call. Otherwise mobile Safari /
@@ -165,7 +182,8 @@ export const ShopifyCartDrawer = () => {
       trackFunnelStep('click_checkout', {
         value: totalPrice,
         currency,
-        metadata: { items: totalItems },
+        metadata: { items: totalItems, inAppBrowser },
+        beacon: true,
       });
       trackFunnelStep(popupOpened ? 'checkout_opened' : 'checkout_popup_blocked', {
         value: totalPrice,
@@ -174,7 +192,9 @@ export const ShopifyCartDrawer = () => {
           items: totalItems,
           latencyMs,
           mode: popupOpened ? 'new_tab' : 'same_tab_fallback',
+          inAppBrowser,
         },
+        beacon: true,
       });
       trackInitiateCheckout({
         value: totalPrice,
