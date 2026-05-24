@@ -1,9 +1,13 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+import { applyDomTranslatePatch } from "./lib/domTranslatePatch";
 import { initMetaPixel, initScrollTracking, initTimeOnSite } from "./lib/metaPixel";
 import { initClarity } from "./lib/clarity";
 import { initFrictionDetectors, tagClaritySession, trackFunnelStep } from "./lib/funnelTracking";
+
+// Must run BEFORE React renders — fixes browser-translation removeChild crash.
+applyDomTranslatePatch();
 
 // Initialize Meta Pixel after first render to capture all visitors
 if (typeof requestIdleCallback !== "undefined") {
