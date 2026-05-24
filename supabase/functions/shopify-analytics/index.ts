@@ -3,7 +3,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const SHOPIFY_STORE_DOMAIN = 'kdpwn5-0h.myshopify.com';
+const SHOPIFY_STORE_DOMAIN = 'sleepenzy.myshopify.com';
 const SHOPIFY_API_VERSION = '2025-07';
 
 function jsonResponse(body: Record<string, unknown>, status = 200) {
@@ -13,20 +13,89 @@ function jsonResponse(body: Record<string, unknown>, status = 200) {
   });
 }
 
+// In-memory token cache (per cold-start). OAuth client_credentials tokens
+// from the Shopify Dev Dashboard expire after ~24h.
+let cachedToken: { value: string; expiresAt: number } | null = null;
+
+async function getShopifyAccessToken(): Promise<{ token?: string; error?: Response }> {
+  // Re-use cached token if it's still valid for at least 5 minutes
+  if (cachedToken && cachedToken.expiresAt - Date.now() > 5 * 60 * 1000) {
+    return { token: cachedToken.value };
+  }
+
+  // Allow legacy permanent token if present (backwards compat)
+  const legacyToken =
+    Deno.env.get('SHOPIFY_ADMIN_API_TOKEN') ?? Deno.env.get('SHOPIFY_ACCESS_TOKEN');
+  const clientId = Deno.env.get('SHOPIFY_CLIENT_ID');
+  const clientSecret = Deno.env.get('SHOPIFY_CLIENT_SECRET');
+
+  if (clientId && clientSecret) {
+    const tokenRes = await fetch(`https://${SHOPIFY_STORE_DOMAIN}/admin/oauth/access_token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        client_id: clientId,
+        client_secret: clientSecret,
+        grant_type: 'client_credentials',
+      }),
+    });
+
+    if (!tokenRes.ok) {
+      const errText = await tokenRes.text();
+      console.error('Shopify OAuth token exchange failed:', tokenRes.status, errText);
+      return {
+        error: jsonResponse({
+          code: 'shopify_oauth_failed',
+          error: `Échec de l'échange OAuth Shopify [${tokenRes.status}].`,
+          details: errText.slice(0, 500),
+          action:
+            "Vérifie SHOPIFY_CLIENT_ID / SHOPIFY_CLIENT_SECRET du Dev Dashboard et que l'app est installée sur la boutique.",
+        }, 502),
+      };
+    }
+
+    const tokenData = await tokenRes.json();
+    const accessToken: string | undefined = tokenData.access_token;
+    const expiresIn: number = tokenData.expires_in ?? 86400; // default 24h
+    if (!accessToken) {
+      return {
+        error: jsonResponse({
+          code: 'shopify_oauth_no_token',
+          error: "Shopify n'a pas renvoyé d'access_token.",
+          details: JSON.stringify(tokenData).slice(0, 500),
+        }, 502),
+      };
+    }
+
+    cachedToken = {
+      value: accessToken,
+      expiresAt: Date.now() + expiresIn * 1000,
+    };
+    return { token: accessToken };
+  }
+
+  if (legacyToken) {
+    return { token: legacyToken };
+  }
+
+  return {
+    error: jsonResponse({
+      code: 'shopify_credentials_missing',
+      error: 'Identifiants Shopify manquants.',
+      action:
+        'Configure SHOPIFY_CLIENT_ID et SHOPIFY_CLIENT_SECRET (depuis le Dev Dashboard Shopify).',
+    }),
+  };
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
-  const SHOPIFY_ACCESS_TOKEN =
-    Deno.env.get('SHOPIFY_ADMIN_API_TOKEN') ?? Deno.env.get('SHOPIFY_ACCESS_TOKEN');
-  if (!SHOPIFY_ACCESS_TOKEN) {
-    return jsonResponse({
-      code: 'shopify_token_missing',
-      error: 'SHOPIFY_ADMIN_API_TOKEN is not configured.',
-      action: 'Ajoute un token Shopify Admin API permanent qui commence par shpat_.',
-    });
-  }
+  const tokenResult = await getShopifyAccessToken();
+  if (tokenResult.error) return tokenResult.error;
+  const SHOPIFY_ACCESS_TOKEN = tokenResult.token!;
 
   try {
     const url = new URL(req.url);
@@ -50,10 +119,13 @@ Deno.serve(async (req) => {
       const errorText = await ordersRes.text();
       if (ordersRes.status === 401 || ordersRes.status === 403) {
         console.error('Shopify Admin API authentication failed:', errorText);
+        // Invalidate cache so the next call tries to refresh
+        cachedToken = null;
         return jsonResponse({
           code: 'shopify_admin_auth_failed',
-          error: 'Token Shopify Admin invalide ou expiré. Mets à jour SHOPIFY_ADMIN_API_TOKEN avec un token Admin API permanent commençant par shpat_.',
-          action: 'Scopes requis : read_orders, read_customers, read_checkouts.',
+          error: 'Token Shopify invalide ou scopes insuffisants.',
+          action: "Vérifie que l'app Dev Dashboard est installée sur la boutique et a les scopes read_orders, read_customers, read_checkouts.",
+          details: errorText.slice(0, 500),
         });
       }
 
