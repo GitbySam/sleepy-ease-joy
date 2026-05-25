@@ -1,4 +1,6 @@
 // Meta Pixel (Facebook Pixel) tracking utility
+import { sendCapiEvent, makeEventId } from './metaCapi';
+
 const PIXEL_ID = '2093867758129616';
 
 declare global {
@@ -33,13 +35,17 @@ export function initMetaPixel() {
   firstScript?.parentNode?.insertBefore(s, firstScript);
 
   window.fbq('init', PIXEL_ID);
-  window.fbq('track', 'PageView');
+  const eventID = makeEventId();
+  window.fbq('track', 'PageView', {}, { eventID });
+  sendCapiEvent({ event_name: 'PageView', event_id: eventID });
 }
 
 /** Track a page view (call on route change) */
 export function trackPageView() {
   if (!window.fbq) return;
-  window.fbq('track', 'PageView');
+  const eventID = makeEventId();
+  window.fbq('track', 'PageView', {}, { eventID });
+  sendCapiEvent({ event_name: 'PageView', event_id: eventID });
 }
 
 /** Track product view */
@@ -50,13 +56,16 @@ export function trackViewContent(params: {
   currency?: string;
 }) {
   if (!window.fbq) return;
-  window.fbq('track', 'ViewContent', {
+  const eventID = makeEventId();
+  const data = {
     content_name: params.contentName,
     content_ids: [params.contentId],
     content_type: 'product',
     value: params.value ?? 0,
     currency: params.currency ?? 'EUR',
-  });
+  };
+  window.fbq('track', 'ViewContent', data, { eventID });
+  sendCapiEvent({ event_name: 'ViewContent', event_id: eventID, ...data });
 }
 
 /** Track add to cart */
@@ -68,14 +77,17 @@ export function trackAddToCart(params: {
   quantity?: number;
 }) {
   if (!window.fbq) return;
-  window.fbq('track', 'AddToCart', {
+  const eventID = makeEventId();
+  const data = {
     content_name: params.contentName,
     content_ids: [params.contentId],
     content_type: 'product',
     value: params.value,
     currency: params.currency ?? 'EUR',
     num_items: params.quantity ?? 1,
-  });
+  };
+  window.fbq('track', 'AddToCart', data, { eventID });
+  sendCapiEvent({ event_name: 'AddToCart', event_id: eventID, ...data });
 }
 
 /** Track initiate checkout */
@@ -85,11 +97,14 @@ export function trackInitiateCheckout(params: {
   numItems: number;
 }) {
   if (!window.fbq) return;
-  window.fbq('track', 'InitiateCheckout', {
+  const eventID = makeEventId();
+  const data = {
     value: params.value,
     currency: params.currency ?? 'EUR',
     num_items: params.numItems,
-  });
+  };
+  window.fbq('track', 'InitiateCheckout', data, { eventID });
+  sendCapiEvent({ event_name: 'InitiateCheckout', event_id: eventID, ...data });
 }
 
 /** Track scroll depth milestones */
