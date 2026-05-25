@@ -28,6 +28,7 @@ const TABS = [
   { id: "traffic", label: "📈 Trafic" },
   { id: "sources", label: "🔗 Sources" },
   { id: "meta", label: "📱 Meta Ads" },
+  { id: "attribution", label: "🎯 Attribution" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -95,6 +96,7 @@ export default function AdminAnalytics() {
         {activeTab === "traffic" && <TrafficTab />}
         {activeTab === "sources" && <SourcesTab />}
         {activeTab === "meta" && <MetaTab />}
+        {activeTab === "attribution" && <AttributionTab days={days} />}
       </div>
     </div>
   );
