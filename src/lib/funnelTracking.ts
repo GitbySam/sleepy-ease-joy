@@ -144,8 +144,13 @@ export function trackFriction(
   if (window.location.pathname.startsWith('/admin')) return;
 
   try {
-    const { referrer: _r, ...ctx } = getCommonContext();
-    void _r;
+    const {
+      referrer: _r,
+      utm_source: _s, utm_medium: _m, utm_campaign: _c,
+      utm_content: _ct, utm_term: _tm, fbclid: _f, landing_page: _lp,
+      ...ctx
+    } = getCommonContext();
+    void _r; void _s; void _m; void _c; void _ct; void _tm; void _f; void _lp;
     supabase
       .from('friction_events')
       .insert([{
