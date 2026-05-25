@@ -53,6 +53,13 @@ function getCommonContext() {
       language: null as string | null,
       device: 'unknown',
       user_agent: '',
+      utm_source: null as string | null,
+      utm_medium: null as string | null,
+      utm_campaign: null as string | null,
+      utm_content: null as string | null,
+      utm_term: null as string | null,
+      fbclid: null as string | null,
+      landing_page: null as string | null,
     };
   }
   let market: string | null = null;
