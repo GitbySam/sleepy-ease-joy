@@ -28,6 +28,7 @@ const TABS = [
   { id: "traffic", label: "📈 Trafic" },
   { id: "sources", label: "🔗 Sources" },
   { id: "meta", label: "📱 Meta Ads" },
+  { id: "attribution", label: "🎯 Attribution" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -95,6 +96,345 @@ export default function AdminAnalytics() {
         {activeTab === "traffic" && <TrafficTab />}
         {activeTab === "sources" && <SourcesTab />}
         {activeTab === "meta" && <MetaTab />}
+        {activeTab === "attribution" && <AttributionTab days={days} />}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────── ATTRIBUTION TAB ─────────── */
+type AttribRow = {
+  visitor_id: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  utm_content: string | null;
+  fbclid: string | null;
+};
+
+function classifySource(r: { utm_source: string | null; fbclid: string | null }): string {
+  if (r.utm_source) return r.utm_source.toLowerCase();
+  if (r.fbclid) return 'facebook';
+  return 'direct';
+}
+
+function AttributionTab({ days }: { days: number }) {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [sessions, setSessions] = useState<AttribRow[]>([]);
+  const [carts, setCarts] = useState<AttribRow[]>([]);
+  const [checkouts, setCheckouts] = useState<AttribRow[]>([]);
+  const [drilldown, setDrilldown] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const sinceISO = new Date(Date.now() - days * 86400000).toISOString();
+      const [sRes, cRes, kRes] = await Promise.all([
+        supabase.from('funnel_events')
+          .select('visitor_id, utm_source, utm_medium, utm_campaign, utm_content, fbclid')
+          .eq('step', 'session_landing')
+          .gte('created_at', sinceISO),
+        supabase.from('cart_events')
+          .select('visitor_id, utm_source, utm_medium, utm_campaign, utm_content, fbclid')
+          .gte('created_at', sinceISO),
+        supabase.from('checkout_events')
+          .select('visitor_id, utm_source, utm_medium, utm_campaign, utm_content, fbclid')
+          .gte('created_at', sinceISO),
+      ]);
+      if (sRes.error || cRes.error || kRes.error) {
+        throw new Error((sRes.error || cRes.error || kRes.error)?.message || 'fetch failed');
+      }
+      setSessions((sRes.data || []) as AttribRow[]);
+      setCarts((cRes.data || []) as AttribRow[]);
+      setCheckouts((kRes.data || []) as AttribRow[]);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erreur');
+    }
+    setLoading(false);
+  }, [days]);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <span className="ml-3 text-gray-500">Chargement de l'attribution…</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="bg-white border-2 border-red-200">
+        <CardContent className="p-6 text-sm text-red-700">{error}</CardContent>
+      </Card>
+    );
+  }
+
+  // ── KPIs by source ──
+  const sourceMap = new Map<string, { sessions: Set<string>; carts: Set<string>; checkouts: Set<string> }>();
+  const ensure = (k: string) => {
+    if (!sourceMap.has(k)) sourceMap.set(k, { sessions: new Set(), carts: new Set(), checkouts: new Set() });
+    return sourceMap.get(k)!;
+  };
+  sessions.forEach((r) => {
+    if (!r.visitor_id) return;
+    ensure(classifySource(r)).sessions.add(r.visitor_id);
+  });
+  carts.forEach((r) => {
+    if (!r.visitor_id) return;
+    ensure(classifySource(r)).carts.add(r.visitor_id);
+  });
+  checkouts.forEach((r) => {
+    if (!r.visitor_id) return;
+    ensure(classifySource(r)).checkouts.add(r.visitor_id);
+  });
+  const sourceRows = Array.from(sourceMap.entries())
+    .map(([source, v]) => ({
+      source,
+      sessions: v.sessions.size,
+      carts: v.carts.size,
+      checkouts: v.checkouts.size,
+      cartRate: v.sessions.size ? (v.carts.size / v.sessions.size) * 100 : 0,
+      coRate: v.sessions.size ? (v.checkouts.size / v.sessions.size) * 100 : 0,
+    }))
+    .sort((a, b) => b.checkouts - a.checkouts || b.sessions - a.sessions);
+
+  const totalSessions = sessions.length;
+  const paidSessions = sessions.filter((r) => r.utm_medium === 'paid' || r.fbclid).length;
+
+  // ── Campaign breakdown ──
+  const campaignMap = new Map<string, { source: string; sessions: Set<string>; carts: Set<string>; checkouts: Set<string> }>();
+  const ensureC = (k: string, source: string) => {
+    if (!campaignMap.has(k)) campaignMap.set(k, { source, sessions: new Set(), carts: new Set(), checkouts: new Set() });
+    return campaignMap.get(k)!;
+  };
+  sessions.forEach((r) => {
+    if (!r.visitor_id || !r.utm_campaign) return;
+    ensureC(r.utm_campaign, classifySource(r)).sessions.add(r.visitor_id);
+  });
+  carts.forEach((r) => {
+    if (!r.visitor_id || !r.utm_campaign) return;
+    ensureC(r.utm_campaign, classifySource(r)).carts.add(r.visitor_id);
+  });
+  checkouts.forEach((r) => {
+    if (!r.visitor_id || !r.utm_campaign) return;
+    ensureC(r.utm_campaign, classifySource(r)).checkouts.add(r.visitor_id);
+  });
+  const campaignRows = Array.from(campaignMap.entries())
+    .map(([campaign, v]) => ({
+      campaign,
+      source: v.source,
+      sessions: v.sessions.size,
+      carts: v.carts.size,
+      checkouts: v.checkouts.size,
+      cartRate: v.sessions.size ? (v.carts.size / v.sessions.size) * 100 : 0,
+      coRate: v.sessions.size ? (v.checkouts.size / v.sessions.size) * 100 : 0,
+    }))
+    .sort((a, b) => b.checkouts - a.checkouts || b.sessions - a.sessions);
+
+  // ── Creative drilldown (utm_content) for selected campaign ──
+  let creativeRows: Array<{ creative: string; sessions: number; carts: number; checkouts: number }> = [];
+  if (drilldown) {
+    const creativeMap = new Map<string, { sessions: Set<string>; carts: Set<string>; checkouts: Set<string> }>();
+    const ensureK = (k: string) => {
+      if (!creativeMap.has(k)) creativeMap.set(k, { sessions: new Set(), carts: new Set(), checkouts: new Set() });
+      return creativeMap.get(k)!;
+    };
+    sessions.forEach((r) => {
+      if (r.utm_campaign !== drilldown || !r.visitor_id) return;
+      ensureK(r.utm_content || '(sans nom)').sessions.add(r.visitor_id);
+    });
+    carts.forEach((r) => {
+      if (r.utm_campaign !== drilldown || !r.visitor_id) return;
+      ensureK(r.utm_content || '(sans nom)').carts.add(r.visitor_id);
+    });
+    checkouts.forEach((r) => {
+      if (r.utm_campaign !== drilldown || !r.visitor_id) return;
+      ensureK(r.utm_content || '(sans nom)').checkouts.add(r.visitor_id);
+    });
+    creativeRows = Array.from(creativeMap.entries())
+      .map(([creative, v]) => ({
+        creative,
+        sessions: v.sessions.size,
+        carts: v.carts.size,
+        checkouts: v.checkouts.size,
+      }))
+      .sort((a, b) => b.checkouts - a.checkouts || b.sessions - a.sessions);
+  }
+
+  const noAttribution = sourceRows.find((r) => r.source === 'direct');
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <p className="text-xs text-gray-500">
+          Période : {days} derniers jours · {sessions.length} sessions trackées
+        </p>
+        <button
+          onClick={fetchData}
+          className="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-200"
+        >
+          <RefreshCw className="h-3.5 w-3.5" /> Actualiser
+        </button>
+      </div>
+
+      {/* KPIs */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <Card className="bg-white"><CardContent className="p-4">
+          <p className="text-xs text-gray-500 uppercase tracking-wide">Sessions totales</p>
+          <p className="text-3xl font-bold text-gray-900 mt-1">{totalSessions}</p>
+        </CardContent></Card>
+        <Card className="bg-white"><CardContent className="p-4">
+          <p className="text-xs text-gray-500 uppercase tracking-wide">Sessions payantes</p>
+          <p className="text-3xl font-bold text-emerald-700 mt-1">{paidSessions}</p>
+          <p className="text-xs text-gray-400 mt-1">{totalSessions ? `${((paidSessions / totalSessions) * 100).toFixed(1)} % du total` : '—'}</p>
+        </CardContent></Card>
+        <Card className="bg-white"><CardContent className="p-4">
+          <p className="text-xs text-gray-500 uppercase tracking-wide">Sans attribution (direct)</p>
+          <p className="text-3xl font-bold text-gray-700 mt-1">{noAttribution?.sessions ?? 0}</p>
+          <p className="text-xs text-gray-400 mt-1">organique / direct / bookmark</p>
+        </CardContent></Card>
+        <Card className="bg-white"><CardContent className="p-4">
+          <p className="text-xs text-gray-500 uppercase tracking-wide">Campagnes actives</p>
+          <p className="text-3xl font-bold text-gray-900 mt-1">{campaignRows.length}</p>
+        </CardContent></Card>
+      </div>
+
+      {/* By source */}
+      <div>
+        <h3 className="text-sm font-semibold text-gray-700 mb-3">📡 Performance par source</h3>
+        <Card className="bg-white">
+          <CardContent className="p-0 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+                <tr>
+                  <th className="px-4 py-3 text-left">Source</th>
+                  <th className="px-4 py-3 text-right">Sessions</th>
+                  <th className="px-4 py-3 text-right">Ajouts panier</th>
+                  <th className="px-4 py-3 text-right">Checkouts</th>
+                  <th className="px-4 py-3 text-right">Taux panier</th>
+                  <th className="px-4 py-3 text-right">Taux checkout</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sourceRows.length === 0 && (
+                  <tr><td colSpan={6} className="px-4 py-6 text-center text-gray-400">Aucune donnée</td></tr>
+                )}
+                {sourceRows.map((r) => (
+                  <tr key={r.source} className="border-t border-gray-100">
+                    <td className="px-4 py-3 font-medium text-gray-900">{r.source}</td>
+                    <td className="px-4 py-3 text-right">{r.sessions}</td>
+                    <td className="px-4 py-3 text-right">{r.carts}</td>
+                    <td className="px-4 py-3 text-right font-semibold text-emerald-700">{r.checkouts}</td>
+                    <td className="px-4 py-3 text-right text-gray-600">{r.cartRate.toFixed(1)} %</td>
+                    <td className="px-4 py-3 text-right text-gray-600">{r.coRate.toFixed(1)} %</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* By campaign */}
+      <div>
+        <h3 className="text-sm font-semibold text-gray-700 mb-3">🎯 Performance par campagne</h3>
+        <Card className="bg-white">
+          <CardContent className="p-0 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+                <tr>
+                  <th className="px-4 py-3 text-left">Campagne</th>
+                  <th className="px-4 py-3 text-left">Source</th>
+                  <th className="px-4 py-3 text-right">Sessions</th>
+                  <th className="px-4 py-3 text-right">Ajouts panier</th>
+                  <th className="px-4 py-3 text-right">Checkouts</th>
+                  <th className="px-4 py-3 text-right">Taux panier</th>
+                  <th className="px-4 py-3 text-right">Taux checkout</th>
+                </tr>
+              </thead>
+              <tbody>
+                {campaignRows.length === 0 && (
+                  <tr><td colSpan={7} className="px-4 py-6 text-center text-gray-400">
+                    Aucune campagne détectée. Configure les UTM dans Meta Ads Manager.
+                  </td></tr>
+                )}
+                {campaignRows.map((r) => (
+                  <tr
+                    key={r.campaign}
+                    onClick={() => setDrilldown(drilldown === r.campaign ? null : r.campaign)}
+                    className={`border-t border-gray-100 cursor-pointer hover:bg-blue-50 ${drilldown === r.campaign ? 'bg-blue-50' : ''}`}
+                  >
+                    <td className="px-4 py-3 font-medium text-gray-900">{r.campaign}</td>
+                    <td className="px-4 py-3 text-gray-600">{r.source}</td>
+                    <td className="px-4 py-3 text-right">{r.sessions}</td>
+                    <td className="px-4 py-3 text-right">{r.carts}</td>
+                    <td className="px-4 py-3 text-right font-semibold text-emerald-700">{r.checkouts}</td>
+                    <td className="px-4 py-3 text-right text-gray-600">{r.cartRate.toFixed(1)} %</td>
+                    <td className="px-4 py-3 text-right text-gray-600">{r.coRate.toFixed(1)} %</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </CardContent>
+        </Card>
+        {campaignRows.length > 0 && (
+          <p className="text-xs text-gray-400 mt-2">💡 Clique sur une campagne pour voir le détail par créatif.</p>
+        )}
+      </div>
+
+      {/* Creative drilldown */}
+      {drilldown && (
+        <div>
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">
+            🎨 Créatifs — campagne « {drilldown} »
+          </h3>
+          <Card className="bg-white">
+            <CardContent className="p-0 overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+                  <tr>
+                    <th className="px-4 py-3 text-left">Créatif (utm_content)</th>
+                    <th className="px-4 py-3 text-right">Sessions</th>
+                    <th className="px-4 py-3 text-right">Ajouts panier</th>
+                    <th className="px-4 py-3 text-right">Checkouts</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {creativeRows.length === 0 && (
+                    <tr><td colSpan={4} className="px-4 py-6 text-center text-gray-400">Aucun utm_content détaillé</td></tr>
+                  )}
+                  {creativeRows.map((r) => (
+                    <tr key={r.creative} className="border-t border-gray-100">
+                      <td className="px-4 py-3 font-medium text-gray-900">{r.creative}</td>
+                      <td className="px-4 py-3 text-right">{r.sessions}</td>
+                      <td className="px-4 py-3 text-right">{r.carts}</td>
+                      <td className="px-4 py-3 text-right font-semibold text-emerald-700">{r.checkouts}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Help */}
+      <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm text-amber-900">
+        <p className="font-semibold mb-1">💡 Configurer Meta Ads pour un suivi précis</p>
+        <p className="text-xs mb-2">
+          Dans Meta Ads Manager, ouvre ton ad set → niveau Annonce → champ <strong>« Paramètres d'URL »</strong> et colle :
+        </p>
+        <pre className="text-xs bg-white border border-amber-200 rounded p-2 overflow-x-auto">
+utm_source=facebook&amp;utm_medium=paid&amp;utm_campaign=&#123;&#123;campaign.name&#125;&#125;&amp;utm_content=&#123;&#123;ad.name&#125;&#125;&amp;utm_term=&#123;&#123;adset.name&#125;&#125;
+        </pre>
+        <p className="text-xs mt-2">
+          Les noms réels des campagnes / ad sets / créatifs remonteront automatiquement ici. À défaut d'UTM, on retombe sur <code>fbclid</code> (présent sur tous les clics Meta).
+        </p>
       </div>
     </div>
   );

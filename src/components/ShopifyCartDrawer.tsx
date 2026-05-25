@@ -12,6 +12,7 @@ import { trackInitiateCheckout } from "@/lib/metaPixel";
 import { trackFunnelStep, trackFriction } from "@/lib/funnelTracking";
 import { supabase } from "@/integrations/supabase/client";
 import { getVisitorId } from "@/lib/visitorId";
+import { getAttributionFields } from "@/lib/attribution";
 import pillowGrey from "@/assets/product-pillow-grey-new.webp";
 import pillowBlack from "@/assets/product-pillow-black.webp";
 import pillowRed from "@/assets/product-pillow-red.webp";
@@ -221,6 +222,7 @@ export const ShopifyCartDrawer = () => {
           user_agent: navigator.userAgent,
           referrer: document.referrer || null,
           visitor_id: getVisitorId(),
+          ...getAttributionFields(),
         };
         supabase.from('checkout_events').insert([payload]).select('id').single().then(({ data, error }) => {
           if (error) {

@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { supabase } from '@/integrations/supabase/client';
 import { getVisitorId } from '@/lib/visitorId';
 import { trackFriction } from '@/lib/funnelTracking';
+import { getAttributionFields } from '@/lib/attribution';
 import {
   type CartItemData,
   type ShopifyProduct,
@@ -76,6 +77,7 @@ export const useCartStore = create<CartStore>()(
             referrer: document.referrer || null,
             source,
             visitor_id: getVisitorId(),
+            ...getAttributionFields(),
           }]).then(); // fire-and-forget
 
           if (!cartId) {

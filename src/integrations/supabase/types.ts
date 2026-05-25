@@ -18,36 +18,57 @@ export type Database = {
         Row: {
           bundle_label: string | null
           created_at: string
+          fbclid: string | null
           id: string
+          landing_page: string | null
           price: number | null
           quantity: number
           referrer: string | null
           source: string | null
           user_agent: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
           variant_id: string
           visitor_id: string | null
         }
         Insert: {
           bundle_label?: string | null
           created_at?: string
+          fbclid?: string | null
           id?: string
+          landing_page?: string | null
           price?: number | null
           quantity?: number
           referrer?: string | null
           source?: string | null
           user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
           variant_id: string
           visitor_id?: string | null
         }
         Update: {
           bundle_label?: string | null
           created_at?: string
+          fbclid?: string | null
           id?: string
+          landing_page?: string | null
           price?: number | null
           quantity?: number
           referrer?: string | null
           source?: string | null
           user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
           variant_id?: string
           visitor_id?: string | null
         }
@@ -61,12 +82,19 @@ export type Database = {
           discount_code: string | null
           display_latency_ms: number | null
           displayed: boolean
+          fbclid: string | null
           id: string
+          landing_page: string | null
           referrer: string | null
           source: string | null
           total_items: number
           total_price: number | null
           user_agent: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
           variant_ids: string[] | null
           visitor_id: string | null
         }
@@ -77,12 +105,19 @@ export type Database = {
           discount_code?: string | null
           display_latency_ms?: number | null
           displayed?: boolean
+          fbclid?: string | null
           id?: string
+          landing_page?: string | null
           referrer?: string | null
           source?: string | null
           total_items?: number
           total_price?: number | null
           user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
           variant_ids?: string[] | null
           visitor_id?: string | null
         }
@@ -93,12 +128,19 @@ export type Database = {
           discount_code?: string | null
           display_latency_ms?: number | null
           displayed?: boolean
+          fbclid?: string | null
           id?: string
+          landing_page?: string | null
           referrer?: string | null
           source?: string | null
           total_items?: number
           total_price?: number | null
           user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
           variant_ids?: string[] | null
           visitor_id?: string | null
         }
@@ -157,7 +199,9 @@ export type Database = {
           created_at: string
           currency: string | null
           device: string | null
+          fbclid: string | null
           id: string
+          landing_page: string | null
           language: string | null
           market: string | null
           metadata: Json | null
@@ -166,6 +210,11 @@ export type Database = {
           step: string
           step_value: string | null
           user_agent: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
           value: number | null
           visitor_id: string
         }
@@ -173,7 +222,9 @@ export type Database = {
           created_at?: string
           currency?: string | null
           device?: string | null
+          fbclid?: string | null
           id?: string
+          landing_page?: string | null
           language?: string | null
           market?: string | null
           metadata?: Json | null
@@ -182,6 +233,11 @@ export type Database = {
           step: string
           step_value?: string | null
           user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
           value?: number | null
           visitor_id: string
         }
@@ -189,7 +245,9 @@ export type Database = {
           created_at?: string
           currency?: string | null
           device?: string | null
+          fbclid?: string | null
           id?: string
+          landing_page?: string | null
           language?: string | null
           market?: string | null
           metadata?: Json | null
@@ -198,6 +256,11 @@ export type Database = {
           step?: string
           step_value?: string | null
           user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
           value?: number | null
           visitor_id?: string
         }

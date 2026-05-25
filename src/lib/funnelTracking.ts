@@ -11,6 +11,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { getVisitorId } from '@/lib/visitorId';
 import { clarityEvent, clarityTag } from '@/lib/clarity';
+import { getAttributionFields } from '@/lib/attribution';
 
 export type FunnelStep =
   | 'session_landing'
@@ -52,6 +53,13 @@ function getCommonContext() {
       language: null as string | null,
       device: 'unknown',
       user_agent: '',
+      utm_source: null as string | null,
+      utm_medium: null as string | null,
+      utm_campaign: null as string | null,
+      utm_content: null as string | null,
+      utm_term: null as string | null,
+      fbclid: null as string | null,
+      landing_page: null as string | null,
     };
   }
   let market: string | null = null;
@@ -70,6 +78,7 @@ function getCommonContext() {
     language,
     device: getDevice(),
     user_agent: navigator.userAgent,
+    ...getAttributionFields(),
   };
 }
 
@@ -142,8 +151,13 @@ export function trackFriction(
   if (window.location.pathname.startsWith('/admin')) return;
 
   try {
-    const { referrer: _r, ...ctx } = getCommonContext();
-    void _r;
+    const {
+      referrer: _r,
+      utm_source: _s, utm_medium: _m, utm_campaign: _c,
+      utm_content: _ct, utm_term: _tm, fbclid: _f, landing_page: _lp,
+      ...ctx
+    } = getCommonContext();
+    void _r; void _s; void _m; void _c; void _ct; void _tm; void _f; void _lp;
     supabase
       .from('friction_events')
       .insert([{
