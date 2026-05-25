@@ -5,9 +5,14 @@ import { applyDomTranslatePatch } from "./lib/domTranslatePatch";
 import { initMetaPixel, initScrollTracking, initTimeOnSite } from "./lib/metaPixel";
 import { initClarity } from "./lib/clarity";
 import { initFrictionDetectors, tagClaritySession, trackFunnelStep } from "./lib/funnelTracking";
+import { captureAttribution } from "./lib/attribution";
 
 // Must run BEFORE React renders — fixes browser-translation removeChild crash.
 applyDomTranslatePatch();
+
+// Capture marketing attribution as early as possible so every subsequent
+// event (cart, checkout, funnel) carries the source ad info.
+captureAttribution();
 
 // Initialize Meta Pixel after first render to capture all visitors
 if (typeof requestIdleCallback !== "undefined") {
