@@ -11,6 +11,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { getVisitorId } from '@/lib/visitorId';
 import { clarityEvent, clarityTag } from '@/lib/clarity';
+import { getAttributionFields } from '@/lib/attribution';
 
 export type FunnelStep =
   | 'session_landing'
@@ -70,6 +71,7 @@ function getCommonContext() {
     language,
     device: getDevice(),
     user_agent: navigator.userAgent,
+    ...getAttributionFields(),
   };
 }
 
