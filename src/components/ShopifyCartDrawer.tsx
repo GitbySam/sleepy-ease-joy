@@ -221,6 +221,7 @@ export const ShopifyCartDrawer = () => {
           user_agent: navigator.userAgent,
           referrer: document.referrer || null,
           visitor_id: getVisitorId(),
+          ...getAttributionFields(),
         };
         supabase.from('checkout_events').insert([payload]).select('id').single().then(({ data, error }) => {
           if (error) {
