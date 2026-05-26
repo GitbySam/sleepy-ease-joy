@@ -1,109 +1,64 @@
-# Attribution publicitaire Meta — Capture + Dashboard
-
 ## Objectif
 
-Savoir précisément quelle **campagne / ad set / créatif Meta** a amené chaque visiteur, et croiser ça avec les **ajouts au panier** et **checkouts** pour mesurer ce qui convertit vraiment.
+Corriger les 6 failles de sécurité signalées **sans casser** le site public ni le tracking analytics. Les visiteurs continuent de naviguer et de générer des événements (cart, funnel, etc.) exactement comme avant. Seul l'accès aux **données** analytics et au **dashboard admin** devient protégé.
 
----
+## Failles à corriger
 
-## Phase 1 — Capture & stockage
+1. `/admin/analytics` accessible à tout le monde (revenus, emails clients visibles)
+2. Edge function `shopify-analytics` appelable par n'importe qui avec la clé anon
+3. Tables `cart_events`, `checkout_events`, `friction_events`, `funnel_events` : lecture publique de toutes les données business
 
-### 1.1 Nouveau module `src/lib/attribution.ts`
-Au tout premier landing du visiteur :
-- Parser `window.location.search` pour extraire :
-  - `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`
-  - `fbclid` (Meta), `gclid` (Google bonus), `ttclid` (TikTok bonus)
-- Détecter la source si UTM absents : parser `document.referrer` (facebook.com, instagram.com, l.facebook.com, lm.facebook.com → `utm_source=facebook`)
-- Stocker dans `localStorage` sous la clé `sleepzy-attribution` avec un timestamp + expiration 30 jours (fenêtre d'attribution standard Meta)
-- **First-touch wins** : ne pas écraser une attribution existante non expirée (le 1er clic publicitaire reste celui qui a "amené" le visiteur)
-- Exposer `getAttribution()` qui retourne l'objet courant ou `null`
+## Stratégie (la plus sûre)
 
-### 1.2 Migration base de données
-Ajouter aux 3 tables `funnel_events`, `cart_events`, `checkout_events` les colonnes :
-- `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term` (text)
-- `fbclid` (text) — l'ID de clic Meta, utile pour relier à CAPI plus tard
-- `landing_page` (text) — page d'entrée de la session (utile pour A/B landing)
+**Principe** : on garde tout ce qui tourne aujourd'hui (l'écriture anonyme des événements est conservée — sinon le tracking casse). On verrouille uniquement la **lecture** et le **dashboard**, derrière un compte admin Lovable Cloud.
 
-Index sur `utm_campaign` et `utm_source` pour performance du dashboard.
+### 1. Base de données
 
-### 1.3 Injection dans le tracking existant
-- `src/lib/funnelTracking.ts` → `getCommonContext()` lit `getAttribution()` et ajoute les champs à chaque insert dans `funnel_events`
-- `src/stores/cartStore.ts` (et tout endroit qui insère dans `cart_events`) → ajoute les mêmes champs
-- Idem pour l'insert dans `checkout_events`
-- Le `endpoint sendBeacon` (checkout) doit aussi inclure ces champs
+- Créer un type `app_role` (`admin`, `user`) + table `user_roles` (pattern officiel non-récursif)
+- Créer la fonction `has_role(user_id, role)` en `SECURITY DEFINER`
+- **Remplacer** les 4 policies SELECT "Anyone can read …" par "Admins can read …" utilisant `has_role(auth.uid(), 'admin')`
+- **Conserver** les 4 policies INSERT "Anyone can insert …" → le tracking continue de marcher pour les visiteurs anonymes
 
-### 1.4 Bootstrap dans `src/main.tsx`
-Appeler `captureAttribution()` **avant** tout autre tracking, dès le chargement.
+### 2. Authentification
 
-### 1.5 Recommandation côté Meta Ads Manager
-Documenter (dans le chat, pas dans le code) le template d'URL à mettre dans le champ **"URL Parameters"** de chaque ad Meta :
-```
-utm_source=facebook&utm_medium=paid&utm_campaign={{campaign.name}}&utm_content={{ad.name}}&utm_term={{adset.name}}
-```
-Comme ça les noms réels des campagnes/ad sets/créatifs remonteront automatiquement.
+- Activer l'auth email/password (Lovable Cloud) — déjà disponible
+- Créer une page `/admin/login` simple (email + mot de passe, pas d'inscription publique)
+- Créer un composant `ProtectedAdminRoute` qui :
+  - vérifie la session Supabase
+  - vérifie via `has_role` que l'utilisateur est `admin`
+  - sinon redirige vers `/admin/login`
+- Wrapper la route `/admin/analytics` avec ce garde
 
----
+### 3. Edge function `shopify-analytics`
 
-## Phase 2 — Dashboard `/admin/analytics`
+- Lire le JWT du header `Authorization`
+- Valider avec `supabase.auth.getClaims(token)` → si invalide : 401
+- Vérifier le rôle admin via la fonction `has_role` → si non admin : 403
+- Le front continue d'appeler la function exactement de la même manière (le SDK envoie le JWT automatiquement quand l'utilisateur est connecté)
 
-Nouvel onglet ou nouvelle section **"Attribution"** dans `src/pages/AdminAnalytics.tsx` :
+### 4. Création du premier admin
 
-### 2.1 KPIs en haut
-- Total sessions par source (Direct / Facebook / Instagram / Google / Autre)
-- % de sessions venant de pubs payantes (utm_medium = paid)
+Après application de la migration, vous créez votre compte admin via la page `/admin/login` (inscription), puis je vous fournis la requête SQL exacte pour insérer votre `user_id` dans `user_roles` avec le rôle `admin`. Une seule manipulation, 30 secondes.
 
-### 2.2 Tableau "Performance par campagne"
-Colonnes : `utm_campaign` · Sessions · Ajouts panier · Checkouts · Taux conv. ajout · Taux conv. checkout
-Tri par défaut : checkouts décroissants. Filtre période (7j / 30j / custom).
+## Ce qui NE change PAS (zéro risque pour le site)
 
-### 2.3 Tableau "Performance par créatif" (drill-down)
-Quand on clique sur une campagne → vue par `utm_content` (= nom du créatif) avec mêmes colonnes.
+- ✅ Toutes les pages publiques (Hero, Product, Cart, Checkout) : identiques
+- ✅ Le tracking Meta Pixel + Supabase `cart_events`/`funnel_events`/etc. : continue d'écrire
+- ✅ Le checkout Shopify : aucun changement
+- ✅ L'edge function `shopify-purchase-webhook` (Meta CAPI) : aucun changement
+- ✅ Tous les autres composants : aucun changement
 
-### 2.4 Graphique tendance
-Courbe ajouts panier / checkouts par source sur 30 jours (Recharts, cohérent avec le dashboard existant).
+## Fichiers touchés
 
-### 2.5 Vue "Visiteurs sans attribution"
-Petit encart listant le volume de sessions sans UTM ni fbclid → utile pour mesurer le trafic organique / direct.
+- **Nouvelle migration SQL** (tables, fonction, policies)
+- `src/App.tsx` — wrapper `ProtectedAdminRoute` autour de `/admin/analytics`
+- `src/pages/AdminLogin.tsx` — **nouveau**, page de connexion admin
+- `src/components/ProtectedAdminRoute.tsx` — **nouveau**, garde de route
+- `supabase/functions/shopify-analytics/index.ts` — ajout du check JWT + admin en tête du handler
+- `supabase/config.toml` — bloc `[functions.shopify-analytics]` avec `verify_jwt = false` (on valide en code pour pouvoir retourner des erreurs propres)
 
----
+## Risque résiduel
 
-## Détails techniques
+Quasi nul : si quelque chose foire côté auth, le pire scénario est que **vous** ne puissiez plus accéder au dashboard pendant quelques minutes — le site public et les ventes ne sont jamais impactés.
 
-**Format `localStorage`** :
-```json
-{
-  "utm_source": "facebook",
-  "utm_campaign": "spring_sale",
-  "utm_content": "video_v3",
-  "fbclid": "IwAR0...",
-  "landing_page": "/",
-  "captured_at": 1748000000000,
-  "expires_at": 1750592000000
-}
-```
-
-**Requêtes SQL types** (côté dashboard, via `supabase.from(...).select(...)`):
-- Agrégation par `utm_campaign` avec count distinct sur `visitor_id`
-- JOIN logique entre `funnel_events` (sessions) et `cart_events` / `checkout_events` via `visitor_id`
-
-**Fichiers touchés** :
-- ➕ `src/lib/attribution.ts` (nouveau)
-- ✏️ `src/main.tsx` (bootstrap)
-- ✏️ `src/lib/funnelTracking.ts` (inclure attribution)
-- ✏️ `src/stores/cartStore.ts` (inclure attribution dans cart_events)
-- ✏️ Insert checkout (vérifier où il est fait — probablement `CtaBridge.tsx` ou `CheckoutRedirectOverlay.tsx`)
-- ✏️ `src/pages/AdminAnalytics.tsx` (nouvelle section Attribution)
-- 🗄️ Migration : 3 ALTER TABLE + 2 index
-
----
-
-## Ce qui sera livré
-
-1. Toute nouvelle visite venant d'une pub Meta (avec UTM correctement configurés côté Ads Manager **ou** simplement avec `fbclid`) sera taggée et le tag suivra le visiteur jusqu'au checkout.
-2. Tu pourras répondre dans `/admin/analytics` à : *"quelle pub Meta a généré le plus d'ajouts au panier cette semaine ?"* et *"quel créatif convertit le mieux ?"*
-3. Les données existantes (avant la migration) resteront `NULL` sur ces nouvelles colonnes — l'attribution commence à la mise en prod.
-
-## Hors scope (pour plus tard si tu veux)
-
-- Meta CAPI (Conversions API) côté serveur via Edge Function — bypasse les ad-blockers et améliore la précision de Meta Ads Manager. Demande un Access Token Meta long-lived.
-- Vue ROI réelle (revenu / dépense ad) — nécessiterait d'importer les coûts depuis Meta Ads API.
+Validez et je lance la migration puis les changements de code.
