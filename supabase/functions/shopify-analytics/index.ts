@@ -6,6 +6,8 @@ const corsHeaders = {
 const SHOPIFY_STORE_DOMAIN = 'sleepenzy.myshopify.com';
 const SHOPIFY_API_VERSION = '2025-07';
 
+import { createClient } from 'npm:@supabase/supabase-js@2';
+
 function jsonResponse(body: Record<string, unknown>, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -91,6 +93,32 @@ async function getShopifyAccessToken(): Promise<{ token?: string; error?: Respon
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
+  }
+
+  // --- Auth: require signed-in admin user ---
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader?.startsWith('Bearer ')) {
+    return jsonResponse({ error: 'Unauthorized' }, 401);
+  }
+  const supabase = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_ANON_KEY')!,
+    { global: { headers: { Authorization: authHeader } } }
+  );
+  const jwt = authHeader.replace('Bearer ', '');
+  const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(jwt);
+  if (claimsError || !claimsData?.claims) {
+    return jsonResponse({ error: 'Unauthorized' }, 401);
+  }
+  const userId = claimsData.claims.sub;
+  const { data: roleRow } = await supabase
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', userId)
+    .eq('role', 'admin')
+    .maybeSingle();
+  if (!roleRow) {
+    return jsonResponse({ error: 'Forbidden: admin role required' }, 403);
   }
 
   const tokenResult = await getShopifyAccessToken();
