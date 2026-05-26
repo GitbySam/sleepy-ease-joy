@@ -460,10 +460,12 @@ function CheckoutFunnelTab({ days }: { days: number }) {
       const sinceISO = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
 
       // Fetch Shopify analytics + funnel clicks/opens/blocks in parallel
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
       const [shopifyRes, clicksRes, openedRes, blockedRes] = await Promise.all([
         fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/shopify-analytics?days=${days}`, {
           headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            Authorization: `Bearer ${accessToken}`,
             apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           },
         }).then(async (r) => {
@@ -1739,9 +1741,11 @@ function SalesTab({ days }: { days: number }) {
 
     try {
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/shopify-analytics?days=${days}`;
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
       const res = await fetch(url, {
         headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${accessToken}`,
           apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
       });
