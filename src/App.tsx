@@ -16,6 +16,8 @@ const Privacy = lazy(() => import("./pages/Privacy"));
 const Returns = lazy(() => import("./pages/Returns"));
 const Shipping = lazy(() => import("./pages/Shipping"));
 const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
+const AdminLogin = lazy(() => import("./pages/AdminLogin"));
+import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import { useCartSync } from "./hooks/useCartSync";
 import CheckoutRedirectOverlay from "./components/CheckoutRedirectOverlay";
 import InAppBrowserBanner from "./components/InAppBrowserBanner";
@@ -77,7 +79,8 @@ const AppRoutes = () => {
               <Route path="/privacy" element={<Suspense fallback={null}><Privacy /></Suspense>} />
               <Route path="/returns" element={<Suspense fallback={null}><Returns /></Suspense>} />
               <Route path="/shipping" element={<Suspense fallback={null}><Shipping /></Suspense>} />
-              <Route path="/admin/analytics" element={<Suspense fallback={null}><AdminAnalytics /></Suspense>} />
+              <Route path="/admin/login" element={<Suspense fallback={null}><AdminLogin /></Suspense>} />
+              <Route path="/admin/analytics" element={<Suspense fallback={null}><ProtectedAdminRoute><AdminAnalytics /></ProtectedAdminRoute></Suspense>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
