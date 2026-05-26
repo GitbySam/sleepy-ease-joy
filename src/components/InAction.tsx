@@ -1,4 +1,7 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { X } from "lucide-react";
 import lifestyleAirplane from "@/assets/lifestyle-airplane.webp";
 import lifestyleTrain from "@/assets/lifestyle-train.webp";
 import lifestyleCar from "@/assets/lifestyle-car.webp";
@@ -8,6 +11,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 
 const InAction = () => {
   const { t } = useLanguage();
+  const [lightbox, setLightbox] = useState<{ type: "img" | "video"; src: string; caption: string } | null>(null);
 
   const scenes = [
     { img: lifestyleAirplane, label: t("inAction.flight"), caption: t("inAction.flightCaption") },
@@ -42,7 +46,8 @@ const InAction = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.15, duration: 0.6 }}
-              className="group relative overflow-hidden rounded-2xl shadow-lg aspect-[3/4] md:aspect-[4/3] md:flex-1"
+              onClick={() => setLightbox({ type: "img", src: scene.img, caption: scene.caption })}
+              className="group relative overflow-hidden rounded-2xl shadow-lg aspect-[3/4] md:aspect-[4/3] md:flex-1 cursor-zoom-in"
             >
               <img
                 src={scene.img}
@@ -66,7 +71,8 @@ const InAction = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 3 * 0.15, duration: 0.6 }}
-            className="group relative overflow-hidden rounded-2xl shadow-lg aspect-[3/4] md:aspect-[4/3] md:flex-1"
+            onClick={() => setLightbox({ type: "video", src: demoVideo, caption: t("inAction.demoCaption") })}
+            className="group relative overflow-hidden rounded-2xl shadow-lg aspect-[3/4] md:aspect-[4/3] md:flex-1 cursor-zoom-in"
           >
             <LazyVideo
               src={demoVideo}
@@ -83,6 +89,20 @@ const InAction = () => {
           </motion.div>
         </div>
       </div>
+
+      <Dialog open={!!lightbox} onOpenChange={(o) => !o && setLightbox(null)}>
+        <DialogContent className="max-w-5xl w-[95vw] p-0 bg-transparent border-0 shadow-none">
+          {lightbox && (
+            <div className="relative w-full max-h-[90vh] flex items-center justify-center">
+              {lightbox.type === "img" ? (
+                <img src={lightbox.src} alt={lightbox.caption} className="w-full h-auto max-h-[90vh] object-contain rounded-xl" />
+              ) : (
+                <video src={lightbox.src} autoPlay loop muted playsInline controls className="w-full h-auto max-h-[90vh] rounded-xl" />
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };
