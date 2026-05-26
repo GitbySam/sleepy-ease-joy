@@ -3,6 +3,16 @@ import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 const PIXEL_ID = '2093867758129616';
 const GRAPH_VERSION = 'v21.0';
 
+const ALLOWED_EVENTS = new Set([
+  'PageView',
+  'ViewContent',
+  'AddToCart',
+  'InitiateCheckout',
+  'Purchase',
+]);
+const MAX_EVENT_VALUE = 500; // CAD; realistic cap for our highest bundle
+const MAX_NUM_ITEMS = 20;
+
 type CapiEvent = {
   event_name: 'PageView' | 'ViewContent' | 'AddToCart' | 'InitiateCheckout' | 'Purchase';
   event_id?: string;
@@ -54,6 +64,33 @@ Deno.serve(async (req) => {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
+    }
+
+    // Allowlist event types — reject anything outside our funnel.
+    if (!ALLOWED_EVENTS.has(ev.event_name)) {
+      return new Response(JSON.stringify({ error: 'event_name not allowed' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Cap value to prevent ad-metric poisoning via inflated Purchase events.
+    if (ev.value !== undefined) {
+      if (typeof ev.value !== 'number' || !Number.isFinite(ev.value) || ev.value < 0) {
+        return new Response(JSON.stringify({ error: 'invalid value' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      if (ev.value > MAX_EVENT_VALUE) {
+        console.warn('[meta-capi] value exceeds cap, clamping', ev.value);
+        ev.value = MAX_EVENT_VALUE;
+      }
+    }
+    if (ev.num_items !== undefined) {
+      if (typeof ev.num_items !== 'number' || ev.num_items < 0 || ev.num_items > MAX_NUM_ITEMS) {
+        ev.num_items = Math.min(Math.max(0, Number(ev.num_items) || 0), MAX_NUM_ITEMS);
+      }
     }
 
     const ip = getClientIp(req);

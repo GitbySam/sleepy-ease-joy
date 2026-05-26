@@ -54,19 +54,23 @@ Deno.serve(async (req) => {
     const webhookSecret = Deno.env.get('SHOPIFY_WEBHOOK_SECRET');
     const capiToken = Deno.env.get('META_CAPI_ACCESS_TOKEN');
 
-    // Validate HMAC (if secret configured). We still return 200 on bad sig
-    // to avoid Shopify retry storms — we just log and skip.
-    if (webhookSecret) {
-      const valid = await verifyShopifyHmac(rawBody, hmacHeader, webhookSecret);
-      if (!valid) {
-        console.warn('[shopify-webhook] invalid HMAC, ignoring');
-        return new Response(JSON.stringify({ skipped: 'invalid_hmac' }), {
-          status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-    } else {
-      console.warn('[shopify-webhook] SHOPIFY_WEBHOOK_SECRET not set — skipping signature check');
+    // Fail-closed: if the webhook secret is not configured, refuse to process
+    // any payload. Without HMAC validation we cannot trust the request is
+    // actually from Shopify, so we must never forward to Meta CAPI.
+    if (!webhookSecret) {
+      console.error('[shopify-webhook] SHOPIFY_WEBHOOK_SECRET not configured — rejecting');
+      return new Response(JSON.stringify({ skipped: 'no_secret' }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const valid = await verifyShopifyHmac(rawBody, hmacHeader, webhookSecret);
+    if (!valid) {
+      console.warn('[shopify-webhook] invalid HMAC, ignoring');
+      return new Response(JSON.stringify({ skipped: 'invalid_hmac' }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     if (!capiToken) {
