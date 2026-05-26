@@ -22,8 +22,13 @@ export default function ProtectedAdminRoute({ children }: { children: React.Reac
         .maybeSingle();
       if (mounted) setStatus(!error && data ? "ok" : "denied");
     };
+    const { data: sub } = supabase.auth.onAuthStateChange(() => {
+      // Defer any Supabase calls outside the auth callback to avoid deadlock
+      setTimeout(() => {
+        if (mounted) check();
+      }, 0);
+    });
     check();
-    const { data: sub } = supabase.auth.onAuthStateChange(() => check());
     return () => {
       mounted = false;
       sub.subscription.unsubscribe();
