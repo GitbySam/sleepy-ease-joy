@@ -89,6 +89,7 @@ const Hero = () => {
   const { t } = useLanguage();
   const { prices, formatPrice } = useMarket();
   const viewerCount = useViewerCount();
+  const { quickAdd, loading } = useQuickAdd();
 
   return (
     <>
@@ -132,11 +133,14 @@ const Hero = () => {
 
         {/* CTA zone — visible immediately, no delay */}
         <div className="px-5 py-4 bg-background space-y-3">
-          <Link to="/product" className="block">
-            <span className="bg-gold text-primary-foreground px-6 py-4 rounded-full text-sm font-bold shadow-gold-glow inline-flex items-center justify-center gap-2 tracking-wider w-full">
-              {t("hero.cta")}
-            </span>
-          </Link>
+          <button
+            type="button"
+            onClick={() => quickAdd()}
+            disabled={loading}
+            className="bg-gold text-primary-foreground px-6 py-4 rounded-full text-sm font-bold shadow-gold-glow inline-flex items-center justify-center gap-2 tracking-wider w-full disabled:opacity-60"
+          >
+            {t("hero.cta")}
+          </button>
 
           {/* Price */}
           <div className="flex items-center justify-center gap-2">
@@ -203,15 +207,16 @@ const Hero = () => {
 
             {/* CTA */}
             <motion.div variants={fadeUp} className="flex flex-row gap-4 items-center">
-              <Link to="/product">
-                <motion.span
-                  whileHover={{ scale: 1.06 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-gold text-primary-foreground px-8 py-4 rounded-full text-base font-bold shadow-gold-glow inline-flex items-center gap-2 tracking-wider"
-                >
-                  {t("hero.cta")}
-                </motion.span>
-              </Link>
+              <motion.button
+                type="button"
+                onClick={() => quickAdd()}
+                disabled={loading}
+                whileHover={{ scale: 1.06 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-gold text-primary-foreground px-8 py-4 rounded-full text-base font-bold shadow-gold-glow inline-flex items-center gap-2 tracking-wider disabled:opacity-60"
+              >
+                {t("hero.cta")}
+              </motion.button>
             </motion.div>
 
             {/* Price anchor */}
