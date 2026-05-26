@@ -14,7 +14,9 @@ import {
   removeLineFromShopifyCart,
   storefrontApiRequest,
   CART_QUERY,
+  attachAttributionToCart,
 } from '@/lib/shopify';
+import { getAttribution } from '@/lib/attribution';
 
 export type { CartItemData, ShopifyProduct };
 
@@ -89,6 +91,24 @@ export const useCartStore = create<CartStore>()(
                 cartCountry: requestedCountry,
                 items: [{ ...item, lineId: result.lineId }],
               });
+              // Fire-and-forget: attach marketing attribution so Shopify Order
+              // carries it through to the post-purchase webhook (Meta CAPI).
+              try {
+                const a = getAttribution();
+                attachAttributionToCart(result.cartId, {
+                  visitor_id: getVisitorId(),
+                  utm_source: a?.utm_source,
+                  utm_medium: a?.utm_medium,
+                  utm_campaign: a?.utm_campaign,
+                  utm_content: a?.utm_content,
+                  utm_term: a?.utm_term,
+                  fbclid: a?.fbclid,
+                  landing_page: a?.landing_page,
+                  fbp: (document.cookie.match(/(?:^|;\s*)_fbp=([^;]+)/) || [])[1] || null,
+                  fbc: (document.cookie.match(/(?:^|;\s*)_fbc=([^;]+)/) || [])[1] || null,
+                  user_agent: navigator.userAgent,
+                });
+              } catch { /* never block checkout */ }
             }
           } else if (existingItem) {
             const newQuantity = existingItem.quantity + item.quantity;

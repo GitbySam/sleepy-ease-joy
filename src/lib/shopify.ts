@@ -195,6 +195,43 @@ const CART_DISCOUNT_CODES_UPDATE = `
   }
 `;
 
+const CART_ATTRIBUTES_UPDATE = `
+  mutation cartAttributesUpdate($cartId: ID!, $attributes: [AttributeInput!]!) {
+    cartAttributesUpdate(cartId: $cartId, attributes: $attributes) {
+      cart { id }
+      userErrors { field message }
+    }
+  }
+`;
+
+/**
+ * Attach marketing attribution to a Shopify cart as cart attributes so the
+ * data survives the redirect to checkout and ends up on the Order
+ * (note_attributes) — where our webhook can read it to send Purchase to Meta CAPI.
+ *
+ * 100% fire-and-forget. ANY failure is swallowed silently. This MUST NOT
+ * block or break the checkout flow under any circumstance.
+ */
+export function attachAttributionToCart(
+  cartId: string,
+  attrs: Record<string, string | null | undefined>,
+): void {
+  try {
+    const attributes = Object.entries(attrs)
+      .filter(([, v]) => v != null && v !== '')
+      .map(([key, value]) => ({ key: `_sleepzy_${key}`, value: String(value) }));
+    if (attributes.length === 0) return;
+
+    // Fire-and-forget — never awaited by callers
+    storefrontApiRequest(CART_ATTRIBUTES_UPDATE, { cartId, attributes })
+      .catch((err) => {
+        console.debug('[attribution] cart attributes update failed silently', err);
+      });
+  } catch (err) {
+    console.debug('[attribution] error', err);
+  }
+}
+
 export async function applyDiscountToCart(cartId: string, discountCode: string): Promise<boolean> {
   try {
     const data = await storefrontApiRequest(CART_DISCOUNT_CODES_UPDATE, {
