@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import cartTrustBadges from "@/assets/cart-trust-badges.jpg";
+import paymentBadges from "@/assets/payment-badges.jpeg";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -508,12 +509,8 @@ export const ShopifyCartDrawer = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-center gap-2 flex-wrap">
-                    <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#1A1F71"/><text x="24" y="20" textAnchor="middle" fill="#fff" fontSize="11" fontWeight="bold" fontFamily="Arial">VISA</text></svg>
-                    <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#EB001B" opacity="0.15"/><circle cx="18" cy="16" r="10" fill="#EB001B"/><circle cx="30" cy="16" r="10" fill="#F79E1B"/><path d="M24 8.5a10 10 0 010 15 10 10 0 010-15z" fill="#FF5F00"/></svg>
-                    <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#016FD0"/><text x="24" y="20" textAnchor="middle" fill="#fff" fontSize="8" fontWeight="bold" fontFamily="Arial">AMEX</text></svg>
-                    <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#F5F5F5" stroke="#ddd" strokeWidth="0.5"/><text x="24" y="18" textAnchor="middle" fill="#3C4043" fontSize="7" fontWeight="bold" fontFamily="Arial">G Pay</text></svg>
-                    <svg viewBox="0 0 48 32" className="h-6 w-auto"><rect width="48" height="32" rx="4" fill="#F5F5F5" stroke="#ddd" strokeWidth="0.5"/><text x="24" y="19" textAnchor="middle" fill="#003087" fontSize="7" fontWeight="bold" fontFamily="Arial">PayPal</text></svg>
+                <div className="flex items-center justify-center">
+                    <img src={paymentBadges} alt="Visa, Mastercard, Apple Pay, Google Pay, PayPal, Shop Pay" className="h-7 w-auto" loading="lazy" />
                 </div>
               </div>
             </>
