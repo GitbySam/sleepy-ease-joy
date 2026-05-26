@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import pillowGrey from "@/assets/product-pillow-grey-new.webp";
 import pillowBlack from "@/assets/product-pillow-black.webp";
 import pillowRed from "@/assets/product-pillow-red.webp";
+import paymentBadges from "@/assets/payment-badges.jpeg";
 
 const COLOR_IMAGES: Record<string, string> = {
   Grey: pillowGrey,
