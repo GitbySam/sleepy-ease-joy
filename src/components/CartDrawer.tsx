@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShieldCheck, Truck, RotateCcw, Minus, Plus, Trash2 } from "lucide-react";
 import pillowHero from "@/assets/product-pillow-grey.webp";
+import paymentBadges from "@/assets/payment-badges.jpeg";
 import UpsellPopup from "./UpsellPopup";
 import { useMarket } from "@/i18n/MarketContext";
 
@@ -128,12 +129,8 @@ const CartDrawer = ({ open, onClose, items, onUpdateQty, onRemove }: CartDrawerP
                 }}
               />
 
-              <div className="flex items-center justify-center gap-3 opacity-60">
-                <span className="text-xs font-bold">VISA</span>
-                <span className="text-xs font-bold">MC</span>
-                <span className="text-xs font-bold">AMEX</span>
-                <span className="text-xs font-bold">GPay</span>
-                <span className="text-xs font-bold">PayPal</span>
+              <div className="flex items-center justify-center">
+                <img src={paymentBadges} alt="Visa, Mastercard, Apple Pay, Google Pay, PayPal, Shop Pay" className="h-7 w-auto" loading="lazy" />
               </div>
 
               <div className="flex items-center justify-center gap-5 text-xs text-muted-foreground">
