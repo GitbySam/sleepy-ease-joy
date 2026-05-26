@@ -510,7 +510,7 @@ export const ShopifyCartDrawer = () => {
                 </div>
 
                 <div className="flex items-center justify-center">
-                    <img src={paymentBadges} alt="Visa, Mastercard, Apple Pay, Google Pay, PayPal, Shop Pay" className="h-7 w-auto" loading="lazy" />
+                    <img src={paymentBadges} alt="Visa, Mastercard, Apple Pay, Google Pay, PayPal, Shop Pay" className="h-10 w-auto" loading="lazy" />
                 </div>
               </div>
             </>

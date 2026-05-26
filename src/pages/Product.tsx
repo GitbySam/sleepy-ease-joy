@@ -789,7 +789,7 @@ const Product = () => {
                 <span className="flex items-center gap-1"><RotateCcw size={14} /> {t("product.guarantee90")}</span>
               </div>
               <div className="flex items-center justify-center">
-                <img src={paymentBadges} alt="Visa, Mastercard, Apple Pay, Google Pay, PayPal, Shop Pay" className="h-7 w-auto" loading="lazy" />
+                <img src={paymentBadges} alt="Visa, Mastercard, Apple Pay, Google Pay, PayPal, Shop Pay" className="h-10 w-auto" loading="lazy" />
               </div>
               <p className="text-[11px] text-muted-foreground flex items-center gap-1">
                 <ShieldCheck size={12} className="text-success" />
