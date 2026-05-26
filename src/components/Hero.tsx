@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
 const heroBanner = "/hero-banner.webp";
 const demoVideo = "/demo-video.mp4";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useMarket } from "@/i18n/MarketContext";
 import { useViewerCount } from "@/hooks/useViewerCount";
+import { useQuickAdd } from "@/hooks/useQuickAdd";
 
 /**
  * Deferred video: shows poster immediately, loads video only after
