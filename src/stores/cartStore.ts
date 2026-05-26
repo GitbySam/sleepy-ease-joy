@@ -14,7 +14,10 @@ import {
   removeLineFromShopifyCart,
   storefrontApiRequest,
   CART_QUERY,
+  attachAttributionToCart,
 } from '@/lib/shopify';
+import { getAttribution } from '@/lib/attribution';
+import { getVisitorId as _getVisitorId } from '@/lib/visitorId';
 
 export type { CartItemData, ShopifyProduct };
 
