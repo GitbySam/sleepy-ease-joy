@@ -12,7 +12,6 @@ export default function AdminLogin() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -25,19 +24,9 @@ export default function AdminLogin() {
     e.preventDefault();
     setLoading(true);
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: `${window.location.origin}/admin/analytics` },
-        });
-        if (error) throw error;
-        toast.success("Compte créé. Vérifie ton email pour confirmer.");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        navigate("/admin/analytics", { replace: true });
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      navigate("/admin/analytics", { replace: true });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erreur";
       toast.error(msg);
@@ -50,7 +39,7 @@ export default function AdminLogin() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>🔒 Admin {mode === "signup" ? "— Créer un compte" : ""}</CardTitle>
+          <CardTitle>🔒 Admin — Connexion</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -60,18 +49,11 @@ export default function AdminLogin() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Mot de passe</Label>
-              <Input id="password" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === "signup" ? "new-password" : "current-password"} />
+              <Input id="password" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : mode === "signup" ? "Créer le compte" : "Se connecter"}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Se connecter"}
             </Button>
-            <button
-              type="button"
-              onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
-              className="w-full text-sm text-gray-500 hover:underline"
-            >
-              {mode === "signup" ? "J'ai déjà un compte" : "Créer un compte admin"}
-            </button>
           </form>
         </CardContent>
       </Card>
