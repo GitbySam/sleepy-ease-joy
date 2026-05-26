@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import cartTrustBadges from "@/assets/cart-trust-badges.jpg";
+import paymentBadges from "@/assets/payment-badges.jpeg";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
