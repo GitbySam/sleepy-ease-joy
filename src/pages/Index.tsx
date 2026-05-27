@@ -29,6 +29,9 @@ const Index = () => (
     <main>
       <Hero />
       <TrustBar />
+      <Suspense fallback={null}>
+        <SocialProofToasts />
+      </Suspense>
       <Suspense fallback={<Placeholder height="500px" />}>
         <InAction />
       </Suspense>
@@ -55,7 +58,6 @@ const Index = () => (
       <Footer />
     </Suspense>
     <Suspense fallback={null}>
-      <SocialProofToasts />
       <InactivityPopup />
     </Suspense>
   </div>
