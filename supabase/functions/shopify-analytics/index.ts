@@ -304,6 +304,31 @@ Deno.serve(async (req) => {
         abandoned_checkout_url: c.abandoned_checkout_url,
         line_items_count: (c.line_items || []).length,
       })),
+      // Per-order attribution: extracted from note_attributes set on the
+      // cart at checkout (see shopify-purchase-webhook for the read side).
+      attributedOrders: orders.map((o: any) => {
+        const attrs: Array<{ name: string; value: string }> = o.note_attributes || [];
+        const get = (k: string) =>
+          attrs.find((a) => a.name === `_sleepzy_${k}`)?.value || null;
+        return {
+          id: o.id,
+          name: o.name,
+          created_at: o.created_at,
+          total_price: o.total_price,
+          currency: o.currency,
+          financial_status: o.financial_status,
+          email: o.email || o.contact_email || null,
+          visitor_id: get('visitor_id'),
+          utm_source: get('utm_source'),
+          utm_medium: get('utm_medium'),
+          utm_campaign: get('utm_campaign'),
+          utm_content: get('utm_content'),
+          utm_term: get('utm_term'),
+          fbclid: get('fbclid'),
+          landing_site: o.landing_site || null,
+          referring_site: o.referring_site || null,
+        };
+      }),
     };
 
     return jsonResponse(result);
