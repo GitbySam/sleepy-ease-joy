@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { ShieldCheck } from "lucide-react";
 const heroBanner = "/hero-banner.webp";
 const demoVideo = "/demo-video.mp4";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -141,13 +142,12 @@ const Hero = () => {
             <span className="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full leading-none tracking-normal whitespace-nowrap">-50%</span>
           </div>
 
-          {/* Micro-reassurances — below CTA, secondary */}
-          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-muted-foreground font-sans-body tracking-normal">
-            <span>{t("hero.freeShipping")}</span>
-            <span className="w-px h-3 bg-border" />
-            <span>{t("hero.securePayment")}</span>
-            <span className="w-px h-3 bg-border" />
-            <span>✅ {t("hero.guarantee")}</span>
+          {/* Guarantee badge — prominently displayed */}
+          <div className="flex items-center justify-center gap-2 bg-success/10 border border-success/20 rounded-xl py-2.5 px-3">
+            <ShieldCheck size={16} className="text-success shrink-0" />
+            <span className="text-xs font-bold text-success font-sans-body tracking-normal">
+              {t("hero.guarantee")}
+            </span>
           </div>
         </div>
       </section>
@@ -213,13 +213,12 @@ const Hero = () => {
               <span className="bg-red-500/10 text-red-500 text-xs font-bold px-2.5 py-1 rounded-full uppercase leading-none tracking-normal whitespace-nowrap">-50%</span>
             </motion.div>
 
-            {/* Micro-reassurances */}
-            <motion.div variants={fadeUp} className="flex items-center gap-4 text-xs text-muted-foreground font-sans-body pt-1">
-              <span>{t("hero.freeShipping")}</span>
-              <span className="w-px h-3 bg-border" />
-              <span>{t("hero.securePayment")}</span>
-              <span className="w-px h-3 bg-border" />
-              <span>✅ {t("hero.guarantee")}</span>
+            {/* Guarantee badge — prominently displayed */}
+            <motion.div variants={fadeUp} className="flex items-center gap-2 bg-success/10 border border-success/20 rounded-xl py-2.5 px-4 w-fit">
+              <ShieldCheck size={18} className="text-success shrink-0" />
+              <span className="text-sm font-bold text-success font-sans-body tracking-normal">
+                {t("hero.guarantee")}
+              </span>
             </motion.div>
           </motion.div>
         </div>

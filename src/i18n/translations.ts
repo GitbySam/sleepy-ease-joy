@@ -696,6 +696,7 @@ export const translations = {
   },
   "ctaBridge.cta": { en: "Shop Now", fr: "Acheter", es: "Comprar" },
   "ctaBridge.savings": { en: "Save up to 67%", fr: "Économisez jusqu'à -67%", es: "Ahorra hasta -67%" },
+  "ctaBridge.guarantee": { en: "30-day money-back guarantee", fr: "Garantie satisfait ou remboursé 30 jours", es: "Garantía de devolución de 30 días" },
 
   // TrustBar
   "trustBar.freeShipping": { en: "Free Shipping", fr: "Livraison gratuite", es: "Envío gratis" },
