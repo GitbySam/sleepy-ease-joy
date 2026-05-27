@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Clock } from "lucide-react";
+import { Check, Clock, ShieldCheck } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useMarket } from "@/i18n/MarketContext";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
@@ -260,10 +260,17 @@ const BundleOffer = () => {
           {t("bundle.cta")}
         </motion.button>
 
-        <div className="flex justify-center gap-6 mt-6 text-xs text-muted-foreground">
+        {/* Prominent guarantee badge */}
+        <div className="flex items-center justify-center gap-2 bg-success/10 border border-success/20 rounded-xl py-2.5 px-3 mt-4">
+          <ShieldCheck size={16} className="text-success shrink-0" />
+          <span className="text-xs font-bold text-success font-sans-body tracking-normal">
+            {t("bundle.guarantee")}
+          </span>
+        </div>
+
+        <div className="flex justify-center gap-6 mt-4 text-xs text-muted-foreground">
           <span>{t("bundle.securePayment")}</span>
           <span>{t("bundle.freeShipping")}</span>
-          <span>{t("bundle.guarantee")}</span>
         </div>
       </div>
     </section>

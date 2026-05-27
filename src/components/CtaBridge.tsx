@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useMarket } from "@/i18n/MarketContext";
@@ -41,6 +41,10 @@ const CtaBridge = () => {
             <span className="text-gold font-bold">{formatPrice(prices.single)}</span>{" "}
             — {t("ctaBridge.savings")}
           </p>
+          <div className="flex items-center justify-center gap-2 text-xs text-success font-semibold pt-1">
+            <ShieldCheck size={14} />
+            {t("ctaBridge.guarantee")}
+          </div>
         </motion.div>
       </div>
     </section>
