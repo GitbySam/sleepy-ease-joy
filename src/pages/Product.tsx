@@ -251,6 +251,8 @@ const Product = () => {
   const [selectedColor, setSelectedColor] = useState(initialColor);
   const [galleryOffset, setGalleryOffset] = useState(0);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   const countdown = useCountdown(15);
   const { t } = useLanguage();
   const { country, currency, prices, formatPrice } = useMarket();
