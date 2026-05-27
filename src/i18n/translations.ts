@@ -736,9 +736,6 @@ export const translations = {
   // BundleOffer countdown
   "bundle.countdown": { en: "Offer ends in", fr: "L'offre se termine dans", es: "La oferta termina en" },
 
-  // BundleOffer countdown
-  "bundle.countdown": { en: "Offer ends in", fr: "L'offre se termine dans", es: "La oferta termina en" },
-
   // TrustBar
   "trustBar.securePayment": { en: "Secure Payment", fr: "Paiement sécurisé", es: "Pago seguro" },
   "trustBar.guarantee": { en: "30-Day Guarantee", fr: "Garantie 30 jours", es: "Garantía 30 días" },
