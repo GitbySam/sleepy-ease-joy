@@ -255,7 +255,7 @@ const BundleOffer = () => {
           whileTap={{ scale: 0.96 }}
           onClick={handleAddToCart}
           disabled={!product || isLoading}
-          className="block w-full bg-gold text-primary-foreground text-center py-4 rounded-full text-lg font-bold shadow-gold-glow uppercase tracking-wider disabled:opacity-60 disabled:cursor-not-allowed"
+          className="block w-full bg-black text-primary-foreground text-center py-4 rounded-full text-lg font-bold shadow-[0_4px_20px_rgba(0,0,0,0.3)] uppercase tracking-wider disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {t("bundle.cta")}
         </motion.button>

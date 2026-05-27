@@ -127,13 +127,17 @@ const Hero = () => {
             <h1 className="text-[22px] font-serif font-bold leading-[1.15] text-white">
               {t("hero.title1")} <span className="text-gold italic">{t("hero.title2")}</span>
             </h1>
+            {/* Subhead */}
+            <p className="text-sm text-white/90 font-sans-body leading-relaxed">
+              {t("hero.subhead")}
+            </p>
           </div>
         </div>
 
         {/* CTA zone — visible immediately, no delay */}
         <div className="px-5 py-4 bg-background space-y-3">
           <Link to="/product" className="block">
-            <span className="bg-gold text-primary-foreground px-6 py-4 rounded-full text-sm font-bold shadow-gold-glow inline-flex items-center justify-center gap-2 tracking-wider w-full">
+            <span className="bg-black text-primary-foreground px-6 py-4 rounded-full text-sm font-bold shadow-[0_4px_20px_rgba(0,0,0,0.3)] inline-flex items-center justify-center gap-2 tracking-wider w-full">
               {t("hero.cta")}
             </span>
           </Link>
@@ -201,13 +205,17 @@ const Hero = () => {
               {t("hero.title1")} <span className="text-gold italic">{t("hero.title2")}</span>
             </motion.h1>
 
+            <motion.p variants={fadeUp} className="text-base text-muted-foreground font-sans-body leading-relaxed max-w-lg">
+              {t("hero.subhead")}
+            </motion.p>
+
             {/* CTA */}
             <motion.div variants={fadeUp} className="flex flex-row gap-4 items-center">
               <Link to="/product">
                 <motion.span
                   whileHover={{ scale: 1.06 }}
                   whileTap={{ scale: 0.95 }}
-                  className="bg-gold text-primary-foreground px-8 py-4 rounded-full text-base font-bold shadow-gold-glow inline-flex items-center gap-2 tracking-wider"
+                  className="bg-black text-primary-foreground px-8 py-4 rounded-full text-base font-bold shadow-[0_4px_20px_rgba(0,0,0,0.3)] inline-flex items-center gap-2 tracking-wider"
                 >
                   {t("hero.cta")}
                 </motion.span>

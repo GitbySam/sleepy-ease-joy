@@ -95,7 +95,7 @@ const Header = () => {
               <motion.span
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-gold text-primary-foreground px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 shadow-gold-glow"
+                className="bg-black text-primary-foreground px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
               >
                 <ShoppingBag size={16} />
                 <span>{t("nav.shopNow")}</span>
@@ -142,13 +142,13 @@ const Header = () => {
               <div className="mt-2"><CountrySelector /></div>
 
               <Link to="/product" onClick={() => setMenuOpen(false)} className="mt-4">
-                <motion.span
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-gold text-primary-foreground px-8 py-3.5 rounded-full text-base font-bold shadow-gold-glow flex items-center gap-2 uppercase tracking-wider"
-                >
-                  <ShoppingBag size={18} />
-                  {t("nav.shopNow")}
-                </motion.span>
+              <motion.span
+                whileTap={{ scale: 0.95 }}
+                className="bg-black text-primary-foreground px-8 py-3.5 rounded-full text-base font-bold shadow-[0_4px_20px_rgba(0,0,0,0.3)] flex items-center gap-2 uppercase tracking-wider"
+              >
+                <ShoppingBag size={18} />
+                {t("nav.shopNow")}
+              </motion.span>
               </Link>
             </div>
           </motion.div>

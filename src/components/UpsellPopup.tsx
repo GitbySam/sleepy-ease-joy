@@ -118,7 +118,7 @@ const UpsellPopup = ({ open, onClose, onAccept }: UpsellPopupProps) => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={onAccept}
-                  className="w-full bg-gold text-primary-foreground py-3.5 rounded-xl text-sm font-bold shadow-gold-glow uppercase tracking-wider"
+                  className="w-full bg-black text-primary-foreground py-3.5 rounded-xl text-sm font-bold shadow-[0_4px_20px_rgba(0,0,0,0.3)] uppercase tracking-wider"
                 >
                   {t("upsell.cta")}
                 </motion.button>
