@@ -703,6 +703,39 @@ export const translations = {
     es: "Solo pedidos pagados (excluye pendientes/reembolsados/cancelados)",
   },
 
+  // CtaBridge
+  "ctaBridge.title": {
+    en: "Tired of waking up on a stranger's shoulder?",
+    fr: "Marre de vous réveiller sur l'épaule d'un inconnu ?",
+    es: "¿Cansado de despertarte en el hombro de un extraño?",
+  },
+  "ctaBridge.desc": {
+    en: "Get the pillow that keeps your head locked in place. No more drool. No more embarrassment.",
+    fr: "L'oreiller qui maintient votre tête en place. Fini la bave. Fini la honte.",
+    es: "La almohada que mantiene tu cabeza en su lugar. Se acabó la baba. Se acabó la vergüenza.",
+  },
+  "ctaBridge.cta": { en: "Shop Now", fr: "Acheter", es: "Comprar" },
+  "ctaBridge.savings": { en: "Save up to 67%", fr: "Économisez jusqu'à -67%", es: "Ahorra hasta -67%" },
+
+  // TrustBar
+  "trustBar.freeShipping": { en: "Free Shipping", fr: "Livraison gratuite", es: "Envío gratis" },
+
+  // StickyMobileCTA
+  "sticky.viewing": { en: "viewing", fr: "consultent", es: "viendo" },
+  "sticky.cta": { en: "Shop Now", fr: "Acheter", es: "Comprar" },
+
+  // Products (ShopifyProducts fallback)
+  "products.title": { en: "Our Products", fr: "Nos Produits", es: "Nuestros Productos" },
+  "products.empty": { en: "No products available", fr: "Aucun produit disponible", es: "No hay productos disponibles" },
+  "products.shopNow": { en: "Shop Now", fr: "Acheter", es: "Comprar" },
+
+  // Cart (ShopifyCartDrawer)
+  "cart.items": { en: "Items", fr: "Articles", es: "Artículos" },
+  "cart.freeShippingQualified": { en: "You qualify for free shipping!", fr: "Vous bénéficiez de la livraison gratuite !", es: "¡Calificas para envío gratis!" },
+
+  // BundleOffer countdown
+  "bundle.countdown": { en: "Offer ends in", fr: "L'offre se termine dans", es: "La oferta termina en" },
+
   // Meta CAPI
   "meta.capiError": { en: "Tracking error", fr: "Erreur de tracking", es: "Error de seguimiento" },
 } as const;
