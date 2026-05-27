@@ -115,7 +115,7 @@ const CartDrawer = ({ open, onClose, items, onUpdateQty, onRemove }: CartDrawerP
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => setUpsellOpen(true)}
-                className="w-full bg-gold text-primary-foreground py-4 rounded-xl text-base font-bold shadow-gold-glow flex items-center justify-center gap-2 uppercase tracking-wider"
+                className="w-full bg-black text-primary-foreground py-4 rounded-xl text-base font-bold shadow-[0_4px_20px_rgba(0,0,0,0.3)] flex items-center justify-center gap-2 uppercase tracking-wider"
               >
                 🔒 Secure Checkout
               </motion.button>

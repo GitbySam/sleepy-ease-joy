@@ -89,7 +89,7 @@ const StickyMobileCTA = () => {
                 const offer = document.getElementById("offer");
                 if (offer) offer.scrollIntoView({ behavior: "smooth" });
               }}
-              className="w-full bg-gold text-primary-foreground text-center py-2.5 rounded-full font-bold shadow-gold-glow flex flex-col items-center justify-center gap-0.5 cursor-pointer leading-tight"
+              className="w-full bg-black text-primary-foreground text-center py-2.5 rounded-full font-bold shadow-[0_4px_20px_rgba(0,0,0,0.3)] flex flex-col items-center justify-center gap-0.5 cursor-pointer leading-tight"
             >
               <span className="flex items-center justify-center gap-2">
                 <ShoppingBag size={16} />

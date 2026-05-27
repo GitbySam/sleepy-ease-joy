@@ -778,7 +778,7 @@ const Product = () => {
               whileTap={{ scale: hasSelection ? 0.97 : 1 }}
               onClick={handleUnifiedAdd}
               disabled={isLoading || !product || !hasSelection}
-              className="w-full bg-gold text-primary-foreground py-4 rounded-xl text-base font-bold shadow-gold-glow flex items-center justify-center gap-2 uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+              className="w-full bg-black text-primary-foreground py-4 rounded-xl text-base font-bold shadow-[0_4px_20px_rgba(0,0,0,0.3)] flex items-center justify-center gap-2 uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -876,7 +876,7 @@ const Product = () => {
           whileTap={{ scale: hasSelection ? 0.97 : 1 }}
           onClick={handleUnifiedAdd}
           disabled={isLoading || !product || !hasSelection}
-          className="w-full bg-gold text-primary-foreground py-3 rounded-full text-sm font-bold uppercase tracking-wider shadow-gold-glow flex items-center justify-center gap-2 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed"
+          className="w-full bg-black text-primary-foreground py-3 rounded-full text-sm font-bold uppercase tracking-wider shadow-[0_4px_20px_rgba(0,0,0,0.3)] flex items-center justify-center gap-2 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed"
         >
           {isLoading ? (
             <Loader2 className="w-4 h-4 animate-spin" />

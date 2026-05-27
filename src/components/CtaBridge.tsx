@@ -30,7 +30,7 @@ const CtaBridge = () => {
           >
             <Link
               to="/product"
-              className="inline-flex items-center gap-2 bg-gold text-primary-foreground px-8 py-4 rounded-full text-base font-bold shadow-gold-glow uppercase tracking-wider"
+              className="inline-flex items-center gap-2 bg-black text-primary-foreground px-8 py-4 rounded-full text-base font-bold shadow-[0_4px_20px_rgba(0,0,0,0.3)] uppercase tracking-wider"
             >
               {t("ctaBridge.cta")}
               <ArrowRight size={18} />

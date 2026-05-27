@@ -35,10 +35,15 @@ export const translations = {
     fr: "Bouche ouverte. Tête sur l'épaule d'un inconnu. Bave sur la chemise. On est tous passés par là. Sleep&zy maintient votre tête en place pour dormir avec dignité.",
     es: "Boca abierta. Cabeza en el hombro de un desconocido. Baba en la camisa. Todos hemos pasado por eso. Sleep&zy mantiene tu cabeza en su lugar para dormir con dignidad.",
   },
+  "hero.subhead": {
+    en: "The ergonomic travel pillow that locks your head in place. No more drool. No more embarrassment.",
+    fr: "L'oreiller de voyage ergonomique qui maintient votre tête en place. Fini la bave. Fini la honte.",
+    es: "La almohada de viaje ergonómica que mantiene tu cabeza en su lugar. Se acabó la baba. Se acabó la vergüenza.",
+  },
   "hero.cta": {
-    en: "Discover Sleep&zy →",
-    fr: "Découvrir Sleep&zy →",
-    es: "Descubre Sleep&zy →",
+    en: "See the Pillow — 50% Off",
+    fr: "Voir l'oreiller — 50% de réduction",
+    es: "Ver la almohada — 50% de descuento",
   },
   "hero.reviews": {
     en: "4.8/5 — 2,400+ reviews",
