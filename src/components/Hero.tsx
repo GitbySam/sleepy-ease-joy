@@ -5,7 +5,6 @@ const heroBanner = "/hero-banner.webp";
 const demoVideo = "/demo-video.mp4";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useMarket } from "@/i18n/MarketContext";
-import { useViewerCount } from "@/hooks/useViewerCount";
 
 /**
  * Deferred video: shows poster immediately, loads video only after
@@ -88,7 +87,6 @@ const StarRating = ({ size = "small" }: { size?: "small" | "large" }) => {
 const Hero = () => {
   const { t } = useLanguage();
   const { prices, formatPrice } = useMarket();
-  const viewerCount = useViewerCount();
 
   return (
     <>
@@ -111,12 +109,6 @@ const Hero = () => {
               <StarRating size="small" />
               <span className="text-[11px] text-white/80 font-sans-body break-words">{t("hero.reviews")}</span>
             </div>
-
-            {/* Live viewers — urgence sociale */}
-            <span className="inline-flex max-w-full items-center gap-2 bg-white/10 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full tracking-normal">
-              <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse shrink-0" />
-              <span className="break-words">🔥 {viewerCount} {t("hero.viewingNow")}</span>
-            </span>
 
             {/* Subtitle */}
             <p className="text-[11px] font-sans-body uppercase tracking-[0.2em] text-white/70">
@@ -187,14 +179,6 @@ const Hero = () => {
             <motion.div variants={fadeUp} className="flex items-center gap-2.5">
               <StarRating size="large" />
               <span className="text-sm text-muted-foreground font-sans-body">{t("hero.reviews")}</span>
-            </motion.div>
-
-            {/* Live viewers */}
-            <motion.div variants={fadeUp}>
-              <span className="inline-flex items-center gap-2 bg-foreground/10 backdrop-blur-sm text-foreground text-xs font-semibold px-3 py-1.5 rounded-full">
-                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                🔥 {viewerCount} {t("hero.viewingNow")}
-              </span>
             </motion.div>
 
             <motion.p variants={fadeUp} className="text-sm font-sans-body uppercase tracking-[0.25em] text-muted-foreground">
