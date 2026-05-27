@@ -80,11 +80,6 @@ export const translations = {
     fr: "🔒 Paiement sécurisé",
     es: "🔒 Pago seguro",
   },
-  "hero.viewingNow": {
-    en: "people viewing right now",
-    fr: "personnes consultent en ce moment",
-    es: "personas viendo ahora",
-  },
 
   // ComparisonSlider
   "comparison.subtitle": { en: "The proof speaks for itself", fr: "La preuve parle d'elle-même", es: "La prueba habla por sí sola" },
@@ -706,7 +701,7 @@ export const translations = {
   "trustBar.freeShipping": { en: "Free Shipping", fr: "Livraison gratuite", es: "Envío gratis" },
 
   // StickyMobileCTA
-  "sticky.viewing": { en: "viewing", fr: "consultent", es: "viendo" },
+  
   "sticky.cta": { en: "Shop Now", fr: "Acheter", es: "Comprar" },
 
   // Products (ShopifyProducts fallback)
