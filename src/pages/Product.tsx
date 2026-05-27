@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Check, ShieldCheck, Truck, RotateCcw, Clock, Loader2, ArrowLeft } from "lucide-react";
 import { X } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -250,6 +251,8 @@ const Product = () => {
   const [selectedColor, setSelectedColor] = useState(initialColor);
   const [galleryOffset, setGalleryOffset] = useState(0);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   const countdown = useCountdown(15);
   const { t } = useLanguage();
   const { country, currency, prices, formatPrice } = useMarket();
@@ -455,7 +458,7 @@ const Product = () => {
             <div className="absolute top-3 left-3 z-10 bg-gold text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1">
               {t("product.winterSaleTag")}
             </div>
-            <div className="bg-gradient-to-br from-muted/50 to-background rounded-2xl p-8 flex items-center justify-center min-h-[350px] md:min-h-[450px] border border-border">
+            <div ref={imageRef} className="scroll-mt-24 bg-gradient-to-br from-muted/50 to-background rounded-2xl p-8 flex items-center justify-center min-h-[350px] md:min-h-[450px] border border-border">
               <AnimatePresence mode="wait">
                 <motion.img
                   key={selectedColor}
@@ -608,6 +611,11 @@ const Product = () => {
                       onClick={() => {
                         setSelectedColor(color);
                         trackFunnelStep('select_color', { step_value: color });
+                        if (isMobile) {
+                          setTimeout(() => {
+                            imageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }, 50);
+                        }
                       }}
                       className={`relative w-9 h-9 rounded-full transition-all duration-200 ${
                         selectedColor === color

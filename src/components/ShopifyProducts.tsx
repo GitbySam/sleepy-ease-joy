@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
@@ -7,6 +7,7 @@ import { useMarket } from "@/i18n/MarketContext";
 import { useCartStore } from "@/stores/cartStore";
 import { trackAddToCart } from "@/lib/metaPixel";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 import pillowGrey from "@/assets/product-pillow-grey-new.webp";
 import pillowBlack from "@/assets/product-pillow-black.webp";
 import pillowRed from "@/assets/product-pillow-red.webp";
@@ -146,6 +147,8 @@ const ShopifyProducts = () => {
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedColor, setSelectedColor] = useState("Grey");
+  const gridRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     fetchProducts(20, undefined, country)
@@ -199,7 +202,14 @@ const ShopifyProducts = () => {
           {COLORS.map((color) => (
             <button
               key={color}
-              onClick={() => setSelectedColor(color)}
+              onClick={() => {
+                setSelectedColor(color);
+                if (isMobile) {
+                  setTimeout(() => {
+                    gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }, 50);
+                }
+              }}
               className={`flex items-center gap-2 px-4 py-2 rounded-full border-2 transition-all text-sm font-medium ${
                 selectedColor === color
                   ? "border-gold bg-gold/10 text-foreground shadow-md scale-105"
@@ -215,7 +225,7 @@ const ShopifyProducts = () => {
           ))}
         </div>
 
-        <div className="flex flex-wrap justify-center gap-8">
+        <div ref={gridRef} className="scroll-mt-24 flex flex-wrap justify-center gap-8">
           {products.map((product) => (
             <ProductCard
               key={product.node.id}
