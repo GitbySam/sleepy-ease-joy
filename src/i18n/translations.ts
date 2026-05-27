@@ -87,11 +87,7 @@ export const translations = {
   },
 
   // ComparisonSlider
-  "comparison.subtitle": {
-    en: "The proof speaks for itself",
-    fr: "La preuve parle d'elle-même",
-    es: "La prueba habla por sí sola",
-  },
+  "comparison.subtitle": { en: "The proof speaks for itself", fr: "La preuve parle d'elle-même", es: "La prueba habla por sí sola" },
   "comparison.title": {
     en: "We've <gold>all</gold> been there.",
     fr: "On est <gold>tous</gold> passés par là.",
@@ -499,24 +495,30 @@ export const translations = {
   },
   "product.benefits.items.compact.title": { en: "Ultra-compact", fr: "Ultra-compact", es: "Ultra compacto" },
   "product.benefits.items.compact.desc": {
-    en: "Fits in your handbag or carry-on — unlike bulky U-shaped pillows.",
-    fr: "Se range dans le sac à main ou bagage cabine — contrairement aux coussins en U.",
-    es: "Cabe en el bolso o equipaje de mano — a diferencia de las almohadas en U.",
+    en: "Rolls up smaller than a water bottle. Fits in any carry-on.",
+    fr: "Se roule plus petit qu'une bouteille d'eau. Tient dans n'importe quel bagage cabine.",
+    es: "Se enrolla más pequeño que una botella de agua. Cabe en cualquier equipaje de mano.",
   },
-  "product.benefits.items.discreet.title": { en: "Discreet & elegant", fr: "Discret et élégant", es: "Discreto y elegante" },
+  "product.benefits.items.washable.title": { en: "Machine washable", fr: "Lavable en machine", es: "Lavable a máquina" },
+  "product.benefits.items.washable.desc": {
+    en: "Removable cotton cover. Wash at 30°C and air dry.",
+    fr: "Housse en coton amovible. Lavage à 30°C et séchage à l'air.",
+    es: "Funda de algodón extraíble. Lavar a 30°C y secar al aire.",
+  },
+  "product.benefits.items.material.title": { en: "Premium memory foam", fr: "Mousse à mémoire de forme premium", es: "Espuma viscoelástica premium" },
+  "product.benefits.items.material.desc": {
+    en: "Adapts to your neck shape. Soft support that doesn't collapse.",
+    fr: "S'adapte à la forme de votre cou. Un soutien doux qui ne s'effondre pas.",
+    es: "Se adapta a la forma de tu cuello. Soporte suave que no se hunde.",
+  },
+  "product.benefits.items.discreet.title": { en: "Looks like a scarf", fr: "Ressemble à un foulard", es: "Parece un pañuelo" },
   "product.benefits.items.discreet.desc": {
-    en: "Modern design — you don't look ridiculous on the plane or at the office.",
-    fr: "Design moderne — vous n'avez pas l'air ridicule en avion ou au bureau.",
-    es: "Diseño moderno — no pareces ridículo en el avión o la oficina.",
-  },
-  "product.benefits.items.multimodal.title": { en: "For every trip", fr: "Pour tous les trajets", es: "Para todos los viajes" },
-  "product.benefits.items.multimodal.desc": {
-    en: "Plane, car, train, bus or office — works wherever you need to rest.",
-    fr: "Avion, voiture, train, bus ou bureau — fonctionne partout où vous voulez vous reposer.",
-    es: "Avión, coche, tren, autobús u oficina — funciona donde quieras descansar.",
+    en: "No medical-device look. Nobody knows it's a pillow until you tell them.",
+    fr: "Pas d'aspect appareil médical. Personne ne sait que c'est un oreiller.",
+    es: "No parece un dispositivo médico. Nadie sabe que es una almohada.",
   },
   "product.benefits.compare.title": {
-    en: "Sleep&zy vs classic U-shaped pillow",
+    en: "Sleep&zy vs Classic U-Pillow",
     fr: "Sleep&zy vs coussin en U classique",
     es: "Sleep&zy vs almohada en U clásica",
   },
@@ -529,21 +531,8 @@ export const translations = {
   "product.benefits.compare.row3.before": { en: "Looks ridiculous", fr: "Vous donne l'air ridicule", es: "Da aspecto ridículo" },
   "product.benefits.compare.row3.after": { en: "Sleek and discreet", fr: "Élégant et discret", es: "Elegante y discreto" },
 
-  // SocialProofToasts
-  "social.from": { en: "from", fr: "de", es: "de" },
-  "social.minAgo": { en: "min ago", fr: "il y a min", es: "hace min" },
-  "social.lines.1": { en: "just saved her dignity", fr: "vient de sauver sa dignité", es: "acaba de salvar su dignidad" },
-  "social.lines.2": { en: "no more drool photos", fr: "fini les photos de bave", es: "se acabaron las fotos de baba" },
-  "social.lines.3": { en: "never embarrassed again", fr: "plus jamais gêné(e)", es: "nunca más avergonzado/a" },
-  "social.lines.4": { en: "no more head-on-stranger moments", fr: "fini la tête sur l'épaule d'un inconnu", es: "se acabó caer en hombro ajeno" },
-  "social.lines.5": { en: "deleted the evidence, got Sleep&zy", fr: "preuves supprimées, Sleep&zy acheté", es: "eliminó las pruebas, compró Sleep&zy" },
-  "social.lines.6": { en: "mouth officially stays closed", fr: "bouche officiellement fermée", es: "boca oficialmente cerrada" },
-  "social.lines.7": { en: "saved a friend from embarrassment too", fr: "a aussi sauvé un(e) ami(e)", es: "también salvó a un amigo" },
-  "social.lines.8": { en: "sleeps with dignity now", fr: "dort avec dignité maintenant", es: "ahora duerme con dignidad" },
-  "social.lines.9": { en: "no more viral Slack photos", fr: "fini les photos virales sur Slack", es: "se acabaron las fotos virales en Slack" },
-  "social.lines.10": { en: "reputation officially protected", fr: "réputation officiellement protégée", es: "reputación oficialmente protegida" },
-  "social.lines.11": { en: "anti-embarrassment kit secured", fr: "kit anti-gêne sécurisé", es: "kit anti-vergüenza asegurado" },
-  "social.lines.12": { en: "no more drooling in public", fr: "fini de baver en public", es: "se acabó babear en público" },
+  // SocialProofToasts (monthly sold counter)
+  "social.monthlySold": { en: "sold this month", fr: "vendus ce mois-ci", es: "vendidos este mes" },
 
   // InactivityPopup
   "inactivity.title": {
@@ -598,111 +587,124 @@ export const translations = {
   },
   "upsell.today": { en: "-50% TODAY", fr: "-50% AUJOURD'HUI", es: "-50% HOY" },
   "upsell.productName": { en: "Sleep&zy™ MP3 Sleep Headband", fr: "Sleep&zy™ MP3 Sleep Headband", es: "Sleep&zy™ MP3 Sleep Headband" },
-  "upsell.onlyLeft": {
-    en: "Only 4 left at this price!",
-    fr: "Plus que 4 à ce prix !",
-    es: "¡Solo quedan 4 a este precio!",
-  },
-  "upsell.benefit1": {
-    en: "Listen to music, ASMR, or white noise to fall asleep",
-    fr: "Écoutez de la musique, ASMR ou bruit blanc pour vous endormir",
-    es: "Escucha música, ASMR o ruido blanco para dormirte",
-  },
-  "upsell.benefit2": {
-    en: "Ultra-thin & comfortable — won't disrupt your sleep",
-    fr: "Ultra-fin & confortable — ne perturbe pas votre sommeil",
-    es: "Ultra delgado y cómodo — no interrumpe tu sueño",
-  },
-  "upsell.benefit3": {
-    en: "Save $20.00 vs buying separately",
-    fr: "Économisez 20€ par rapport à l'achat séparé",
-    es: "Ahorra 20€ comprando juntos",
-  },
-  "upsell.benefit4": {
-    en: "FREE shipping with your order",
-    fr: "Livraison GRATUITE avec votre commande",
-    es: "Envío GRATIS con tu pedido",
-  },
-  "upsell.cta": {
-    en: "✅ YES! Add the headband — $19.90",
-    fr: "✅ OUI ! Ajouter le bandeau — 19,90€",
-    es: "✅ ¡SÍ! Añadir la diadema — 19,90€",
-  },
-  "upsell.decline": {
-    en: "No thanks, I'll pay full price later ($69.90 CAD)",
-    fr: "Non merci, je paierai le prix plein plus tard (69,90$ CAD)",
-    es: "No gracias, pagaré el precio completo después ($69.90 CAD)",
-  },
-  "upsell.exclusive": {
-    en: "🔒 This exclusive offer expires when you close this window",
-    fr: "🔒 Cette offre exclusive expire quand vous fermez cette fenêtre",
-    es: "🔒 Esta oferta exclusiva expira cuando cierres esta ventana",
-  },
+  "upsell.productPriceOld": { en: "$49.90", fr: "49,90€", es: "49,90€" },
+  "upsell.productPrice": { en: "$24.95", fr: "24,95€", es: "24,95€" },
+  "upsell.noThanks": { en: "No thanks", fr: "Non merci", es: "No gracias" },
+  "upsell.addToCart": { en: "Add to Cart", fr: "Ajouter au panier", es: "Añadir al carrito" },
 
-  // Cart
-  "cart.title": { en: "Cart", fr: "Panier", es: "Carrito" },
+  // CartDrawer
+  "cart.title": { en: "Your Cart", fr: "Votre Panier", es: "Tu Carrito" },
   "cart.empty": { en: "Your cart is empty", fr: "Votre panier est vide", es: "Tu carrito está vacío" },
-  "cart.items": { en: "item(s) in your cart", fr: "article(s) dans votre panier", es: "artículo(s) en tu carrito" },
-  "cart.transportBag": { en: "Transport Bag included", fr: "Sac de transport inclus", es: "Bolsa de transporte incluida" },
+  "cart.addItems": { en: "Add items to get started", fr: "Ajoutez des articles pour commencer", es: "Añade artículos para empezar" },
+  "cart.subtotal": { en: "Subtotal", fr: "Sous-total", es: "Subtotal" },
+  "cart.shipping": { en: "Shipping", fr: "Livraison", es: "Envío" },
+  "cart.free": { en: "FREE", fr: "GRATUITE", es: "GRATIS" },
   "cart.total": { en: "Total", fr: "Total", es: "Total" },
-  "cart.checkout": { en: "Secure Checkout", fr: "Paiement sécurisé", es: "Pago seguro" },
-  "cart.trustBanner": { en: "Free shipping + 30 day money back guarantee", fr: "Livraison gratuite + Garantie remboursée 30 jours", es: "Envío gratis + Garantía de devolución de 30 días" },
-  "cart.socialProof": { en: "4.8/5 - 2400+ happy sleepers", fr: "4.8/5 - 2400+ dormeurs satisfaits", es: "4.8/5 - 2400+ durmientes felices" },
-  "cart.freeShippingQualified": { en: "You qualify for FREE shipping!", fr: "Vous bénéficiez de la livraison GRATUITE !", es: "¡Calificas para envío GRATIS!" },
-  "cart.testimonial1": { en: '"Best pillow I\'ve ever bought!" — Sarah T.', fr: '"Le meilleur oreiller que j\'ai acheté !" — Sarah T.', es: '"¡La mejor almohada que he comprado!" — Sarah T.' },
-  "cart.testimonial2": { en: '"Game changer for long flights" — Mike R.', fr: '"Un must pour les longs vols" — Mike R.', es: '"Un cambio total para vuelos largos" — Mike R.' },
-  "cart.testimonial3": { en: '"I finally sleep on trains!" — Emma L.', fr: '"Je dors enfin dans le train !" — Emma L.', es: '"¡Por fin duermo en el tren!" — Emma L.' },
+  "cart.checkout": { en: "Checkout", fr: "Commander", es: "Pagar" },
+  "cart.continue": { en: "Continue Shopping", fr: "Continuer les achats", es: "Seguir comprando" },
+  "cart.trustTitle": { en: "Why 2,400+ customers trust us", fr: "Pourquoi 2 400+ clients nous font confiance", es: "Por qué 2 400+ clientes confían en nosotros" },
+  "cart.trustLine1": { en: "✅ 30-day money-back guarantee", fr: "✅ Garantie satisfait ou remboursé 30 jours", es: "✅ Garantía de devolución de 30 días" },
+  "cart.trustLine2": { en: "🚚 Free shipping on all orders", fr: "🚚 Livraison gratuite sur toutes les commandes", es: "🚚 Envío gratis en todos los pedidos" },
+  "cart.trustLine3": { en: "🔒 Secure SSL checkout", fr: "🔒 Paiement sécurisé SSL", es: "🔒 Pago seguro con SSL" },
+  "cart.recentBuyers": { en: "Recent buyers", fr: "Acheteurs récents", es: "Compradores recientes" },
+  "cart.recentBuyer1": { en: "Sarah from Toronto", fr: "Sarah de Toronto", es: "Sarah de Toronto" },
+  "cart.recentBuyer2": { en: "Marc from Montreal", fr: "Marc de Montréal", es: "Marc de Montreal" },
+  "cart.recentBuyer3": { en: "Emily from Vancouver", fr: "Emily de Vancouver", es: "Emily de Vancouver" },
+  "cart.recentBuyer4": { en: "Jake from Calgary", fr: "Jake de Calgary", es: "Jake de Calgary" },
+  "cart.recentBuyer5": { en: "Isabelle from Ottawa", fr: "Isabelle d'Ottawa", es: "Isabelle de Ottawa" },
+  "cart.secureCheckout": { en: "Secure Checkout", fr: "Paiement Sécurisé", es: "Pago Seguro" },
+  "cart.progressFreeShip": { en: "Free shipping unlocked! 🎉", fr: "Livraison gratuite débloquée ! 🎉", es: "¡Envío gratis desbloqueado! 🎉" },
 
-  // Shopify Products
-  "products.title": { en: "Our Products", fr: "Nos Produits", es: "Nuestros Productos" },
-  "products.empty": { en: "No products available at the moment. Check back soon!", fr: "Aucun produit disponible pour le moment. Revenez bientôt !", es: "No hay productos disponibles por el momento. ¡Vuelve pronto!" },
-  "products.add": { en: "Add", fr: "Ajouter", es: "Añadir" },
-  "products.shopNow": { en: "Shop Now", fr: "Découvrir", es: "Ver más" },
-  "products.addedToCart": { en: "added to cart", fr: "ajouté au panier", es: "añadido al carrito" },
-  "products.noImage": { en: "No image", fr: "Pas d'image", es: "Sin imagen" },
+  // ShopifyProducts
+  "shopify.selectColor": { en: "Select a color:", fr: "Choisissez une couleur :", es: "Selecciona un color:" },
+  "shopify.color.black": { en: "Midnight Black", fr: "Noir Minuit", es: "Negro Medianoche" },
+  "shopify.color.grey": { en: "Storm Grey", fr: "Gris Orage", es: "Gris Tormenta" },
+  "shopify.color.blue": { en: "Ocean Blue", fr: "Bleu Océan", es: "Azul Océano" },
+  "shopify.color.navy": { en: "Navy Blue", fr: "Bleu Marine", es: "Azul Marino" },
+  "shopify.color.white": { en: "Cloud White", fr: "Blanc Nuage", es: "Blanco Nube" },
+  "shopify.color.beige": { en: "Sand Beige", fr: "Beige Sable", es: "Beige Arena" },
+  "shopify.color.pink": { en: "Rose Pink", fr: "Rose Poudré", es: "Rosa" },
+  "shopify.color.purple": { en: "Lavender Purple", fr: "Violet Lavande", es: "Púrpura Lavanda" },
+  "shopify.color.red": { en: "Ruby Red", fr: "Rouge Rubis", es: "Rojo Rubí" },
 
-  // Sticky Mobile CTA
-  "sticky.cta": { en: "Shop Now — 50% OFF", fr: "Acheter — -50%", es: "Comprar — -50%" },
-  "sticky.viewing": {
-    en: "{count} people are viewing this product",
-    fr: "{count} personnes consultent ce produit",
-    es: "{count} personas están viendo este producto",
+  "shopify.pack.solo": { en: "1 Pillow", fr: "1 Oreiller", es: "1 Almohada" },
+  "shopify.pack.duo": { en: "2 Pillows", fr: "2 Oreillers", es: "2 Almohadas" },
+  "shopify.pack.family": { en: "3 Pillows", fr: "3 Oreillers", es: "3 Almohadas" },
+  "shopify.pack.solo.price": { en: "$34.95", fr: "34,95€", es: "34,95€" },
+  "shopify.pack.solo.oldPrice": { en: "$69.90", fr: "69,90€", es: "69,90€" },
+  "shopify.pack.duo.price": { en: "$59.95", fr: "59,95€", es: "59,95€" },
+  "shopify.pack.duo.oldPrice": { en: "$119.90", fr: "119,90€", es: "119,90€" },
+  "shopify.pack.family.price": { en: "$64.95", fr: "64,95€", es: "64,95€" },
+  "shopify.pack.family.oldPrice": { en: "$179.85", fr: "179,85€", es: "179,85€" },
+  "shopify.pack.solo.perUnit": { en: "per pillow", fr: "par oreiller", es: "por almohada" },
+  "shopify.pack.duo.perUnit": { en: "$29.97 per pillow", fr: "29,97€ par oreiller", es: "29,97€ por almohada" },
+  "shopify.pack.family.perUnit": { en: "$21.65 per pillow", fr: "21,65€ par oreiller", es: "21,65€ por almohada" },
+  "shopify.pack.solo.desc": { en: "For the solo traveler", fr: "Pour le voyageur solo", es: "Para el viajero solo" },
+  "shopify.pack.duo.desc": { en: "For couples & best friends", fr: "Pour les couples & meilleurs amis", es: "Para parejas y mejores amigos" },
+  "shopify.pack.family.desc": { en: "For families & gift givers", fr: "Pour les familles & ceux qui offrent", es: "Para familias y regalos" },
+  "shopify.save": { en: "Save", fr: "Économisez", es: "Ahorra" },
+  "shopify.mostPopular": { en: "Most Popular", fr: "Plus populaire", es: "Más popular" },
+  "shopify.bestValue": { en: "Best Value", fr: "Meilleure offre", es: "Mejor oferta" },
+  "shopify.cta": { en: "Shop Now", fr: "Acheter", es: "Comprar" },
+  "shopify.stockWarning": {
+    en: "⚡ Only 8 left in stock — order within the next few minutes",
+    fr: "⚡ Plus que 8 en stock — commandez dans les prochaines minutes",
+    es: "⚡ Solo quedan 8 en stock — pide en los próximos minutos",
+  },
+  "shopify.badge.delivery": { en: "Fast delivery", fr: "Livraison rapide", es: "Entrega rápida" },
+  "shopify.badge.returns": { en: "30-day returns", fr: "Retours 30 jours", es: "Devoluciones 30 días" },
+  "shopify.badge.secure": { en: "Secure payment", fr: "Paiement sécurisé", es: "Pago seguro" },
+  "shopify.badge.guarantee": { en: "Satisfaction guaranteed", fr: "Satisfaction garantie", es: "Satisfacción garantizada" },
+
+  "shopify.recentOrders": { en: "Recent orders", fr: "Commandes récentes", es: "Pedidos recientes" },
+  "shopify.recentOrders.desc": { en: "Shipping today", fr: "Expédiées aujourd'hui", es: "Enviando hoy" },
+
+  // CheckoutRedirectOverlay
+  "checkout.redirecting": { en: "Redirecting to secure checkout...", fr: "Redirection vers le paiement sécurisé...", es: "Redirigiendo al pago seguro..." },
+  "checkout.pleaseWait": { en: "Please wait a moment", fr: "Veuillez patienter un instant", es: "Por favor espera un momento" },
+
+  // AdminLogin
+  "admin.loginTitle": { en: "Admin Login", fr: "Connexion Admin", es: "Inicio de Sesión Admin" },
+  "admin.email": { en: "Email", fr: "Email", es: "Correo electrónico" },
+  "admin.password": { en: "Password", fr: "Mot de passe", es: "Contraseña" },
+  "admin.loginButton": { en: "Login", fr: "Connexion", es: "Iniciar sesión" },
+  "admin.loginError": { en: "Invalid credentials", fr: "Identifiants invalides", es: "Credenciales inválidas" },
+
+  // AdminAnalytics
+  "admin.analyticsTitle": { en: "Analytics Dashboard", fr: "Tableau de bord", es: "Panel de análisis" },
+  "admin.periodLabel": { en: "Period:", fr: "Période :", es: "Período:" },
+  "admin.last7": { en: "Last 7 days", fr: "7 derniers jours", es: "Últimos 7 días" },
+  "admin.last30": { en: "Last 30 days", fr: "30 derniers jours", es: "Últimos 30 días" },
+  "admin.last90": { en: "Last 90 days", fr: "90 derniers jours", es: "Últimos 90 días" },
+  "admin.revenue": { en: "Revenue", fr: "Chiffre d'affaires", es: "Ingresos" },
+  "admin.orders": { en: "Orders", fr: "Commandes", es: "Pedidos" },
+  "admin.aov": { en: "AOV", fr: "Panier moyen", es: "Valor promedio" },
+  "admin.customers": { en: "New Customers", fr: "Nouveaux clients", es: "Nuevos clientes" },
+  "admin.refunded": { en: "Refunded", fr: "Remboursées", es: "Reembolsados" },
+  "admin.cancelled": { en: "Cancelled", fr: "Annulées", es: "Cancelados" },
+  "admin.abandoned": { en: "Abandoned Carts", fr: "Paniers abandonnés", es: "Carritos abandonados" },
+  "admin.abandonedValue": { en: "Abandoned Value", fr: "Valeur abandonnée", es: "Valor abandonado" },
+  "admin.topProducts": { en: "Top Products", fr: "Produits phares", es: "Productos principales" },
+  "admin.ordersByDay": { en: "Orders by Day", fr: "Commandes par jour", es: "Pedidos por día" },
+  "admin.topCountries": { en: "Top Countries", fr: "Top pays", es: "Principales países" },
+  "admin.noData": { en: "No data available", fr: "Aucune donnée disponible", es: "No hay datos disponibles" },
+  "admin.loading": { en: "Loading...", fr: "Chargement...", es: "Cargando..." },
+  "admin.logout": { en: "Logout", fr: "Déconnexion", es: "Cerrar sesión" },
+  "admin.attributionTitle": { en: "Order Attribution", fr: "Attribution des commandes", es: "Atribución de pedidos" },
+  "admin.attributionSource": { en: "Source", fr: "Source", es: "Fuente" },
+  "admin.attributionOrders": { en: "Orders", fr: "Commandes", es: "Pedidos" },
+  "admin.attributionRevenue": { en: "Revenue", fr: "Chiffre d'affaires", es: "Ingresos" },
+  "admin.attributionAov": { en: "AOV", fr: "Panier moyen", es: "Valor promedio" },
+  "admin.currencyCad": { en: "CAD", fr: "CAD", es: "CAD" },
+  "admin.currencyUsd": { en: "USD", fr: "USD", es: "USD" },
+  "admin.realRevenueNote": {
+    en: "Paid orders only (excludes pending/refunded/cancelled)",
+    fr: "Commandes payées uniquement (hors en attente/remboursées/annulées)",
+    es: "Solo pedidos pagados (excluye pendientes/reembolsados/cancelados)",
   },
 
-  // Trust Bar
-  "trustBar.freeShipping": { en: "Free Shipping", fr: "Livraison gratuite", es: "Envío gratis" },
-  "trustBar.securePayment": { en: "Secure Payment", fr: "Paiement sécurisé", es: "Pago seguro" },
-  "trustBar.guarantee": { en: "30 Day Guarantee", fr: "Garantie 30 jours", es: "Garantía 30 días" },
-  "trustBar.ssl": { en: "SSL Encrypted", fr: "Chiffrement SSL", es: "Cifrado SSL" },
-
-  // Bundle Countdown
-  "bundle.countdown": {
-    en: "This offer expires in",
-    fr: "Cette offre expire dans",
-    es: "Esta oferta expira en",
-  },
-
-  // CTA Bridge
-  "ctaBridge.title": {
-    en: "Ready to sleep with dignity?",
-    fr: "Prêt(e) à dormir avec dignité ?",
-    es: "¿Listo/a para dormir con dignidad?",
-  },
-  "ctaBridge.desc": {
-    en: "Join 2,400+ travelers who stopped being embarrassed. 30-day money-back guarantee.",
-    fr: "Rejoignez 2 400+ voyageurs qui ont cessé d'être gênés. Garantie satisfait ou remboursé 30 jours.",
-    es: "Únete a 2 400+ viajeros que dejaron de pasar vergüenza. Garantía de 30 días.",
-  },
-  "ctaBridge.cta": {
-    en: "Shop now — 50% off",
-    fr: "Acheter — -50%",
-    es: "Comprar — -50%",
-  },
-  "ctaBridge.savings": {
-    en: "Save 50% today",
-    fr: "Économisez 50% aujourd'hui",
-    es: "Ahorra 50% hoy",
-  },
+  // Meta CAPI
+  "meta.capiError": { en: "Tracking error", fr: "Erreur de tracking", es: "Error de seguimiento" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;
