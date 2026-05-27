@@ -458,7 +458,7 @@ const Product = () => {
             <div className="absolute top-3 left-3 z-10 bg-gold text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1">
               {t("product.winterSaleTag")}
             </div>
-            <div className="bg-gradient-to-br from-muted/50 to-background rounded-2xl p-8 flex items-center justify-center min-h-[350px] md:min-h-[450px] border border-border">
+            <div ref={imageRef} className="scroll-mt-24 bg-gradient-to-br from-muted/50 to-background rounded-2xl p-8 flex items-center justify-center min-h-[350px] md:min-h-[450px] border border-border">
               <AnimatePresence mode="wait">
                 <motion.img
                   key={selectedColor}
