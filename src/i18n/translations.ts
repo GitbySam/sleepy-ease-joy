@@ -536,42 +536,27 @@ export const translations = {
 
   // InactivityPopup
   "inactivity.title": {
-    en: "WAIT! Your dignity is at stake",
-    fr: "ATTENDEZ ! Votre dignité est en jeu",
-    es: "¡ESPERA! Tu dignidad está en juego",
+    en: "A little gift for you",
+    fr: "Un petit cadeau pour vous",
+    es: "Un pequeño regalo para ti",
   },
   "inactivity.subtitle": {
-    en: "Next time you fall asleep in public, will you be ready?",
-    fr: "La prochaine fois que vous vous endormirez en public, serez-vous prêt(e) ?",
-    es: "La próxima vez que te duermas en público, ¿estarás listo/a?",
+    en: "Save an extra 10% on your first order. No strings attached.",
+    fr: "Économisez 10% de plus sur votre première commande. Sans engagement.",
+    es: "Ahorra un 10% extra en tu primer pedido. Sin compromiso.",
   },
   "inactivity.extra10": { en: "EXTRA 10% OFF", fr: "-10% SUPPLÉMENTAIRES", es: "-10% EXTRA" },
-  "inactivity.orderNow": { en: "Order now and get an", fr: "Commandez maintenant et bénéficiez d'une", es: "Pide ahora y obtén un" },
-  "inactivity.additional10": {
-    en: "additional 10% off your entire order!",
-    fr: "réduction supplémentaire de 10% sur toute la commande !",
-    es: "10% de descuento adicional en todo tu pedido!",
-  },
-  "inactivity.expires": {
-    en: "⏰ This offer expires when you leave this page",
-    fr: "⏰ Cette offre expire quand vous quittez cette page",
-    es: "⏰ Esta oferta expira cuando salgas de esta página",
-  },
   "inactivity.cta": {
-    en: "SHOP NOW",
-    fr: "ACHETER MAINTENANT",
-    es: "COMPRAR AHORA",
+    en: "Claim my 10% off",
+    fr: "Profiter de mes -10%",
+    es: "Obtener mi -10%",
   },
   "inactivity.decline": {
-    en: "No thanks, I enjoy being photographed drooling",
-    fr: "Non merci, j'aime qu'on me photographie en train de baver",
-    es: "No gracias, me gusta que me fotografíen babeando",
+    en: "Maybe later",
+    fr: "Plus tard",
+    es: "Quizás más tarde",
   },
-  "inactivity.trust": {
-    en: "Secure payment • Free shipping • 30-day guarantee",
-    fr: "Paiement sécurisé • Livraison gratuite • Garantie 30 jours",
-    es: "Pago seguro • Envío gratis • Garantía 30 días",
-  },
+
 
   // UpsellPopup
   "upsell.limitedOffer": { en: "⚡ Only 13 left", fr: "⚡ Plus que 13", es: "⚡ Solo quedan 13" },
