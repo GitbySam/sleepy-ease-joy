@@ -58,7 +58,6 @@ const Index = () => (
       <Footer />
     </Suspense>
     <Suspense fallback={null}>
-      <SocialProofToasts />
       <InactivityPopup />
     </Suspense>
   </div>
