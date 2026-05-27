@@ -9,9 +9,9 @@ export const translations = {
   "nav.faq": { en: "FAQ", fr: "FAQ", es: "FAQ" },
   "nav.shopNow": { en: "Shop Now", fr: "Acheter", es: "Comprar" },
   "header.marquee": {
-    en: "Limited Offer -50% \u00a0•\u00a0 Free Shipping \u00a0•\u00a0 Secure Payment",
-    fr: "Offre limitée -50% \u00a0•\u00a0 Livraison gratuite \u00a0•\u00a0 Paiement sécurisé",
-    es: "Oferta limitada -50% \u00a0•\u00a0 Envío gratis \u00a0•\u00a0 Pago seguro",
+    en: "⚡ Only 13 left in stock \u00a0•\u00a0 -50% OFF \u00a0•\u00a0 Free Shipping",
+    fr: "⚡ Plus que 13 en stock \u00a0•\u00a0 -50% \u00a0•\u00a0 Livraison gratuite",
+    es: "⚡ Solo quedan 13 en stock \u00a0•\u00a0 -50% \u00a0•\u00a0 Envío gratis",
   },
 
   // Hero
@@ -210,9 +210,9 @@ export const translations = {
 
   // BundleOffer
   "bundle.subtitle": {
-    en: "Limited offer — up to 67% off",
-    fr: "Offre limitée — jusqu'à -67%",
-    es: "Oferta limitada — hasta -67%",
+    en: "⚡ Only 13 left — up to 67% off",
+    fr: "⚡ Plus que 13 en stock — jusqu'à -67%",
+    es: "⚡ Solo quedan 13 — hasta -67%",
   },
   "bundle.title": {
     en: "Protect your <gold>reputation</gold>",
@@ -574,7 +574,7 @@ export const translations = {
   },
 
   // UpsellPopup
-  "upsell.limitedOffer": { en: "Limited offer", fr: "Offre limitée", es: "Oferta limitada" },
+  "upsell.limitedOffer": { en: "⚡ Only 13 left", fr: "⚡ Plus que 13", es: "⚡ Solo quedan 13" },
   "upsell.banner": {
     en: "🎧 Complete your anti-embarrassment kit & save 50%",
     fr: "🎧 Complétez votre kit anti-gêne et économisez 50%",
