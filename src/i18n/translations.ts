@@ -736,6 +736,24 @@ export const translations = {
   // BundleOffer countdown
   "bundle.countdown": { en: "Offer ends in", fr: "L'offre se termine dans", es: "La oferta termina en" },
 
+  // BundleOffer countdown
+  "bundle.countdown": { en: "Offer ends in", fr: "L'offre se termine dans", es: "La oferta termina en" },
+
+  // TrustBar
+  "trustBar.securePayment": { en: "Secure Payment", fr: "Paiement sécurisé", es: "Pago seguro" },
+  "trustBar.guarantee": { en: "30-Day Guarantee", fr: "Garantie 30 jours", es: "Garantía 30 días" },
+  "trustBar.ssl": { en: "SSL Encrypted", fr: "Chiffrement SSL", es: "Cifrado SSL" },
+
+  // UpsellPopup
+  "upsell.benefit1": { en: "Blocks light for deeper sleep", fr: "Bloque la lumière pour un sommeil plus profond", es: "Bloquea la luz para dormir más profundo" },
+  "upsell.benefit2": { en: "Built-in ultra-thin speakers", fr: "Haut-parleurs ultra-fins intégrés", es: "Altavoces ultrafinos integrados" },
+  "upsell.benefit3": { en: "Bluetooth 5.0 connectivity", fr: "Connectivité Bluetooth 5.0", es: "Conectividad Bluetooth 5.0" },
+  "upsell.benefit4": { en: "8-hour battery life", fr: "Autonomie de 8 heures", es: "Batería de 8 horas" },
+  "upsell.onlyLeft": { en: "Only {count} left", fr: "Plus que {count}", es: "Solo quedan {count}" },
+  "upsell.cta": { en: "Add to Cart", fr: "Ajouter au panier", es: "Añadir al carrito" },
+  "upsell.decline": { en: "No thanks", fr: "Non merci", es: "No gracias" },
+  "upsell.exclusive": { en: "Exclusive offer", fr: "Offre exclusive", es: "Oferta exclusiva" },
+
   // Meta CAPI
   "meta.capiError": { en: "Tracking error", fr: "Erreur de tracking", es: "Error de seguimiento" },
 } as const;
