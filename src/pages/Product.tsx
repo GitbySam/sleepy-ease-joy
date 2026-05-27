@@ -611,6 +611,11 @@ const Product = () => {
                       onClick={() => {
                         setSelectedColor(color);
                         trackFunnelStep('select_color', { step_value: color });
+                        if (isMobile) {
+                          setTimeout(() => {
+                            imageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }, 50);
+                        }
                       }}
                       className={`relative w-9 h-9 rounded-full transition-all duration-200 ${
                         selectedColor === color
