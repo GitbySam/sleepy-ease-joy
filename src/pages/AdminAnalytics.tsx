@@ -29,6 +29,7 @@ const TABS = [
   { id: "sources", label: "🔗 Sources" },
   { id: "meta", label: "📱 Meta Ads" },
   { id: "attribution", label: "🎯 Attribution" },
+  { id: "attributed_sales", label: "🧾 Ventes attribuées" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -97,6 +98,215 @@ export default function AdminAnalytics() {
         {activeTab === "sources" && <SourcesTab />}
         {activeTab === "meta" && <MetaTab />}
         {activeTab === "attribution" && <AttributionTab days={days} />}
+        {activeTab === "attributed_sales" && <AttributedSalesTab days={days} />}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────── ATTRIBUTED SALES TAB ───────────
+ * Pour chaque commande Shopify de la période, affiche la source / campagne /
+ * créatif (utm_content) issue des note_attributes posés sur le cart au
+ * moment du checkout. Permet d'identifier précisément quelle pub a généré
+ * la vente — fallback "Direct/Inconnu" si aucun UTM n'est présent.
+ */
+type AttributedOrder = {
+  id: number;
+  name: string;
+  created_at: string;
+  total_price: string;
+  currency: string;
+  financial_status: string | null;
+  email: string | null;
+  visitor_id: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  utm_content: string | null;
+  utm_term: string | null;
+  fbclid: string | null;
+  landing_site: string | null;
+  referring_site: string | null;
+};
+
+function AttributedSalesTab({ days }: { days: number }) {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [orders, setOrders] = useState<AttributedOrder[]>([]);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/shopify-analytics?days=${days}`;
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${session?.access_token ?? ''}` },
+      });
+      const json = await res.json();
+      if (!res.ok || json.error) {
+        throw new Error(json.error || `HTTP ${res.status}`);
+      }
+      const list: AttributedOrder[] = json.attributedOrders || [];
+      // newest first
+      list.sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at));
+      setOrders(list);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erreur');
+    }
+    setLoading(false);
+  }, [days]);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <span className="ml-3 text-gray-500">Chargement des ventes attribuées…</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="bg-white border-2 border-red-200">
+        <CardContent className="p-6 text-sm text-red-700">{error}</CardContent>
+      </Card>
+    );
+  }
+
+  const attributed = orders.filter((o) => o.utm_source || o.utm_campaign || o.fbclid);
+  const direct = orders.length - attributed.length;
+  const paid = orders.filter((o) => o.financial_status === 'paid' || o.financial_status === 'partially_paid');
+
+  const metaSearchUrl = (q: string) =>
+    `https://adsmanager.facebook.com/adsmanager/manage/ads?act=&search=${encodeURIComponent(q)}`;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <p className="text-xs text-gray-500">
+          Période : {days} derniers jours · {orders.length} commandes ({paid.length} payées)
+        </p>
+        <button
+          onClick={fetchData}
+          className="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-200"
+        >
+          <RefreshCw className="h-3.5 w-3.5" /> Actualiser
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <Card className="bg-white"><CardContent className="p-4">
+          <p className="text-xs text-gray-500 uppercase tracking-wide">Commandes</p>
+          <p className="text-3xl font-bold text-gray-900 mt-1">{orders.length}</p>
+        </CardContent></Card>
+        <Card className="bg-white"><CardContent className="p-4">
+          <p className="text-xs text-gray-500 uppercase tracking-wide">Attribuées</p>
+          <p className="text-3xl font-bold text-emerald-700 mt-1">{attributed.length}</p>
+          <p className="text-xs text-gray-400 mt-1">{orders.length ? `${((attributed.length / orders.length) * 100).toFixed(0)} %` : '—'}</p>
+        </CardContent></Card>
+        <Card className="bg-white"><CardContent className="p-4">
+          <p className="text-xs text-gray-500 uppercase tracking-wide">Direct / Inconnu</p>
+          <p className="text-3xl font-bold text-gray-700 mt-1">{direct}</p>
+        </CardContent></Card>
+        <Card className="bg-white"><CardContent className="p-4">
+          <p className="text-xs text-gray-500 uppercase tracking-wide">Payées</p>
+          <p className="text-3xl font-bold text-emerald-700 mt-1">{paid.length}</p>
+        </CardContent></Card>
+      </div>
+
+      <Card className="bg-white">
+        <CardContent className="p-0 overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+              <tr>
+                <th className="px-4 py-3 text-left">Date</th>
+                <th className="px-4 py-3 text-left">Commande</th>
+                <th className="px-4 py-3 text-right">Montant</th>
+                <th className="px-4 py-3 text-left">Statut</th>
+                <th className="px-4 py-3 text-left">Source</th>
+                <th className="px-4 py-3 text-left">Campagne</th>
+                <th className="px-4 py-3 text-left">Ad Set (utm_term)</th>
+                <th className="px-4 py-3 text-left">Créatif (utm_content)</th>
+                <th className="px-4 py-3 text-left">Meta</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.length === 0 && (
+                <tr><td colSpan={9} className="px-4 py-6 text-center text-gray-400">Aucune commande</td></tr>
+              )}
+              {orders.map((o) => {
+                const isDirect = !o.utm_source && !o.utm_campaign && !o.fbclid;
+                const source = o.utm_source || (o.fbclid ? 'facebook' : 'direct');
+                return (
+                  <tr key={o.id} className={`border-t border-gray-100 ${isDirect ? 'bg-gray-50/50' : ''}`}>
+                    <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
+                      {new Date(o.created_at).toLocaleDateString('fr-CA')}<br/>
+                      <span className="text-xs text-gray-400">{new Date(o.created_at).toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' })}</span>
+                    </td>
+                    <td className="px-4 py-3 font-medium text-gray-900">
+                      <a
+                        href={`https://admin.shopify.com/store/sleepenzy/orders/${o.id}`}
+                        target="_blank" rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >{o.name}</a>
+                      {o.email && <div className="text-xs text-gray-400 truncate max-w-[180px]">{o.email}</div>}
+                    </td>
+                    <td className="px-4 py-3 text-right font-semibold whitespace-nowrap">
+                      {parseFloat(o.total_price).toFixed(2)} {o.currency}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-block px-2 py-0.5 rounded text-xs ${
+                        o.financial_status === 'paid' ? 'bg-emerald-100 text-emerald-700'
+                        : o.financial_status === 'refunded' ? 'bg-red-100 text-red-700'
+                        : 'bg-gray-100 text-gray-600'
+                      }`}>{o.financial_status || '—'}</span>
+                    </td>
+                    <td className="px-4 py-3">
+                      {isDirect ? (
+                        <span className="text-gray-400 italic">Direct / Inconnu</span>
+                      ) : (
+                        <span className="font-medium text-gray-800">{source}</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-gray-700 max-w-[180px] truncate" title={o.utm_campaign || ''}>
+                      {o.utm_campaign || '—'}
+                    </td>
+                    <td className="px-4 py-3 text-gray-700 max-w-[160px] truncate" title={o.utm_term || ''}>
+                      {o.utm_term || '—'}
+                    </td>
+                    <td className="px-4 py-3 text-gray-700 max-w-[200px] truncate" title={o.utm_content || ''}>
+                      {o.utm_content || (o.fbclid ? <span className="text-xs text-gray-400">fbclid uniquement</span> : '—')}
+                    </td>
+                    <td className="px-4 py-3">
+                      {o.utm_content ? (
+                        <a
+                          href={metaSearchUrl(o.utm_content)}
+                          target="_blank" rel="noopener noreferrer"
+                          className="text-xs text-blue-600 hover:underline whitespace-nowrap"
+                        >Voir l'ad ↗</a>
+                      ) : o.utm_campaign ? (
+                        <a
+                          href={metaSearchUrl(o.utm_campaign)}
+                          target="_blank" rel="noopener noreferrer"
+                          className="text-xs text-blue-600 hover:underline whitespace-nowrap"
+                        >Voir campagne ↗</a>
+                      ) : (
+                        <span className="text-xs text-gray-300">—</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </CardContent>
+      </Card>
+
+      <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 text-xs text-amber-900">
+        💡 Les ventes <strong>Direct / Inconnu</strong> sont des commandes pour lesquelles aucun UTM ni <code>fbclid</code> n'a été capturé au moment du checkout (lien partagé, app iOS, navigation manuelle…). Configure <code>utm_term=&#123;&#123;adset.name&#125;&#125;</code> dans Meta Ads pour aussi remonter le nom de l'ad set.
       </div>
     </div>
   );
