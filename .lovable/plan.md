@@ -1,40 +1,60 @@
-# Redirection vers /product à la fermeture du panier
+# Réparation /admin/analytics : tracking checkout & visibilité des ventes
 
-## Objectif
-Quand l'utilisateur ferme le drawer du panier juste après avoir fait un ajout au panier depuis la home (ou tout autre page hors `/product`), le rediriger automatiquement vers `/product` (en conservant la variante/couleur sélectionnée si possible).
+## Problème
 
-Si l'utilisateur ouvre le panier manuellement (clic sur l'icône panier) sans ATC récent, ou si l'ATC vient déjà de `/product`, la fermeture ne déclenche aucune redirection.
+La commande **#1069** (28/05 16h40, payée 34.95 CAD) est bien remontée par l'API Shopify et **comptée** dans :
+- Onglet "Ventes Shopify" → total 62 commandes payées / $3036.71 (inclut #1069)
+- Onglet "Ventes attribuées" → ligne visible (source = google/organic)
 
-## Comportement
+Mais elle **n'apparaît pas dans le funnel** parce que pour ce visiteur, deux events de tracking n'ont jamais été insérés en base :
+- `funnel_events.step = 'click_checkout'`
+- `checkout_events` (0 ligne pour ce visitor_id)
 
-- ATC depuis Hero / Header / StickyCTA / ShopifyProducts (landing) → ouverture auto du panier → à la fermeture (X, overlay, Escape) → redirection vers `/product?color=<couleur ajoutée>`.
-- ATC depuis `/product` → fermeture du panier → reste sur place.
-- Ouverture manuelle du panier (icône header) sans ATC récent → fermeture → reste sur place.
-- Clic sur "Secure Checkout" → flux Shopify normal, **aucune** redirection produit (la fermeture du drawer dans ce cas ne déclenche pas non plus la redirection).
+Le visiteur a pourtant : `add_to_cart` ✅ → puis directement `return_from_checkout` ✅ → puis Shopify a enregistré la vente ✅. Le clic checkout lui-même n'a pas été tracké.
 
-## Implémentation
+Et dans l'onglet "Ventes Shopify", il n'y a aucune **liste des dernières commandes** — juste des agrégats — donc l'utilisateur ne peut pas confirmer visuellement qu'une vente précise a bien été captée.
 
-### 1. `src/stores/cartStore.ts`
-- Ajouter un flag éphémère `pendingProductRedirect: { color?: string } | null` dans le store (non persisté).
-- Dans `addItem`, après un ajout réussi, si `window.location.pathname !== '/product'` et `pathname !== '/product/...'`, set `pendingProductRedirect = { color: item.selectedOptions?.find(o => o.name === 'Color')?.value }`.
-- Setter dédié `consumePendingRedirect()` qui retourne la valeur et la remet à `null`.
-- Si l'utilisateur clique Checkout, on appelle `consumePendingRedirect()` pour l'effacer sans rediriger.
+## Plan en 3 parties
 
-### 2. `src/components/ShopifyCartDrawer.tsx`
-- Au moment de la fermeture (handler `onClose` partagé par X, overlay, Escape), lire `pendingProductRedirect`. Si présent et qu'on n'est pas déjà sur `/product` :
-  - `navigate('/product' + (color ? '?color=' + encodeURIComponent(color) : ''))`
-  - puis `consumePendingRedirect()`.
-- Le bouton Checkout appelle `consumePendingRedirect()` avant l'ouverture Shopify pour éviter une redirection parasite lors de la fermeture qui suit.
+### 1. Trouver pourquoi `click_checkout` / `checkout_events` ne sont pas loggés
 
-### 3. Détails techniques
-- Utiliser `useNavigate` de react-router (déjà utilisé ailleurs).
-- Le flag est volontairement éphémère (non persisté via `partialize`) pour ne pas survivre à un refresh.
-- Aucune modification de la logique Shopify, du tracking ou des prix.
+Inspecter le composant qui ouvre le checkout Shopify (probablement `ShopifyCartDrawer.tsx` ou `CheckoutRedirectOverlay.tsx`) pour vérifier :
+- Que `trackFunnelStep('click_checkout', …)` est bien appelé **avant** `window.open` / redirection
+- Que l'insertion `checkout_events` n'est pas conditionnée à un `displayed=true` côté desktop uniquement (la latency stats laisse penser que c'est opportuniste — peut-être que sur certains parcours rapides, le visiteur quitte avant que le insert async se termine)
+- Que l'insert utilise `fetch(..., { keepalive: true })` ou `navigator.sendBeacon` pour survivre à la navigation (sans ça, un `window.location.href = shopifyUrl` tue la requête en vol)
+- Que l'event est aussi loggé si checkout s'ouvre dans un **même onglet** (cas mobile / popup bloqué)
 
-## Fichiers touchés
-- `src/stores/cartStore.ts` (ajout du flag + helpers)
-- `src/components/ShopifyCartDrawer.tsx` (consommation du flag à la fermeture et au checkout)
+Fix attendu : passer les inserts cart_events / checkout_events / funnel_events `click_checkout` en `fetch keepalive: true` ou `sendBeacon` pour garantir qu'ils partent même si la page change immédiatement après.
 
-## Hors scope
-- Pas de changement sur le CartDrawer legacy (`src/components/CartDrawer.tsx`) qui n'est pas le drawer actif.
-- Pas de changement des CTA, du tracking, ni du flux checkout.
+### 2. Ajouter une "Liste des dernières commandes" dans l'onglet 💰 Ventes Shopify
+
+Dans `SalesTab` (`src/pages/AdminAnalytics.tsx` L1940), ajouter sous la card "Revenus réels" une nouvelle Card "Dernières commandes" :
+- 10 commandes les plus récentes (tri par `created_at` desc)
+- Colonnes : Date/Heure, N° commande (lien Shopify Admin), Email, Total, Statut, Source (si attribuée)
+- Source = `data.attributedOrders` (déjà retourné par l'edge function — pas de nouvel appel)
+- Badge vert "✅ Tracké" si on trouve un `checkout_events` correspondant pour ce `visitor_id`, badge ambre "⚠️ Non tracké" sinon — permet de voir d'un coup d'œil les ventes invisibles dans le funnel
+
+### 3. Afficher un compteur de couverture tracking
+
+Sous la liste, une ligne KPI :
+- `X / 62 ventes ont un checkout_event correspondant` → ex : "47/62 (76%) ventes trackées correctement"
+- Si < 90 %, alerte ambre expliquant que le funnel est sous-évalué
+
+## Détails techniques
+
+- L'edge function `shopify-analytics` retourne déjà tout (orders, ordersByDay, attributedOrders) — aucun changement backend nécessaire pour la partie 2 et 3
+- Pour la couverture tracking : un seul `SELECT visitor_id FROM checkout_events WHERE created_at >= since` côté SalesTab, puis intersection en mémoire avec `attributedOrders.map(o => o.visitor_id)`
+- Partie 1 : inspection ciblée des call-sites de tracking dans le flow ATC → Checkout
+
+## Ce qui n'est pas inclus
+
+- Pas de modif du schéma DB
+- Pas de modif de l'edge function `shopify-analytics`
+- Pas de modif des autres onglets (Funnel, Funnel Checkout, Attribution) — ils continueront d'afficher leurs chiffres basés sur les events Supabase
+
+## Résultat
+
+Après ces 3 changements :
+- Tu verras la commande #1069 (et toutes les suivantes) explicitement listée dans l'onglet "Ventes Shopify"
+- Tu sauras immédiatement quelles ventes ne sont pas trackées côté Supabase (badge ambre)
+- Les futures ventes seront trackées correctement dans le funnel (fix sendBeacon/keepalive)
