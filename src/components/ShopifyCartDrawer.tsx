@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import cartTrustBadges from "@/assets/cart-trust-badges.jpg";
 import paymentBadges from "@/assets/payment-badges.jpeg";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -40,7 +41,20 @@ const BUNDLE_COLOR_IMAGES: Record<string, string> = {
 const TESTIMONIAL_KEYS = ["cart.testimonial1", "cart.testimonial2", "cart.testimonial3"] as const;
 
 export const ShopifyCartDrawer = () => {
-  const { items, isLoading, isSyncing, isDrawerOpen, setDrawerOpen, updateQuantity, removeItem, addItem, getCheckoutUrl, syncCart, setRedirecting } = useCartStore();
+  const { items, isLoading, isSyncing, isDrawerOpen, setDrawerOpen, updateQuantity, removeItem, addItem, getCheckoutUrl, syncCart, setRedirecting, consumePendingRedirect } = useCartStore();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleDrawerOpenChange = (open: boolean) => {
+    setDrawerOpen(open);
+    if (!open) {
+      const pending = consumePendingRedirect();
+      if (pending && !location.pathname.startsWith('/product')) {
+        const qs = pending.color ? `?color=${encodeURIComponent(pending.color)}` : '';
+        navigate(`/product${qs}`);
+      }
+    }
+  };
   const { t } = useLanguage();
   const { country, currency, formatPrice, prices } = useMarket();
 
@@ -152,6 +166,8 @@ export const ShopifyCartDrawer = () => {
       });
       return;
     }
+    // Don't redirect to /product after checkout — the user is leaving for Shopify.
+    consumePendingRedirect();
     // Dedupe rapid double-clicks (< 1.5s) so they don't inflate metrics.
     const now = Date.now();
     const w = window as unknown as { __lastCheckoutClick?: number };
@@ -313,7 +329,7 @@ export const ShopifyCartDrawer = () => {
   }, []);
 
   return (
-    <Sheet open={isDrawerOpen} onOpenChange={setDrawerOpen}>
+    <Sheet open={isDrawerOpen} onOpenChange={handleDrawerOpenChange}>
       <SheetTrigger asChild>
         <button className="relative p-2 hover:bg-muted rounded-lg transition-colors">
           <ShoppingCart className="h-5 w-5 text-foreground" />

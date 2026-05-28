@@ -31,6 +31,8 @@ interface CartStore {
   setDrawerOpen: (open: boolean) => void;
   isRedirecting: boolean;
   setRedirecting: (v: boolean) => void;
+  pendingProductRedirect: { color?: string } | null;
+  consumePendingRedirect: () => { color?: string } | null;
   addItem: (item: Omit<CartItemData, 'lineId'>, country?: CountryCode) => Promise<void>;
   updateQuantity: (variantId: string, quantity: number, bundleLabel?: string) => Promise<void>;
   removeItem: (variantId: string, bundleLabel?: string) => Promise<void>;
@@ -52,6 +54,12 @@ export const useCartStore = create<CartStore>()(
       setDrawerOpen: (open) => set({ isDrawerOpen: open }),
       isRedirecting: false,
       setRedirecting: (v) => set({ isRedirecting: v }),
+      pendingProductRedirect: null,
+      consumePendingRedirect: () => {
+        const v = get().pendingProductRedirect;
+        if (v) set({ pendingProductRedirect: null });
+        return v;
+      },
 
       addItem: async (item, country) => {
         const requestedCountry: CountryCode = country ?? 'CA';
@@ -137,6 +145,15 @@ export const useCartStore = create<CartStore>()(
               clearCart();
             }
           }
+          // Mark a pending redirect to /product if the ATC was triggered
+          // from anywhere other than the product page itself.
+          try {
+            const path = typeof window !== 'undefined' ? window.location.pathname : '';
+            if (!path.startsWith('/product')) {
+              const colorOpt = item.selectedOptions?.find(o => o.name?.toLowerCase() === 'color')?.value;
+              set({ pendingProductRedirect: { color: colorOpt } });
+            }
+          } catch { /* noop */ }
         } catch (error) {
           console.error('Failed to add item:', error);
           trackFriction('shopify_error', {
