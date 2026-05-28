@@ -5,12 +5,76 @@ import { Link, useLocation } from "react-router-dom";
 const ShopifyCartDrawer = lazy(() => import("./ShopifyCartDrawer"));
 import { useLanguage } from "@/i18n/LanguageContext";
 import CountrySelector from "./CountrySelector";
+import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
+import { useMarket } from "@/i18n/MarketContext";
+import { useCartStore } from "@/stores/cartStore";
+import { trackAddToCart } from "@/lib/metaPixel";
+import { toast } from "sonner";
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { t } = useLanguage();
   const location = useLocation();
+  const { country, currency, prices } = useMarket();
+  const { addItem, setDrawerOpen } = useCartStore();
+  const [product, setProduct] = useState<ShopifyProduct | null>(null);
+
+  useEffect(() => {
+    fetchProducts(20, undefined, country)
+      .then((all) => {
+        const filtered = all.filter((p) => {
+          const s = `${p.node.title} ${p.node.handle}`.toLowerCase();
+          return !/(kit|bundle)/.test(s);
+        });
+        setProduct(filtered[0] || null);
+      })
+      .catch(() => {});
+  }, [country]);
+
+  const handleHeaderAtc = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setMenuOpen(false);
+    if (!product) {
+      toast.error("Product unavailable");
+      return;
+    }
+    const greyVariants = product.node.variants.edges.filter((v) =>
+      v.node.selectedOptions?.some((o) => o.name === "Color" && o.value === "Grey")
+    );
+    const variant =
+      greyVariants.find((v) => v.node.selectedOptions?.some((o) => o.value === "Single"))?.node ||
+      greyVariants[0]?.node ||
+      product.node.variants.edges[0]?.node;
+    if (!variant) {
+      toast.error("Variant not available");
+      return;
+    }
+    await addItem(
+      {
+        product,
+        variantId: variant.id,
+        variantTitle: variant.title,
+        price: variant.price,
+        quantity: 1,
+        selectedOptions: variant.selectedOptions || [],
+        bundleLabel: "1 Sleep&zy",
+        bundlePrice: prices.single,
+        bundleUnitSize: 1,
+      },
+      country
+    );
+    trackAddToCart({
+      contentName: `1 Sleep&zy (Grey)`,
+      contentId: variant.id,
+      value: prices.single,
+      currency,
+      quantity: 1,
+    });
+    toast.success(`1 Sleep&zy ${t("product.addedToCart")}`, { position: "top-center" });
+    setTimeout(() => setDrawerOpen(true), 500);
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -91,16 +155,15 @@ const Header = () => {
           <div className="flex items-center gap-3">
             {/* LanguageSwitcher hidden but system still active */}
             <CountrySelector />
-            <Link to="/product" className="hidden md:block">
-              <motion.span
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-black text-primary-foreground px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
-              >
-                <ShoppingBag size={16} />
-                <span>{t("nav.shopNow")}</span>
-              </motion.span>
-            </Link>
+            <motion.button
+              onClick={handleHeaderAtc}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="hidden md:flex bg-black text-primary-foreground px-5 py-2.5 rounded-full text-sm font-semibold items-center gap-2 shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
+            >
+              <ShoppingBag size={16} />
+              <span>{t("nav.shopNow")}</span>
+            </motion.button>
             <Suspense fallback={null}><ShopifyCartDrawer /></Suspense>
 
             {/* Mobile hamburger */}
@@ -141,15 +204,14 @@ const Header = () => {
 
               <div className="mt-2"><CountrySelector /></div>
 
-              <Link to="/product" onClick={() => setMenuOpen(false)} className="mt-4">
-              <motion.span
+              <motion.button
+                onClick={handleHeaderAtc}
                 whileTap={{ scale: 0.95 }}
-                className="bg-black text-primary-foreground px-8 py-3.5 rounded-full text-base font-bold shadow-[0_4px_20px_rgba(0,0,0,0.3)] flex items-center gap-2 uppercase tracking-wider"
+                className="mt-4 bg-black text-primary-foreground px-8 py-3.5 rounded-full text-base font-bold shadow-[0_4px_20px_rgba(0,0,0,0.3)] flex items-center gap-2 uppercase tracking-wider"
               >
                 <ShoppingBag size={18} />
                 {t("nav.shopNow")}
-              </motion.span>
-              </Link>
+              </motion.button>
             </div>
           </motion.div>
         )}
