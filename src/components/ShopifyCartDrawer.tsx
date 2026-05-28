@@ -59,7 +59,7 @@ export const ShopifyCartDrawer = () => {
   const { country, currency, formatPrice, prices } = useMarket();
 
   // Sleep Kit upsell — only when cart has a Sleep&zy pack (no Sleep Bundle)
-  const PACK_LABELS = ["SOLO TRAVELERS", "DUO PACK", "FAMILY PACK"];
+  const PACK_LABELS = ["SOLO TRAVELERS", "DUO PACK", "FAMILY PACK", "1 SLEEP&ZY"];
   const SLEEP_KIT_LABEL = "Sleep Kit";
   const SLEEP_KIT_MAX = 5;
   const kitPrice = prices.sleepKit;
