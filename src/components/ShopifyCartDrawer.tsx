@@ -241,19 +241,49 @@ export const ShopifyCartDrawer = () => {
           visitor_id: getVisitorId(),
           ...getAttributionFields(),
         };
-        supabase.from('checkout_events').insert([payload]).select('id').single().then(({ data, error }) => {
-          if (error) {
-            console.error('Failed to log checkout event', error);
-            return;
-          }
-          if (data?.id) {
-            pendingId = data.id;
-            sessionStorage.setItem('pending_checkout_id', JSON.stringify({
-              id: data.id,
-              clickedAt: Date.now(),
-            }));
-          }
-        });
+        // CRITICAL: use fetch with `keepalive: true` so this insert survives
+        // the immediate `window.location.href = finalUrl` navigation below.
+        // The Supabase JS client uses standard XHR which gets aborted on
+        // navigation — that's why orders sometimes show in Shopify with no
+        // matching `checkout_events` row (root cause of funnel under-count).
+        try {
+          const restUrl = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/checkout_events`;
+          const apiKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+          const insertReq = fetch(restUrl, {
+            method: 'POST',
+            keepalive: true,
+            headers: {
+              'Content-Type': 'application/json',
+              apikey: apiKey,
+              Authorization: `Bearer ${apiKey}`,
+              Prefer: 'return=representation',
+            },
+            body: JSON.stringify(payload),
+          });
+          // Best-effort: read the inserted id to enable later display-latency
+          // update. Won't block navigation.
+          insertReq
+            .then(async (r) => {
+              if (!r.ok) {
+                console.error('Failed to log checkout event', r.status, await r.text().catch(() => ''));
+                return;
+              }
+              const rows = await r.json().catch(() => null);
+              const id = rows?.[0]?.id;
+              if (id) {
+                pendingId = id;
+                try {
+                  sessionStorage.setItem('pending_checkout_id', JSON.stringify({
+                    id,
+                    clickedAt: Date.now(),
+                  }));
+                } catch {}
+              }
+            })
+            .catch((err) => console.error('checkout_events insert failed', err));
+        } catch (e) {
+          console.error('Failed to fire checkout_events insert', e);
+        }
       } catch (e) {
         console.error('Failed to prepare checkout event', e);
       }
