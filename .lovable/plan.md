@@ -1,38 +1,40 @@
+# Redirection vers /product à la fermeture du panier
+
 ## Objectif
+Quand l'utilisateur ferme le drawer du panier juste après avoir fait un ajout au panier depuis la home (ou tout autre page hors `/product`), le rediriger automatiquement vers `/product` (en conservant la variante/couleur sélectionnée si possible).
 
-Sur mobile, quand l'utilisateur clique sur une pastille de couleur, faire défiler la page automatiquement vers l'image du produit pour qu'il voit immédiatement le changement.
-
-## Fichiers modifiés
-
-### 1. `src/pages/Product.tsx`
-- Ajouter `useIsMobile` (hook déjà existant dans `src/hooks/use-mobile.tsx`)
-- Ajouter une `ref` (`imageRef`) sur le conteneur de la galerie image (colonne gauche)
-- Dans le `onClick` de chaque pastille de couleur, après `setSelectedColor(...)` :
-  ```ts
-  if (isMobile) {
-    imageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-  ```
-- Délai léger (`setTimeout` 50ms) pour laisser le re-render se faire avant le scroll
-
-### 2. `src/components/ShopifyProducts.tsx`
-- Même logique pour le sélecteur de couleur global de la section produits
-- Ajouter une `ref` sur le conteneur de la grille de produits
-- Scroll vers le haut de la grille au clic (mobile uniquement)
-
-### 3. `src/components/BundleOffer.tsx` (si concerné)
-- Vérifier la présence d'un sélecteur de couleur et appliquer la même logique si besoin
+Si l'utilisateur ouvre le panier manuellement (clic sur l'icône panier) sans ATC récent, ou si l'ATC vient déjà de `/product`, la fermeture ne déclenche aucune redirection.
 
 ## Comportement
 
-- **Desktop** : aucun changement (image toujours visible à côté du sélecteur)
-- **Mobile** : scroll fluide vers l'image dès le clic, l'utilisateur voit le changement de couleur sans effort
-- Le scroll utilise `block: 'start'` avec un offset visuel naturel (header sticky pris en compte via `scroll-margin-top` sur le conteneur image)
+- ATC depuis Hero / Header / StickyCTA / ShopifyProducts (landing) → ouverture auto du panier → à la fermeture (X, overlay, Escape) → redirection vers `/product?color=<couleur ajoutée>`.
+- ATC depuis `/product` → fermeture du panier → reste sur place.
+- Ouverture manuelle du panier (icône header) sans ATC récent → fermeture → reste sur place.
+- Clic sur "Secure Checkout" → flux Shopify normal, **aucune** redirection produit (la fermeture du drawer dans ce cas ne déclenche pas non plus la redirection).
 
-## Détail technique
+## Implémentation
 
-Ajouter sur le conteneur image :
-```tsx
-<div ref={imageRef} className="scroll-mt-20 ...">
-```
-Le `scroll-mt-20` (Tailwind) évite que l'image soit cachée sous le header sticky mobile.
+### 1. `src/stores/cartStore.ts`
+- Ajouter un flag éphémère `pendingProductRedirect: { color?: string } | null` dans le store (non persisté).
+- Dans `addItem`, après un ajout réussi, si `window.location.pathname !== '/product'` et `pathname !== '/product/...'`, set `pendingProductRedirect = { color: item.selectedOptions?.find(o => o.name === 'Color')?.value }`.
+- Setter dédié `consumePendingRedirect()` qui retourne la valeur et la remet à `null`.
+- Si l'utilisateur clique Checkout, on appelle `consumePendingRedirect()` pour l'effacer sans rediriger.
+
+### 2. `src/components/ShopifyCartDrawer.tsx`
+- Au moment de la fermeture (handler `onClose` partagé par X, overlay, Escape), lire `pendingProductRedirect`. Si présent et qu'on n'est pas déjà sur `/product` :
+  - `navigate('/product' + (color ? '?color=' + encodeURIComponent(color) : ''))`
+  - puis `consumePendingRedirect()`.
+- Le bouton Checkout appelle `consumePendingRedirect()` avant l'ouverture Shopify pour éviter une redirection parasite lors de la fermeture qui suit.
+
+### 3. Détails techniques
+- Utiliser `useNavigate` de react-router (déjà utilisé ailleurs).
+- Le flag est volontairement éphémère (non persisté via `partialize`) pour ne pas survivre à un refresh.
+- Aucune modification de la logique Shopify, du tracking ou des prix.
+
+## Fichiers touchés
+- `src/stores/cartStore.ts` (ajout du flag + helpers)
+- `src/components/ShopifyCartDrawer.tsx` (consommation du flag à la fermeture et au checkout)
+
+## Hors scope
+- Pas de changement sur le CartDrawer legacy (`src/components/CartDrawer.tsx`) qui n'est pas le drawer actif.
+- Pas de changement des CTA, du tracking, ni du flux checkout.
