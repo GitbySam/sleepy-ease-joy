@@ -1924,6 +1924,7 @@ interface ShopifyResult {
   topProducts: Array<{ title: string; quantity: number; revenue: number }>;
   topCountries: Array<{ code: string; count: number }>;
   abandonedCheckouts: AbandonedRow[];
+  attributedOrders?: AttributedOrder[];
 }
 interface ShopifyAnalyticsError {
   code?: string;
