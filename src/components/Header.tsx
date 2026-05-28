@@ -37,7 +37,7 @@ const Header = () => {
     e.stopPropagation();
     setMenuOpen(false);
     if (!product) {
-      toast.error(t("product.unavailable") || "Product unavailable");
+      toast.error("Product unavailable");
       return;
     }
     const greyVariants = product.node.variants.edges.filter((v) =>
