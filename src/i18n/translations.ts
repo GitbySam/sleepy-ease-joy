@@ -37,7 +37,7 @@ export const translations = {
   },
   "hero.subhead": {
     en: "The ergonomic travel pillow that locks your head in place. No more drool. No more embarrassment.",
-    fr: "L'oreiller de voyage ergonomique qui maintient votre tête en place. Fini la bave. Fini la honte.",
+    fr: "L'oreiller de voyage ergonomique qui maintient votre tête en place. Fini de baver. Fini la honte.",
     es: "La almohada de viaje ergonómica que mantiene tu cabeza en su lugar. Se acabó la baba. Se acabó la vergüenza.",
   },
   "hero.cta": {
