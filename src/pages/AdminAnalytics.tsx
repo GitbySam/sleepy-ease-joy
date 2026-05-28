@@ -2142,6 +2142,109 @@ function SalesTab({ days }: { days: number }) {
         </Card>
       </div>
 
+      {/* Dernières commandes Shopify + couverture tracking */}
+      <Card className="bg-white border-2 border-emerald-200">
+        <CardHeader>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <CardTitle className="text-base flex items-center gap-2">
+                🧾 Dernières commandes ({days}j)
+              </CardTitle>
+              <p className="text-xs text-gray-500 mt-1">
+                Les {Math.min(15, recentOrders.length)} commandes les plus récentes remontées par Shopify Admin API.
+              </p>
+            </div>
+            <div className="text-right">
+              <p className={`text-3xl font-bold ${coverageOk ? 'text-emerald-600' : 'text-amber-600'}`}>
+                {coveragePct}%
+              </p>
+              <p className="text-xs text-gray-500">
+                {trackedOrders.length}/{totalAttributable} trackées
+              </p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {!coverageOk && totalAttributable > 0 && (
+            <div className="mb-3 rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-900">
+              <p className="font-semibold mb-0.5">⚠️ Tracking sous-évalué</p>
+              <p>
+                Seulement {trackedOrders.length}/{totalAttributable} ventes ont un{' '}
+                <code className="bg-amber-100 px-1 rounded">checkout_event</code> côté site. Les onglets
+                Funnel / Funnel Checkout affichent donc des chiffres en-dessous de la réalité. Les commandes marquées
+                ⚠️ ci-dessous n'ont pas été trackées au moment du clic checkout (souvent : navigation immédiate vers
+                Shopify qui tue la requête en vol — déjà corrigé pour les futures ventes).
+              </p>
+            </div>
+          )}
+          {recentOrders.length === 0 ? (
+            <p className="text-gray-400 text-sm py-8 text-center">Aucune commande sur la période</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead className="text-gray-500 uppercase tracking-wide">
+                  <tr>
+                    <th className="text-left py-2 pr-2">Date</th>
+                    <th className="text-left py-2 pr-2">N°</th>
+                    <th className="text-left py-2 pr-2">Email</th>
+                    <th className="text-right py-2 pr-2">Total</th>
+                    <th className="text-left py-2 pr-2">Statut</th>
+                    <th className="text-left py-2 pr-2">Source</th>
+                    <th className="text-center py-2">Tracké</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentOrders.map((o) => {
+                    const tracked = !!(o.visitor_id && trackedVisitorIds.has(o.visitor_id));
+                    const source = o.utm_source || (o.fbclid ? 'facebook' : 'direct');
+                    return (
+                      <tr key={o.id} className="border-t border-gray-100">
+                        <td className="py-2 pr-2 text-gray-600 whitespace-nowrap">
+                          {new Date(o.created_at).toLocaleString('fr-CA', {
+                            day: '2-digit', month: '2-digit',
+                            hour: '2-digit', minute: '2-digit',
+                          })}
+                        </td>
+                        <td className="py-2 pr-2">
+                          <a
+                            href={`https://admin.shopify.com/store/sleepenzy/orders/${o.id}`}
+                            target="_blank" rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline font-medium"
+                          >{o.name}</a>
+                        </td>
+                        <td className="py-2 pr-2 text-gray-700 truncate max-w-[180px]" title={o.email || ''}>
+                          {o.email || <span className="text-gray-300 italic">—</span>}
+                        </td>
+                        <td className="py-2 pr-2 text-right font-semibold whitespace-nowrap">
+                          {parseFloat(o.total_price).toFixed(2)} {o.currency}
+                        </td>
+                        <td className="py-2 pr-2">
+                          <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] ${
+                            o.financial_status === 'paid' ? 'bg-emerald-100 text-emerald-700'
+                            : o.financial_status === 'refunded' ? 'bg-red-100 text-red-700'
+                            : 'bg-gray-100 text-gray-600'
+                          }`}>{o.financial_status || '—'}</span>
+                        </td>
+                        <td className="py-2 pr-2 text-gray-700">{source}</td>
+                        <td className="py-2 text-center">
+                          {tracked ? (
+                            <span title="Checkout tracké côté site" className="text-emerald-600">✅</span>
+                          ) : o.visitor_id ? (
+                            <span title="Aucun checkout_event pour ce visitor_id" className="text-amber-600">⚠️</span>
+                          ) : (
+                            <span title="Pas de visitor_id (commande externe ou ancien tracking)" className="text-gray-300">—</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Abandoned checkouts */}
       <Card className="bg-white border-2 border-amber-200">
         <CardHeader>
