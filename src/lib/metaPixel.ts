@@ -2,6 +2,47 @@
 import { sendCapiEvent, makeEventId } from './metaCapi';
 
 const PIXEL_ID = '2093867758129616';
+const USER_DATA_KEY = 'sleepzy_fb_user_data';
+
+type AdvancedMatchingData = {
+  em?: string; // email
+  ph?: string; // phone
+  fn?: string; // first name
+  ln?: string; // last name
+  ct?: string; // city
+  st?: string; // state
+  zp?: string; // zip
+  country?: string;
+};
+
+function loadUserData(): AdvancedMatchingData | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(USER_DATA_KEY);
+    return raw ? (JSON.parse(raw) as AdvancedMatchingData) : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Store user data for advanced matching and re-init the pixel with it.
+ * Pixel will hash values automatically (SHA-256) before sending to Meta.
+ * Call this when you capture an email/phone (checkout, newsletter, etc.).
+ */
+export function setPixelUserData(data: AdvancedMatchingData) {
+  if (typeof window === 'undefined') return;
+  const existing = loadUserData() || {};
+  const merged: AdvancedMatchingData = { ...existing, ...data };
+  try {
+    localStorage.setItem(USER_DATA_KEY, JSON.stringify(merged));
+  } catch {
+    // ignore quota errors
+  }
+  if (window.fbq) {
+    window.fbq('init', PIXEL_ID, merged as Record<string, string>);
+  }
+}
 
 declare global {
   interface Window {
@@ -34,7 +75,14 @@ export function initMetaPixel() {
   const firstScript = b.getElementsByTagName('script')[0];
   firstScript?.parentNode?.insertBefore(s, firstScript);
 
-  window.fbq('init', PIXEL_ID);
+  // Advanced matching: pass any previously-captured user data.
+  // Values are hashed automatically (SHA-256) by the pixel before transmission.
+  const userData = loadUserData();
+  if (userData && Object.keys(userData).length > 0) {
+    window.fbq('init', PIXEL_ID, userData as Record<string, string>);
+  } else {
+    window.fbq('init', PIXEL_ID);
+  }
   const eventID = makeEventId();
   window.fbq('track', 'PageView', {}, { eventID });
   sendCapiEvent({ event_name: 'PageView', event_id: eventID });
