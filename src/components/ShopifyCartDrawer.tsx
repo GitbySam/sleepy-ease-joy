@@ -329,7 +329,7 @@ export const ShopifyCartDrawer = () => {
   }, []);
 
   return (
-    <Sheet open={isDrawerOpen} onOpenChange={setDrawerOpen}>
+    <Sheet open={isDrawerOpen} onOpenChange={handleDrawerOpenChange}>
       <SheetTrigger asChild>
         <button className="relative p-2 hover:bg-muted rounded-lg transition-colors">
           <ShoppingCart className="h-5 w-5 text-foreground" />
