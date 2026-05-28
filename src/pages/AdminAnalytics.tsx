@@ -1944,6 +1944,10 @@ function SalesTab({ days }: { days: number }) {
   const [data, setData] = useState<ShopifyResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  // Set of visitor_ids that DID log a checkout_event on our site.
+  // Used to flag Shopify orders whose checkout was untracked client-side
+  // (root cause of funnel under-counting).
+  const [trackedVisitorIds, setTrackedVisitorIds] = useState<Set<string>>(new Set());
 
   const fetchData = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -1954,12 +1958,20 @@ function SalesTab({ days }: { days: number }) {
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/shopify-analytics?days=${days}`;
       const { data: sessionData } = await supabase.auth.getSession();
       const accessToken = sessionData.session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-      const res = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        },
-      });
+      const sinceISO = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+      const [res, checkoutVisitorsRes] = await Promise.all([
+        fetch(url, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+        }),
+        supabase
+          .from('checkout_events')
+          .select('visitor_id')
+          .gte('created_at', sinceISO)
+          .not('visitor_id', 'is', null),
+      ]);
       const json = await res.json().catch(() => ({} as ShopifyAnalyticsError));
       if (!res.ok) {
         setError(formatShopifyAnalyticsError(json, res.status));
@@ -1968,6 +1980,11 @@ function SalesTab({ days }: { days: number }) {
       } else {
         setData(json as ShopifyResult);
       }
+      const ids = new Set<string>();
+      (checkoutVisitorsRes.data || []).forEach((row: { visitor_id: string | null }) => {
+        if (row.visitor_id) ids.add(row.visitor_id);
+      });
+      setTrackedVisitorIds(ids);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Erreur réseau');
     }
@@ -2035,6 +2052,20 @@ function SalesTab({ days }: { days: number }) {
   const checkoutToOrderRate = s.abandonedCount + s.paidOrders > 0
     ? Math.round((s.paidOrders / (s.abandonedCount + s.paidOrders)) * 1000) / 10
     : 0;
+
+  // Dernières commandes (depuis attributedOrders, déjà retourné par l'edge fn)
+  const recentOrders = [...(data.attributedOrders || [])]
+    .sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at))
+    .slice(0, 15);
+
+  // Couverture tracking : combien de ventes Shopify ont un checkout_event correspondant
+  const ordersWithVisitor = (data.attributedOrders || []).filter((o) => !!o.visitor_id);
+  const trackedOrders = ordersWithVisitor.filter((o) => o.visitor_id && trackedVisitorIds.has(o.visitor_id));
+  const totalAttributable = data.attributedOrders?.length ?? 0;
+  const coveragePct = totalAttributable > 0
+    ? Math.round((trackedOrders.length / totalAttributable) * 100)
+    : 0;
+  const coverageOk = coveragePct >= 90;
 
   return (
     <div className="space-y-6">
