@@ -35,6 +35,26 @@ interface ShopifyOrder {
   cancelled_at?: string | null;
 }
 
+interface AttributedOrder {
+  id: number | string;
+  name?: string;
+  created_at: string;
+  total_price: string;
+  currency: string;
+  financial_status: string | null;
+  cancelled_at?: string | null;
+  email?: string | null;
+  visitor_id?: string | null;
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
+  utm_content?: string | null;
+  utm_term?: string | null;
+  fbclid?: string | null;
+  landing_site?: string | null;
+  referring_site?: string | null;
+}
+
 interface ShopifyResult {
   summary: { currency: string };
   // we re-derive everything from the raw orders below
