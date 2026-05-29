@@ -401,7 +401,10 @@ export default function AdminAnalytics() {
   /* ── 90-day chart series ── */
   const chartData = useMemo(() => {
     return makeDayKeys(WINDOW_DAYS).map((k) => {
-      const b = buckets.get(k)!;
+      const b = buckets.get(k);
+      if (!b) {
+        return { date: k.slice(5), revenu: 0, conversion: 0 };
+      }
       const conv = b.visitors > 0 ? (b.purchases / b.visitors) * 100 : 0;
       return {
         date: k.slice(5), // MM-DD
