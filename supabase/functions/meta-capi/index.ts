@@ -12,6 +12,28 @@ const ALLOWED_EVENTS = new Set([
 ]);
 const MAX_EVENT_VALUE = 500; // CAD; realistic cap for our highest bundle
 const MAX_NUM_ITEMS = 20;
+const MAX_BODY_BYTES = 8 * 1024;
+const LIMITS = {
+  email: 254,
+  phone: 32,
+  event_source_url: 2048,
+  fbp: 128,
+  fbc: 256,
+  fbclid: 256,
+  event_id: 128,
+  content_name: 255,
+  content_type: 64,
+  content_id: 64,
+  content_ids_max: 50,
+};
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function clampStr(v: unknown, max: number): string | undefined {
+  if (typeof v !== 'string') return undefined;
+  const t = v.trim();
+  if (!t) return undefined;
+  return t.length > max ? t.slice(0, max) : t;
+}
 
 type CapiEvent = {
   event_name: 'PageView' | 'ViewContent' | 'AddToCart' | 'InitiateCheckout' | 'Purchase';
@@ -57,7 +79,29 @@ Deno.serve(async (req) => {
       });
     }
 
-    const body = (await req.json()) as { event: CapiEvent };
+    const cl = Number(req.headers.get('content-length') || '0');
+    if (cl && cl > MAX_BODY_BYTES) {
+      return new Response(JSON.stringify({ error: 'payload_too_large' }), {
+        status: 413,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const rawText = await req.text();
+    if (rawText.length > MAX_BODY_BYTES) {
+      return new Response(JSON.stringify({ error: 'payload_too_large' }), {
+        status: 413,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    let body: { event: CapiEvent };
+    try {
+      body = JSON.parse(rawText) as { event: CapiEvent };
+    } catch {
+      return new Response(JSON.stringify({ error: 'invalid_json' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
     const ev = body?.event;
     if (!ev?.event_name) {
       return new Response(JSON.stringify({ error: 'event_name required' }), {
@@ -72,6 +116,32 @@ Deno.serve(async (req) => {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
+    }
+
+    // Clamp string fields to safe limits
+    const email = clampStr(ev.email, LIMITS.email);
+    if (email && !EMAIL_RE.test(email)) {
+      return new Response(JSON.stringify({ error: 'invalid_email' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    ev.email = email ?? null;
+    ev.phone = clampStr(ev.phone, LIMITS.phone) ?? null;
+    ev.event_source_url = clampStr(ev.event_source_url, LIMITS.event_source_url);
+    ev.fbp = clampStr(ev.fbp, LIMITS.fbp) ?? null;
+    ev.fbc = clampStr(ev.fbc, LIMITS.fbc) ?? null;
+    ev.fbclid = clampStr(ev.fbclid, LIMITS.fbclid) ?? null;
+    ev.event_id = clampStr(ev.event_id, LIMITS.event_id);
+    ev.content_name = clampStr(ev.content_name, LIMITS.content_name);
+    ev.content_type = clampStr(ev.content_type, LIMITS.content_type);
+    if (Array.isArray(ev.content_ids)) {
+      ev.content_ids = ev.content_ids
+        .slice(0, LIMITS.content_ids_max)
+        .map((v) => clampStr(v, LIMITS.content_id))
+        .filter((v): v is string => !!v);
+    } else {
+      ev.content_ids = undefined;
     }
 
     // Cap value to prevent ad-metric poisoning via inflated Purchase events.
@@ -143,7 +213,7 @@ Deno.serve(async (req) => {
 
     if (!metaRes.ok) {
       console.error('Meta CAPI error', metaRes.status, metaJson);
-      return new Response(JSON.stringify({ error: 'meta_error', status: metaRes.status, details: metaJson }), {
+      return new Response(JSON.stringify({ error: 'upstream_error' }), {
         status: 502,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -155,8 +225,7 @@ Deno.serve(async (req) => {
     });
   } catch (err) {
     console.error('meta-capi error', err);
-    const msg = err instanceof Error ? err.message : 'unknown';
-    return new Response(JSON.stringify({ error: msg }), {
+    return new Response(JSON.stringify({ error: 'internal_error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
