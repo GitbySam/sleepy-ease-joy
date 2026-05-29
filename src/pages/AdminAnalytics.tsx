@@ -437,6 +437,33 @@ export default function AdminAnalytics() {
     };
   }, [buckets]);
 
+  /* ── Daily breakdown last 7 days (Mon→Sun order based on actual dates) ── */
+  const last7Days = useMemo(() => {
+    const keys = makeDayKeys(7); // J-7 → J-1, chronological
+    const weekdayFmt = new Intl.DateTimeFormat("fr-CA", { weekday: "short" });
+    const dateFmt = new Intl.DateTimeFormat("fr-CA", { day: "2-digit", month: "2-digit" });
+    return keys.map((k) => {
+      const b = buckets.get(k);
+      const [y, m, d] = k.split("-").map(Number);
+      const dateObj = new Date(y, m - 1, d);
+      const conv = b && b.visitors > 0 ? (b.purchases / b.visitors) * 100 : 0;
+      const aovDay = b && b.orders > 0 ? b.revenue / b.orders : 0;
+      return {
+        key: k,
+        weekday: weekdayFmt.format(dateObj).replace(".", ""),
+        date: dateFmt.format(dateObj),
+        revenue: b?.revenue ?? 0,
+        orders: b?.orders ?? 0,
+        visitors: b?.visitors ?? 0,
+        addToCart: b?.addToCart ?? 0,
+        checkout: b?.checkout ?? 0,
+        purchases: b?.purchases ?? 0,
+        aov: aovDay,
+        conv,
+      };
+    });
+  }, [buckets]);
+
   /* ── Render ── */
   if (loading) {
     return (
