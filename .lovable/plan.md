@@ -1,60 +1,94 @@
-# Réparation /admin/analytics : tracking checkout & visibilité des ventes
 
-## Problème
+# Refonte `/admin/analytics`
 
-La commande **#1069** (28/05 16h40, payée 34.95 CAD) est bien remontée par l'API Shopify et **comptée** dans :
-- Onglet "Ventes Shopify" → total 62 commandes payées / $3036.71 (inclut #1069)
-- Onglet "Ventes attribuées" → ligne visible (source = google/organic)
+Page unique, focus **"est-ce que mon produit se vend bien ?"**. On rase les 5 onglets actuels (Funnel, Funnel Checkout, Shopify, Cart Events, Other) et l'ancien layout.
 
-Mais elle **n'apparaît pas dans le funnel** parce que pour ce visiteur, deux events de tracking n'ont jamais été insérés en base :
-- `funnel_events.step = 'click_checkout'`
-- `checkout_events` (0 ligne pour ce visitor_id)
+## Structure de la page
 
-Le visiteur a pourtant : `add_to_cart` ✅ → puis directement `return_from_checkout` ✅ → puis Shopify a enregistré la vente ✅. Le clic checkout lui-même n'a pas été tracké.
+```text
+┌─────────────────────────────────────────────────────────┐
+│  Sleep&zy — Performance produit          [↻ Actualiser] │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  [Carte 1] REVENU 7 DERNIERS JOURS                      │
+│   $X XXX CAD     XX commandes payées     AOV $XX        │
+│   ▲ +12% vs moyenne 30j                                 │
+│                                                         │
+│  [Carte 2] CONVERSION 7 DERNIERS JOURS                  │
+│   X.XX %     (XX achats / XXXX visiteurs)               │
+│   ▲ +0.4 pts vs moyenne 30j                             │
+│                                                         │
+├─────────────────────────────────────────────────────────┤
+│  TABLEAU COMPARATIF — moyennes journalières             │
+│                                                         │
+│  KPI                  | 7j     | moy 14j | moy 30j | moy 90j │
+│  ─────────────────────┼────────┼─────────┼─────────┼─────────│
+│  Revenu / jour        | $XXX   | $XXX    | $XXX    | $XXX    │
+│  Commandes / jour     | X.X    | X.X     | X.X     | X.X     │
+│  AOV                  | $XX    | $XX     | $XX     | $XX     │
+│  Visiteurs / jour     | XXX    | XXX     | XXX     | XXX     │
+│  Conversion %         | X.XX%  | X.XX%   | X.XX%   | X.XX%   │
+│                                                         │
+│  Chaque cellule "7j" affiche un badge ▲/▼ vs la moy 30j │
+├─────────────────────────────────────────────────────────┤
+│  FUNNEL — 7 derniers jours                              │
+│                                                         │
+│   Visiteurs       XXXX   ████████████████████  100%     │
+│   Vue produit     XXXX   ███████████████        78%     │
+│   Add to cart      XXX   ██████                 22%     │
+│   Checkout         XX    ███                    8%      │
+│   Achat payé       XX    █                      2.1%    │
+│                                                         │
+│   Sous chaque étape : drop-off % vs étape précédente    │
+│   + même ligne en gris pour la moyenne 30j (comparaison)│
+├─────────────────────────────────────────────────────────┤
+│  TENDANCE 90 JOURS — Recharts                           │
+│   Line chart : revenu/jour (barres) + conversion (ligne)│
+└─────────────────────────────────────────────────────────┘
+```
 
-Et dans l'onglet "Ventes Shopify", il n'y a aucune **liste des dernières commandes** — juste des agrégats — donc l'utilisateur ne peut pas confirmer visuellement qu'une vente précise a bien été captée.
+## Données & sources
 
-## Plan en 3 parties
+Tout vient de ce qui est **déjà branché** — pas de nouvelle clé API à demander.
 
-### 1. Trouver pourquoi `click_checkout` / `checkout_events` ne sont pas loggés
+| Donnée | Source |
+|---|---|
+| Revenu payé, commandes, AOV | Edge function `shopify-analytics` (déjà existante) |
+| Visiteurs uniques | `funnel_events` (Supabase) — `step = 'page_view'`, distinct `visitor_id` |
+| Vue produit | `funnel_events` — `step = 'view_content'` |
+| Add to cart | `cart_events` |
+| Checkout initié | `checkout_events` |
+| Achat payé | `shopify-analytics` (orders `financial_status = paid`) |
 
-Inspecter le composant qui ouvre le checkout Shopify (probablement `ShopifyCartDrawer.tsx` ou `CheckoutRedirectOverlay.tsx`) pour vérifier :
-- Que `trackFunnelStep('click_checkout', …)` est bien appelé **avant** `window.open` / redirection
-- Que l'insertion `checkout_events` n'est pas conditionnée à un `displayed=true` côté desktop uniquement (la latency stats laisse penser que c'est opportuniste — peut-être que sur certains parcours rapides, le visiteur quitte avant que le insert async se termine)
-- Que l'insert utilise `fetch(..., { keepalive: true })` ou `navigator.sendBeacon` pour survivre à la navigation (sans ça, un `window.location.href = shopifyUrl` tue la requête en vol)
-- Que l'event est aussi loggé si checkout s'ouvre dans un **même onglet** (cas mobile / popup bloqué)
+## Logique de calcul
 
-Fix attendu : passer les inserts cart_events / checkout_events / funnel_events `click_checkout` en `fetch keepalive: true` ou `sendBeacon` pour garantir qu'ils partent même si la page change immédiatement après.
+- **Période 7j** = 7 jours calendaires précédents (J-7 → J-1 minuit local Canada).
+- **Moyennes 14j / 30j / 90j** = total sur la fenêtre ÷ nombre de jours → valeur moyenne par jour, comparable aux "par jour" de la colonne 7j.
+- **Variation %** affichée sur la colonne 7j uniquement, calculée contre la moy 30j (vert si > +3%, rouge si < -3%, gris sinon).
 
-### 2. Ajouter une "Liste des dernières commandes" dans l'onglet 💰 Ventes Shopify
+## Implémentation technique
 
-Dans `SalesTab` (`src/pages/AdminAnalytics.tsx` L1940), ajouter sous la card "Revenus réels" une nouvelle Card "Dernières commandes" :
-- 10 commandes les plus récentes (tri par `created_at` desc)
-- Colonnes : Date/Heure, N° commande (lien Shopify Admin), Email, Total, Statut, Source (si attribuée)
-- Source = `data.attributedOrders` (déjà retourné par l'edge function — pas de nouvel appel)
-- Badge vert "✅ Tracké" si on trouve un `checkout_events` correspondant pour ce `visitor_id`, badge ambre "⚠️ Non tracké" sinon — permet de voir d'un coup d'œil les ventes invisibles dans le funnel
+1. **Étendre `shopify-analytics`** pour accepter `?days=90` et renvoyer les orders bruts (déjà le cas), puis côté client je bucket par jour pour reconstruire 7/14/30/90.
+2. **Nouveau hook** `useProductPerformance()` dans `src/pages/AdminAnalytics.tsx` :
+   - Fetch parallèle : `shopify-analytics?days=90`, `funnel_events` (90j), `cart_events` (90j), `checkout_events` (90j).
+   - Agrège en mémoire par jour → calcule 7j / moy 14j / moy 30j / moy 90j pour chaque KPI.
+3. **Réécriture complète de `src/pages/AdminAnalytics.tsx`** :
+   - Suppression de `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` et de tous les onglets actuels.
+   - 4 sections : 2 cartes KPI hero, tableau comparatif, funnel visuel, chart 90j.
+   - Composants : `Card` shadcn, `Table` shadcn, `Recharts` (`BarChart` + `Line`).
+4. **Pas de migration DB** — tout existe déjà (`cart_events`, `checkout_events`, `funnel_events`, `user_roles`).
+5. **Pas de nouvelle edge function**. La seule éventuelle modif côté serveur : si la requête 90j fait timeout, je rajouterai un index sur `funnel_events(created_at, step)` via migration.
 
-### 3. Afficher un compteur de couverture tracking
+## Hors scope (explicitement)
 
-Sous la liste, une ligne KPI :
-- `X / 62 ventes ont un checkout_event correspondant` → ex : "47/62 (76%) ventes trackées correctement"
-- Si < 90 %, alerte ambre expliquant que le funnel est sous-évalué
+- Meta Ads, ROAS, CPA, CTR — pas connecté, et tu n'as pas demandé à brancher.
+- Microsoft Clarity — pas d'API exploitable, juste un lien dans le header vers le dashboard Clarity.
+- Détail par produit / par variant — un seul produit hero (le travel pillow), donc inutile.
+- Liste des commandes récentes / debug raw — supprimé (tu as dit "rase tout").
 
-## Détails techniques
+## Fichiers touchés
 
-- L'edge function `shopify-analytics` retourne déjà tout (orders, ordersByDay, attributedOrders) — aucun changement backend nécessaire pour la partie 2 et 3
-- Pour la couverture tracking : un seul `SELECT visitor_id FROM checkout_events WHERE created_at >= since` côté SalesTab, puis intersection en mémoire avec `attributedOrders.map(o => o.visitor_id)`
-- Partie 1 : inspection ciblée des call-sites de tracking dans le flow ATC → Checkout
+- `src/pages/AdminAnalytics.tsx` — réécriture complète (~400 lignes → ~350 lignes).
+- `supabase/functions/shopify-analytics/index.ts` — petite modif pour accepter `days=90` proprement (déjà supporté en fait, à vérifier).
 
-## Ce qui n'est pas inclus
-
-- Pas de modif du schéma DB
-- Pas de modif de l'edge function `shopify-analytics`
-- Pas de modif des autres onglets (Funnel, Funnel Checkout, Attribution) — ils continueront d'afficher leurs chiffres basés sur les events Supabase
-
-## Résultat
-
-Après ces 3 changements :
-- Tu verras la commande #1069 (et toutes les suivantes) explicitement listée dans l'onglet "Ventes Shopify"
-- Tu sauras immédiatement quelles ventes ne sont pas trackées côté Supabase (badge ambre)
-- Les futures ventes seront trackées correctement dans le funnel (fix sendBeacon/keepalive)
+Pas d'autre fichier modifié. Pas de nouvelle dépendance.
