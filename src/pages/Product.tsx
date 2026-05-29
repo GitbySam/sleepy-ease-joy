@@ -32,6 +32,14 @@ import testimonialAlex from "@/assets/testimonial-alex.webp";
 import testimonialSophie from "@/assets/testimonial-sophie.webp";
 import sleepKitPremium from "@/assets/sleep-kit-three-essentials.png";
 import bundleThreeItemsHero from "@/assets/bundle-three-items-hero.jpg";
+import bundleThreeItemsBlack from "@/assets/bundle-three-items-black.jpg";
+import bundleThreeItemsRed from "@/assets/bundle-three-items-red.jpg";
+
+const BUNDLE_IMAGES: Record<string, string> = {
+  Black: bundleThreeItemsBlack,
+  Red: bundleThreeItemsRed,
+  Grey: bundleThreeItemsHero,
+};
 import { useCartStore } from "@/stores/cartStore";
 import { fetchProducts, type ShopifyProduct, applyDiscountToCart } from "@/lib/shopify";
 import { toast } from "sonner";
