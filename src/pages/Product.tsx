@@ -537,7 +537,9 @@ const Product = () => {
             </div>
 
             {/* Client reviews — desktop & tablet only (mobile shown before benefits) */}
-            <ClientReviewsBlock className="hidden md:grid" reviews={clientReviews} />
+            <div id="product-reviews-desktop">
+              <ClientReviewsBlock className="hidden md:grid" reviews={clientReviews} />
+            </div>
 
           </motion.div>
 
