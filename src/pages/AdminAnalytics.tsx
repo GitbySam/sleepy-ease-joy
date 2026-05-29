@@ -490,6 +490,65 @@ export default function AdminAnalytics() {
     });
   }, [buckets]);
 
+  /* ── Meta attribution aggregations ── */
+  const paidAttributedInWindow = useMemo(() => {
+    const cutoff = Date.now() - attribWindow * 24 * 60 * 60 * 1000;
+    return attributedOrders.filter((o) => {
+      const paid = o.financial_status === "paid" || o.financial_status === "partially_paid";
+      if (!paid || o.cancelled_at) return false;
+      const t = new Date(o.created_at).getTime();
+      return t >= cutoff;
+    });
+  }, [attributedOrders, attribWindow]);
+
+  const adsBreakdown = useMemo(() => {
+    type Row = {
+      key: string;
+      source: string;
+      campaign: string;
+      ad: string;
+      orders: number;
+      revenue: number;
+    };
+    const map = new Map<string, Row>();
+    for (const o of paidAttributedInWindow) {
+      const source = o.utm_source || (o.fbclid ? "facebook" : "(direct)");
+      const campaign = o.utm_campaign || "(sans campagne)";
+      const ad = o.utm_content || "(sans ad)";
+      const key = `${source}||${campaign}||${ad}`;
+      const row = map.get(key) || { key, source, campaign, ad, orders: 0, revenue: 0 };
+      row.orders += 1;
+      row.revenue += parseFloat(o.total_price || "0");
+      map.set(key, row);
+    }
+    return Array.from(map.values()).sort((a, b) => b.revenue - a.revenue);
+  }, [paidAttributedInWindow]);
+
+  const adsTotals = useMemo(() => {
+    const totalOrders = paidAttributedInWindow.length;
+    const totalRevenue = paidAttributedInWindow.reduce(
+      (s, o) => s + parseFloat(o.total_price || "0"),
+      0,
+    );
+    const metaOrders = paidAttributedInWindow.filter(
+      (o) => (o.utm_source || "").toLowerCase() === "facebook" || !!o.fbclid,
+    ).length;
+    const metaRevenue = paidAttributedInWindow
+      .filter((o) => (o.utm_source || "").toLowerCase() === "facebook" || !!o.fbclid)
+      .reduce((s, o) => s + parseFloat(o.total_price || "0"), 0);
+    return { totalOrders, totalRevenue, metaOrders, metaRevenue };
+  }, [paidAttributedInWindow]);
+
+  const recentAttributedOrders = useMemo(() => {
+    return [...attributedOrders]
+      .filter((o) => {
+        const paid = o.financial_status === "paid" || o.financial_status === "partially_paid";
+        return paid && !o.cancelled_at;
+      })
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 20);
+  }, [attributedOrders]);
+
   /* ── Render ── */
   if (loading) {
     return (
