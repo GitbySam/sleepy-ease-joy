@@ -206,8 +206,10 @@ async function fetchAll(): Promise<{
   buckets: Map<string, DayBucket>;
   currency: string;
   errors: string[];
+  attributedOrders: AttributedOrder[];
 }> {
   const errors: string[] = [];
+  let attributedOrders: AttributedOrder[] = [];
   const sinceIso = new Date(
     Date.now() - WINDOW_DAYS * 24 * 60 * 60 * 1000,
   ).toISOString();
@@ -266,6 +268,7 @@ async function fetchAll(): Promise<{
         const json = await resp.json();
         currency = json?.summary?.currency || "CAD";
         const orders: ShopifyOrder[] = json?.attributedOrders || [];
+        attributedOrders = (json?.attributedOrders || []) as AttributedOrder[];
         for (const o of orders) {
           if (!o.created_at) continue;
           const key = toLocalDateKey(o.created_at);
@@ -338,7 +341,7 @@ async function fetchAll(): Promise<{
   // discard the placeholder Shopify response we threw away
   void shopRes;
 
-  return { buckets, currency, errors };
+  return { buckets, currency, errors, attributedOrders };
 }
 
 /* ────────────────────────────────────────────────────────── */
