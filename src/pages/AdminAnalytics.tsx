@@ -35,6 +35,26 @@ interface ShopifyOrder {
   cancelled_at?: string | null;
 }
 
+interface AttributedOrder {
+  id: number | string;
+  name?: string;
+  created_at: string;
+  total_price: string;
+  currency: string;
+  financial_status: string | null;
+  cancelled_at?: string | null;
+  email?: string | null;
+  visitor_id?: string | null;
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
+  utm_content?: string | null;
+  utm_term?: string | null;
+  fbclid?: string | null;
+  landing_site?: string | null;
+  referring_site?: string | null;
+}
+
 interface ShopifyResult {
   summary: { currency: string };
   // we re-derive everything from the raw orders below
@@ -186,8 +206,10 @@ async function fetchAll(): Promise<{
   buckets: Map<string, DayBucket>;
   currency: string;
   errors: string[];
+  attributedOrders: AttributedOrder[];
 }> {
   const errors: string[] = [];
+  let attributedOrders: AttributedOrder[] = [];
   const sinceIso = new Date(
     Date.now() - WINDOW_DAYS * 24 * 60 * 60 * 1000,
   ).toISOString();
@@ -246,6 +268,7 @@ async function fetchAll(): Promise<{
         const json = await resp.json();
         currency = json?.summary?.currency || "CAD";
         const orders: ShopifyOrder[] = json?.attributedOrders || [];
+        attributedOrders = (json?.attributedOrders || []) as AttributedOrder[];
         for (const o of orders) {
           if (!o.created_at) continue;
           const key = toLocalDateKey(o.created_at);
@@ -318,7 +341,7 @@ async function fetchAll(): Promise<{
   // discard the placeholder Shopify response we threw away
   void shopRes;
 
-  return { buckets, currency, errors };
+  return { buckets, currency, errors, attributedOrders };
 }
 
 /* ────────────────────────────────────────────────────────── */
@@ -332,6 +355,8 @@ export default function AdminAnalytics() {
   const [currency, setCurrency] = useState("CAD");
   const [errors, setErrors] = useState<string[]>([]);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+  const [attributedOrders, setAttributedOrders] = useState<AttributedOrder[]>([]);
+  const [attribWindow, setAttribWindow] = useState<7 | 30 | 90>(30);
 
   const load = useCallback(async () => {
     setRefreshing(true);
@@ -340,6 +365,7 @@ export default function AdminAnalytics() {
       setBuckets(res.buckets);
       setCurrency(res.currency);
       setErrors(res.errors);
+      setAttributedOrders(res.attributedOrders);
       setLastRefresh(new Date());
     } finally {
       setLoading(false);
@@ -463,6 +489,65 @@ export default function AdminAnalytics() {
       };
     });
   }, [buckets]);
+
+  /* ── Meta attribution aggregations ── */
+  const paidAttributedInWindow = useMemo(() => {
+    const cutoff = Date.now() - attribWindow * 24 * 60 * 60 * 1000;
+    return attributedOrders.filter((o) => {
+      const paid = o.financial_status === "paid" || o.financial_status === "partially_paid";
+      if (!paid || o.cancelled_at) return false;
+      const t = new Date(o.created_at).getTime();
+      return t >= cutoff;
+    });
+  }, [attributedOrders, attribWindow]);
+
+  const adsBreakdown = useMemo(() => {
+    type Row = {
+      key: string;
+      source: string;
+      campaign: string;
+      ad: string;
+      orders: number;
+      revenue: number;
+    };
+    const map = new Map<string, Row>();
+    for (const o of paidAttributedInWindow) {
+      const source = o.utm_source || (o.fbclid ? "facebook" : "(direct)");
+      const campaign = o.utm_campaign || "(sans campagne)";
+      const ad = o.utm_content || "(sans ad)";
+      const key = `${source}||${campaign}||${ad}`;
+      const row = map.get(key) || { key, source, campaign, ad, orders: 0, revenue: 0 };
+      row.orders += 1;
+      row.revenue += parseFloat(o.total_price || "0");
+      map.set(key, row);
+    }
+    return Array.from(map.values()).sort((a, b) => b.revenue - a.revenue);
+  }, [paidAttributedInWindow]);
+
+  const adsTotals = useMemo(() => {
+    const totalOrders = paidAttributedInWindow.length;
+    const totalRevenue = paidAttributedInWindow.reduce(
+      (s, o) => s + parseFloat(o.total_price || "0"),
+      0,
+    );
+    const metaOrders = paidAttributedInWindow.filter(
+      (o) => (o.utm_source || "").toLowerCase() === "facebook" || !!o.fbclid,
+    ).length;
+    const metaRevenue = paidAttributedInWindow
+      .filter((o) => (o.utm_source || "").toLowerCase() === "facebook" || !!o.fbclid)
+      .reduce((s, o) => s + parseFloat(o.total_price || "0"), 0);
+    return { totalOrders, totalRevenue, metaOrders, metaRevenue };
+  }, [paidAttributedInWindow]);
+
+  const recentAttributedOrders = useMemo(() => {
+    return [...attributedOrders]
+      .filter((o) => {
+        const paid = o.financial_status === "paid" || o.financial_status === "partially_paid";
+        return paid && !o.cancelled_at;
+      })
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 20);
+  }, [attributedOrders]);
 
   /* ── Render ── */
   if (loading) {
@@ -615,6 +700,181 @@ export default function AdminAnalytics() {
             <p className="mt-3 text-xs text-slate-500">
               Du plus ancien (J-7) au plus récent (J-1, hier). Aujourd'hui est
               exclu pour ne comparer que des journées complètes.
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Meta attribution — quelles pubs génèrent les ventes */}
+        <Card>
+          <CardHeader>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <CardTitle className="text-base">
+                  Attribution Meta — quelles publicités ont généré les ventes
+                </CardTitle>
+                <p className="text-xs text-slate-500 mt-1">
+                  Source&nbsp;: <code>note_attributes</code> écrits sur la commande Shopify
+                  au moment du checkout (<code>utm_source</code>, <code>utm_campaign</code>,{" "}
+                  <code>utm_content</code>, <code>fbclid</code>).
+                </p>
+              </div>
+              <div className="inline-flex rounded-md border bg-white p-0.5 text-xs">
+                {[7, 30, 90].map((d) => (
+                  <button
+                    key={d}
+                    onClick={() => setAttribWindow(d as 7 | 30 | 90)}
+                    className={`px-3 py-1.5 rounded ${
+                      attribWindow === d
+                        ? "bg-slate-900 text-white"
+                        : "text-slate-600 hover:bg-slate-100"
+                    }`}
+                  >
+                    {d}j
+                  </button>
+                ))}
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="rounded-md border bg-slate-50 px-3 py-2">
+                <div className="text-[10px] uppercase tracking-wider text-slate-500">
+                  Ventes attribuées (total)
+                </div>
+                <div className="text-xl font-semibold">{adsTotals.totalOrders}</div>
+                <div className="text-xs text-slate-600">
+                  {fmt(adsTotals.totalRevenue, "currency", currency)}
+                </div>
+              </div>
+              <div className="rounded-md border bg-slate-50 px-3 py-2">
+                <div className="text-[10px] uppercase tracking-wider text-slate-500">
+                  Dont via Meta (Facebook/Instagram)
+                </div>
+                <div className="text-xl font-semibold">{adsTotals.metaOrders}</div>
+                <div className="text-xs text-slate-600">
+                  {fmt(adsTotals.metaRevenue, "currency", currency)}
+                </div>
+              </div>
+              <div className="rounded-md border bg-slate-50 px-3 py-2">
+                <div className="text-[10px] uppercase tracking-wider text-slate-500">
+                  Part Meta du CA
+                </div>
+                <div className="text-xl font-semibold">
+                  {adsTotals.totalRevenue > 0
+                    ? `${((adsTotals.metaRevenue / adsTotals.totalRevenue) * 100).toFixed(0)}%`
+                    : "—"}
+                </div>
+              </div>
+              <div className="rounded-md border bg-slate-50 px-3 py-2">
+                <div className="text-[10px] uppercase tracking-wider text-slate-500">
+                  AOV Meta
+                </div>
+                <div className="text-xl font-semibold">
+                  {adsTotals.metaOrders > 0
+                    ? fmt(adsTotals.metaRevenue / adsTotals.metaOrders, "currency", currency)
+                    : "—"}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold mb-2">
+                Classement par publicité (campagne · ad)
+              </h3>
+              {adsBreakdown.length === 0 ? (
+                <p className="text-sm text-slate-500">
+                  Aucune commande attribuée sur cette fenêtre.
+                </p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Source</TableHead>
+                      <TableHead>Campagne</TableHead>
+                      <TableHead>Publicité (ad)</TableHead>
+                      <TableHead className="text-right">Ventes</TableHead>
+                      <TableHead className="text-right">Revenu</TableHead>
+                      <TableHead className="text-right">AOV</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {adsBreakdown.map((r) => (
+                      <TableRow key={r.key}>
+                        <TableCell className="font-medium capitalize">{r.source}</TableCell>
+                        <TableCell className="text-slate-700 max-w-[260px] truncate" title={r.campaign}>
+                          {r.campaign}
+                        </TableCell>
+                        <TableCell className="text-slate-700 max-w-[260px] truncate" title={r.ad}>
+                          {r.ad}
+                        </TableCell>
+                        <TableCell className="text-right">{r.orders}</TableCell>
+                        <TableCell className="text-right font-semibold">
+                          {fmt(r.revenue, "currency", currency)}
+                        </TableCell>
+                        <TableCell className="text-right text-slate-600">
+                          {fmt(r.revenue / r.orders, "currency", currency)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold mb-2">
+                20 dernières ventes — publicité d'origine
+              </h3>
+              {recentAttributedOrders.length === 0 ? (
+                <p className="text-sm text-slate-500">Aucune commande payée récente.</p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Commande</TableHead>
+                      <TableHead className="text-right">Montant</TableHead>
+                      <TableHead>Source</TableHead>
+                      <TableHead>Campagne</TableHead>
+                      <TableHead>Publicité</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {recentAttributedOrders.map((o) => {
+                      const source = o.utm_source || (o.fbclid ? "facebook" : "(direct)");
+                      return (
+                        <TableRow key={String(o.id)}>
+                          <TableCell className="text-xs text-slate-600 whitespace-nowrap">
+                            {new Date(o.created_at).toLocaleString("fr-CA", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </TableCell>
+                          <TableCell className="font-medium">{o.name || `#${o.id}`}</TableCell>
+                          <TableCell className="text-right font-semibold">
+                            {fmt(parseFloat(o.total_price || "0"), "currency", currency)}
+                          </TableCell>
+                          <TableCell className="capitalize">{source}</TableCell>
+                          <TableCell className="max-w-[220px] truncate" title={o.utm_campaign || ""}>
+                            {o.utm_campaign || <span className="text-slate-400">—</span>}
+                          </TableCell>
+                          <TableCell className="max-w-[220px] truncate" title={o.utm_content || ""}>
+                            {o.utm_content || <span className="text-slate-400">—</span>}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              )}
+            </div>
+
+            <p className="text-xs text-slate-500">
+              Astuce&nbsp;: dans Meta Ads Manager, configure les URL parameters de tes pubs avec{" "}
+              <code>utm_source=facebook&amp;utm_medium=paid&amp;utm_campaign={`{{campaign.name}}`}&amp;utm_content={`{{ad.name}}`}</code>{" "}
+              pour que le nom exact de chaque pub remonte ici.
             </p>
           </CardContent>
         </Card>
