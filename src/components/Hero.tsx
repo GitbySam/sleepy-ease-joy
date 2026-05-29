@@ -108,7 +108,13 @@ const Hero = () => {
             {/* Stars — compact proof */}
             <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 min-w-0">
               <StarRating size="small" />
-              <span className="text-[11px] text-white/80 font-sans-body break-words">{t("hero.reviews")}</span>
+              <button
+                type="button"
+                onClick={() => document.getElementById("testimonials")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                className="text-[11px] text-white/80 font-sans-body break-words underline-offset-2 hover:underline cursor-pointer"
+              >
+                {t("hero.reviews")}
+              </button>
             </div>
 
             {/* Subtitle */}
@@ -178,7 +184,13 @@ const Hero = () => {
             {/* Social proof FIRST */}
             <motion.div variants={fadeUp} className="flex items-center gap-2.5">
               <StarRating size="large" />
-              <span className="text-sm text-muted-foreground font-sans-body">{t("hero.reviews")}</span>
+              <button
+                type="button"
+                onClick={() => document.getElementById("testimonials")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                className="text-sm text-muted-foreground font-sans-body underline-offset-2 hover:underline hover:text-foreground transition-colors cursor-pointer"
+              >
+                {t("hero.reviews")}
+              </button>
             </motion.div>
 
             <motion.p variants={fadeUp} className="text-sm font-sans-body uppercase tracking-[0.25em] text-muted-foreground">
