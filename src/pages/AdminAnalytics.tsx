@@ -437,6 +437,33 @@ export default function AdminAnalytics() {
     };
   }, [buckets]);
 
+  /* ── Daily breakdown last 7 days (Mon→Sun order based on actual dates) ── */
+  const last7Days = useMemo(() => {
+    const keys = makeDayKeys(7); // J-7 → J-1, chronological
+    const weekdayFmt = new Intl.DateTimeFormat("fr-CA", { weekday: "short" });
+    const dateFmt = new Intl.DateTimeFormat("fr-CA", { day: "2-digit", month: "2-digit" });
+    return keys.map((k) => {
+      const b = buckets.get(k);
+      const [y, m, d] = k.split("-").map(Number);
+      const dateObj = new Date(y, m - 1, d);
+      const conv = b && b.visitors > 0 ? (b.purchases / b.visitors) * 100 : 0;
+      const aovDay = b && b.orders > 0 ? b.revenue / b.orders : 0;
+      return {
+        key: k,
+        weekday: weekdayFmt.format(dateObj).replace(".", ""),
+        date: dateFmt.format(dateObj),
+        revenue: b?.revenue ?? 0,
+        orders: b?.orders ?? 0,
+        visitors: b?.visitors ?? 0,
+        addToCart: b?.addToCart ?? 0,
+        checkout: b?.checkout ?? 0,
+        purchases: b?.purchases ?? 0,
+        aov: aovDay,
+        conv,
+      };
+    });
+  }, [buckets]);
+
   /* ── Render ── */
   if (loading) {
     return (
@@ -533,6 +560,64 @@ export default function AdminAnalytics() {
             </CardContent>
           </Card>
         </section>
+
+        {/* Daily breakdown last 7 days */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">
+              Historique jour par jour — 7 derniers jours
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Jour</TableHead>
+                  <TableHead className="text-right">Revenu</TableHead>
+                  <TableHead className="text-right">Commandes</TableHead>
+                  <TableHead className="text-right">AOV</TableHead>
+                  <TableHead className="text-right">Visiteurs</TableHead>
+                  <TableHead className="text-right">Add to cart</TableHead>
+                  <TableHead className="text-right">Checkout</TableHead>
+                  <TableHead className="text-right">Conv.</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {last7Days.map((d) => (
+                  <TableRow key={d.key}>
+                    <TableCell className="font-medium capitalize">
+                      {d.weekday}{" "}
+                      <span className="text-xs text-slate-500">{d.date}</span>
+                    </TableCell>
+                    <TableCell className="text-right font-semibold">
+                      {fmt(d.revenue, "currency", currency)}
+                    </TableCell>
+                    <TableCell className="text-right">{d.orders}</TableCell>
+                    <TableCell className="text-right text-slate-600">
+                      {d.orders > 0 ? fmt(d.aov, "currency", currency) : "—"}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {d.visitors.toLocaleString("en-CA")}
+                    </TableCell>
+                    <TableCell className="text-right text-slate-600">
+                      {d.addToCart}
+                    </TableCell>
+                    <TableCell className="text-right text-slate-600">
+                      {d.checkout}
+                    </TableCell>
+                    <TableCell className="text-right text-slate-600">
+                      {d.visitors > 0 ? fmt(d.conv, "percent") : "—"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <p className="mt-3 text-xs text-slate-500">
+              Du plus ancien (J-7) au plus récent (J-1, hier). Aujourd'hui est
+              exclu pour ne comparer que des journées complètes.
+            </p>
+          </CardContent>
+        </Card>
 
         {/* Comparison table */}
         <Card>
