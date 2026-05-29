@@ -561,6 +561,64 @@ export default function AdminAnalytics() {
           </Card>
         </section>
 
+        {/* Daily breakdown last 7 days */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">
+              Historique jour par jour — 7 derniers jours
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Jour</TableHead>
+                  <TableHead className="text-right">Revenu</TableHead>
+                  <TableHead className="text-right">Commandes</TableHead>
+                  <TableHead className="text-right">AOV</TableHead>
+                  <TableHead className="text-right">Visiteurs</TableHead>
+                  <TableHead className="text-right">Add to cart</TableHead>
+                  <TableHead className="text-right">Checkout</TableHead>
+                  <TableHead className="text-right">Conv.</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {last7Days.map((d) => (
+                  <TableRow key={d.key}>
+                    <TableCell className="font-medium capitalize">
+                      {d.weekday}{" "}
+                      <span className="text-xs text-slate-500">{d.date}</span>
+                    </TableCell>
+                    <TableCell className="text-right font-semibold">
+                      {fmt(d.revenue, "currency", currency)}
+                    </TableCell>
+                    <TableCell className="text-right">{d.orders}</TableCell>
+                    <TableCell className="text-right text-slate-600">
+                      {d.orders > 0 ? fmt(d.aov, "currency", currency) : "—"}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {d.visitors.toLocaleString("en-CA")}
+                    </TableCell>
+                    <TableCell className="text-right text-slate-600">
+                      {d.addToCart}
+                    </TableCell>
+                    <TableCell className="text-right text-slate-600">
+                      {d.checkout}
+                    </TableCell>
+                    <TableCell className="text-right text-slate-600">
+                      {d.visitors > 0 ? fmt(d.conv, "percent") : "—"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <p className="mt-3 text-xs text-slate-500">
+              Du plus ancien (J-7) au plus récent (J-1, hier). Aujourd'hui est
+              exclu pour ne comparer que des journées complètes.
+            </p>
+          </CardContent>
+        </Card>
+
         {/* Comparison table */}
         <Card>
           <CardHeader>
