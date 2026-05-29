@@ -355,6 +355,8 @@ export default function AdminAnalytics() {
   const [currency, setCurrency] = useState("CAD");
   const [errors, setErrors] = useState<string[]>([]);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+  const [attributedOrders, setAttributedOrders] = useState<AttributedOrder[]>([]);
+  const [attribWindow, setAttribWindow] = useState<7 | 30 | 90>(30);
 
   const load = useCallback(async () => {
     setRefreshing(true);
@@ -363,6 +365,7 @@ export default function AdminAnalytics() {
       setBuckets(res.buckets);
       setCurrency(res.currency);
       setErrors(res.errors);
+      setAttributedOrders(res.attributedOrders);
       setLastRefresh(new Date());
     } finally {
       setLoading(false);
