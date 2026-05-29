@@ -537,7 +537,9 @@ const Product = () => {
             </div>
 
             {/* Client reviews — desktop & tablet only (mobile shown before benefits) */}
-            <ClientReviewsBlock className="hidden md:grid" reviews={clientReviews} />
+            <div id="product-reviews-desktop">
+              <ClientReviewsBlock className="hidden md:grid" reviews={clientReviews} />
+            </div>
 
           </motion.div>
 
@@ -573,7 +575,20 @@ const Product = () => {
                     </span>
                   ))}
                 </div>
-                <span className="text-sm text-muted-foreground font-sans-body">{t("product.reviews")}</span>
+                <button
+                  onClick={() => {
+                    const desktop = document.getElementById('product-reviews-desktop');
+                    const mobile = document.getElementById('product-reviews-mobile');
+                    if (desktop && desktop.offsetParent !== null) {
+                      desktop.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    } else if (mobile) {
+                      mobile.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
+                  className="text-sm text-muted-foreground font-sans-body underline hover:text-foreground transition-colors cursor-pointer"
+                >
+                  {t("product.reviews")}
+                </button>
               </div>
             </div>
 
@@ -874,7 +889,9 @@ const Product = () => {
             })()}
           </div>
           {/* Client reviews — mobile only, before benefits */}
-          <ClientReviewsBlock className="md:hidden px-4" reviews={clientReviews} />
+          <div id="product-reviews-mobile">
+            <ClientReviewsBlock className="md:hidden px-4" reviews={clientReviews} />
+          </div>
           <ProductBenefits />
         </Suspense>
       </div>
