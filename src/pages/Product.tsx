@@ -889,7 +889,9 @@ const Product = () => {
             })()}
           </div>
           {/* Client reviews — mobile only, before benefits */}
-          <ClientReviewsBlock className="md:hidden px-4" reviews={clientReviews} />
+          <div id="product-reviews-mobile">
+            <ClientReviewsBlock className="md:hidden px-4" reviews={clientReviews} />
+          </div>
           <ProductBenefits />
         </Suspense>
       </div>
