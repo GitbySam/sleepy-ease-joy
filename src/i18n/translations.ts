@@ -9,9 +9,9 @@ export const translations = {
   "nav.faq": { en: "FAQ", fr: "FAQ", es: "FAQ" },
   "nav.shopNow": { en: "Shop Now", fr: "Acheter", es: "Comprar" },
   "header.marquee": {
-    en: "⚡ Only 13 left in stock \u00a0•\u00a0 -50% OFF \u00a0•\u00a0 Free Shipping",
-    fr: "⚡ Plus que 13 en stock \u00a0•\u00a0 -50% \u00a0•\u00a0 Livraison gratuite",
-    es: "⚡ Solo quedan 13 en stock \u00a0•\u00a0 -50% \u00a0•\u00a0 Envío gratis",
+    en: "⚡ Only 8 left in stock \u00a0•\u00a0 -50% OFF \u00a0•\u00a0 Free Shipping",
+    fr: "⚡ Plus que 8 en stock \u00a0•\u00a0 -50% \u00a0•\u00a0 Livraison gratuite",
+    es: "⚡ Solo quedan 8 en stock \u00a0•\u00a0 -50% \u00a0•\u00a0 Envío gratis",
   },
 
   // Hero
@@ -205,9 +205,9 @@ export const translations = {
 
   // BundleOffer
   "bundle.subtitle": {
-    en: "⚡ Only 13 left — up to 67% off",
-    fr: "⚡ Plus que 13 en stock — jusqu'à -67%",
-    es: "⚡ Solo quedan 13 — hasta -67%",
+    en: "⚡ Only 8 left — up to 67% off",
+    fr: "⚡ Plus que 8 en stock — jusqu'à -67%",
+    es: "⚡ Solo quedan 8 — hasta -67%",
   },
   "bundle.title": {
     en: "Protect your <gold>reputation</gold>",
@@ -554,7 +554,7 @@ export const translations = {
 
 
   // UpsellPopup
-  "upsell.limitedOffer": { en: "⚡ Only 13 left", fr: "⚡ Plus que 13", es: "⚡ Solo quedan 13" },
+  "upsell.limitedOffer": { en: "⚡ Only 8 left", fr: "⚡ Plus que 8", es: "⚡ Solo quedan 8" },
   "upsell.banner": {
     en: "🎧 Complete your anti-embarrassment kit & save 50%",
     fr: "🎧 Complétez votre kit anti-gêne et économisez 50%",
