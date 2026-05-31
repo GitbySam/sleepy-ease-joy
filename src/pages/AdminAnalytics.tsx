@@ -514,7 +514,7 @@ export default function AdminAnalytics() {
     };
     const map = new Map<string, Row>();
     for (const o of paidAttributedInWindow) {
-      const source = o.utm_source || (o.fbclid ? "facebook" : "(direct)");
+      const source = resolveSource(o);
       const campaign = o.utm_campaign || "(sans campagne)";
       const ad = o.utm_content || "(sans ad)";
       const key = `${source}||${campaign}||${ad}`;
@@ -532,11 +532,13 @@ export default function AdminAnalytics() {
       (s, o) => s + parseFloat(o.total_price || "0"),
       0,
     );
-    const metaOrders = paidAttributedInWindow.filter(
-      (o) => (o.utm_source || "").toLowerCase() === "facebook" || !!o.fbclid,
-    ).length;
+    const isMeta = (o: AttributedOrder) =>
+      (o.utm_source || "").toLowerCase() === "facebook" ||
+      !!o.fbclid ||
+      !!o.fbc;
+    const metaOrders = paidAttributedInWindow.filter(isMeta).length;
     const metaRevenue = paidAttributedInWindow
-      .filter((o) => (o.utm_source || "").toLowerCase() === "facebook" || !!o.fbclid)
+      .filter(isMeta)
       .reduce((s, o) => s + parseFloat(o.total_price || "0"), 0);
     return { totalOrders, totalRevenue, metaOrders, metaRevenue };
   }, [paidAttributedInWindow]);
