@@ -1,60 +1,37 @@
-## Diagnostic — pourquoi la commande 1076 est "direct"
+## Problèmes
 
-Le cart envoie à Shopify (`note_attributes`) :
-- `_sleepzy_utm_source`, `_sleepzy_utm_campaign`, `_sleepzy_fbclid` (depuis `localStorage` — `captureAttribution`)
-- `_sleepzy_fbp`, `_sleepzy_fbc` (depuis les cookies `_fbp` / `_fbc` posés automatiquement par le Pixel Meta)
+Dans `src/components/StickyMobileCTA.tsx` :
 
-Le dashboard `/admin/analytics` (ligne 515 de `AdminAnalytics.tsx`) calcule la source ainsi :
-```
-const source = o.utm_source || (o.fbclid ? "facebook" : "(direct)");
-```
-→ Si `utm_source` ET `fbclid` sont absents, c'est "direct" — **même quand `_fbc` est présent**.
+1. **Le bouton est inactif sur la home** — il fait `document.getElementById("offer").scrollIntoView()`. Or l'id `offer` n'existe que dans `BundleOffer.tsx`, qui n'est **pas** monté sur `/` (la home utilise `ShopifyProducts` avec `id="products"`). Résultat : `getElementById` renvoie `null` et rien ne se passe au clic.
 
-Or `_fbc` ("Facebook Click ID", format `fb.1.<timestamp>.<fbclid>`) est posé par le Pixel uniquement quand l'utilisateur arrive via un clic d'annonce Meta. C'est **le signal d'attribution Meta le plus fiable**.
+2. **Disparaît trop vite après le scroll** — la logique actuelle :
+   - À chaque évènement scroll, on appelle `hideSticky()` puis on programme un timer de 3 s qui le ré-affiche.
+   - Donc dès qu'on arrête de scroller, la barre est cachée et ne réapparaît que 3 s plus tard — pile pendant la fenêtre où l'utilisateur voudrait cliquer.
+   - Le `isOfferCtaVisible()` cherche aussi `#offer` (absent sur la home) → renvoie toujours `false`, OK ici mais incohérent.
 
-Pour la commande 1076, l'utilisateur a cliqué une pub Meta (cookie `_fbc` posé), mais `captureAttribution` n'a pas re-stocké le `fbclid` (probablement parce qu'une attribution antérieure existait déjà ou que la capture s'est faite sur une nav SPA sans re-lecture des params). Résultat : le webhook reçoit bien `_sleepzy_fbc` mais pas `_sleepzy_fbclid` ni `_sleepzy_utm_source` → le dashboard tombe sur "direct".
+## Correctifs (uniquement `src/components/StickyMobileCTA.tsx`)
 
-## Correctifs
+### A. Rendre le clic fonctionnel
+- Utiliser `useNavigate` + `useLocation` de `react-router-dom`.
+- Au clic :
+  - Essayer d'abord `document.getElementById("offer") || document.getElementById("products")` et `scrollIntoView` si trouvé sur la page courante.
+  - Sinon (cas home sans section offer visée), naviguer vers `/product` (ou `/product#offer`).
+- Cela règle aussi le cas où l'utilisateur est sur une page sans section produit.
 
-### 1. Edge function `shopify-analytics` — exposer fbp/fbc et extraire fbclid depuis fbc
+### B. Garder la barre visible assez longtemps pour cliquer
+- Ne plus cacher la barre à chaque évènement scroll. Nouvelle logique :
+  - Afficher dès qu'on est `pastHero` (scrollY > 100) **et** qu'on n'est pas sur la section offer/products visible.
+  - Cacher uniquement quand : on remonte au-dessus du Hero, ou la section cible (`#offer` ou `#products`) entre dans le viewport (l'utilisateur est déjà sur le CTA principal).
+  - Conserver l'apparition immédiate sur "scroll rapide vers le haut" (intention de quitter).
+  - Supprimer le timer d'inactivité qui re-cache puis re-montre — il crée la disparition gênante.
+- Mettre à jour `isOfferCtaVisible()` pour viser `#offer` **ou** `#products`.
 
-Dans le `attributedOrders.map`, ajouter :
-- `fbp: get('fbp')`
-- `fbc: get('fbc')`
-- Si `fbclid` est null mais `fbc` existe, parser `fb.1.<ts>.<fbclid>` pour récupérer le `fbclid` original.
+### C. Empêcher la disparition involontaire pendant un tap
+- Augmenter la zone cliquable (déjà OK) et s'assurer que `pointer-events` reste actif pendant l'animation `exit` (la durée 0.3 s de Framer est correcte, on garde).
 
-### 2. `AdminAnalytics.tsx` — logique de source enrichie
-
-Mettre à jour le type `AttributedOrder` (ajout `fbp`, `fbc`) puis remplacer partout :
-```ts
-const source = o.utm_source || (o.fbclid ? "facebook" : "(direct)");
-```
-par un helper :
-```ts
-const resolveSource = (o) => {
-  if (o.utm_source) return o.utm_source;
-  if (o.fbclid || o.fbc) return "facebook"; // fbc = clic d'annonce Meta
-  if (o.fbp) return "facebook (organic/retargeting)"; // visite sans clic ad
-  return "(direct)";
-};
-```
-
-Et dans le filtre "Meta only" (lignes 534/537), inclure aussi `!!o.fbc` :
-```ts
-(o.utm_source || "").toLowerCase() === "facebook" || !!o.fbclid || !!o.fbc
-```
-
-Garder une distinction visuelle dans le tableau "Ventes récentes" :
-- Badge "Meta Ad" si `utm_source=facebook` ou `fbclid` ou `fbc`
-- Badge "Meta (pixel only)" si uniquement `fbp` sans `fbc`
-- Sinon "Direct"
-
-### 3. Mention dans le guide du dashboard
-
-Ajouter une ligne expliquant que les ventes avec `_fbc` mais sans `utm_*` sont attribuées à Meta (clic publicitaire détecté via le cookie Pixel), même si le `fbclid` n'a pas survécu dans `localStorage`.
+## Hors scope
+- Pas de changement de style, copy, ni de la logique d'apparition du Hero.
+- Pas de modifications backend/analytics.
 
 ## Fichiers touchés
-- `supabase/functions/shopify-analytics/index.ts` (ajout fbp/fbc + fallback fbclid)
-- `src/pages/AdminAnalytics.tsx` (type, helper resolveSource, filtre Meta, légende)
-
-Aucune modification du flux d'achat, du webhook, ou de la capture côté client — uniquement la lecture/affichage admin.
+- `src/components/StickyMobileCTA.tsx`
