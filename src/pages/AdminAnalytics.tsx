@@ -731,8 +731,14 @@ export default function AdminAnalytics() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">
-              Historique jour par jour — 7 derniers jours
+              Profitabilité jour par jour — 7 derniers jours
             </CardTitle>
+            <p className="text-xs text-slate-500 mt-1">
+              Profit = Revenu − COGS (produit + freight + packaging, CAD) − Frais Shopify (2.9 % + 0.30 $) − Dépense pub (saisie manuelle).
+              <br />
+              <strong>Coûts unitaires CAD :</strong> Single 15.55 · Duo 24.95 · Family 34.23 · Sleep Kit 2.00.
+              Édite la cellule "Pub" pour saisir ton budget pub du jour (sauvegarde auto).
+            </p>
           </CardHeader>
           <CardContent>
             <Table>
@@ -741,10 +747,12 @@ export default function AdminAnalytics() {
                   <TableHead>Jour</TableHead>
                   <TableHead className="text-right">Revenu</TableHead>
                   <TableHead className="text-right">Commandes</TableHead>
-                  <TableHead className="text-right">AOV</TableHead>
+                  <TableHead className="text-right">COGS</TableHead>
+                  <TableHead className="text-right">Frais</TableHead>
+                  <TableHead className="text-right">Pub ($ CAD)</TableHead>
+                  <TableHead className="text-right">Profit</TableHead>
+                  <TableHead className="text-right">Marge</TableHead>
                   <TableHead className="text-right">Visiteurs</TableHead>
-                  <TableHead className="text-right">Add to cart</TableHead>
-                  <TableHead className="text-right">Checkout</TableHead>
                   <TableHead className="text-right">Conv.</TableHead>
                 </TableRow>
               </TableHeader>
@@ -760,22 +768,97 @@ export default function AdminAnalytics() {
                     </TableCell>
                     <TableCell className="text-right">{d.orders}</TableCell>
                     <TableCell className="text-right text-slate-600">
-                      {d.orders > 0 ? fmt(d.aov, "currency", currency) : "—"}
+                      {d.cogs > 0 ? fmt(d.cogs, "currency", currency) : "—"}
+                    </TableCell>
+                    <TableCell className="text-right text-slate-600">
+                      {d.fees > 0 ? fmt(d.fees, "currency", currency) : "—"}
                     </TableCell>
                     <TableCell className="text-right">
+                      <Input
+                        type="number"
+                        inputMode="decimal"
+                        step="0.01"
+                        min="0"
+                        defaultValue={d.ads || ""}
+                        placeholder="0"
+                        disabled={savingDate === d.key}
+                        onBlur={(e) => {
+                          const v = parseFloat(e.target.value) || 0;
+                          if (v !== d.ads) saveAdSpend(d.key, v);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                        }}
+                        className="h-8 w-24 ml-auto text-right text-sm"
+                      />
+                    </TableCell>
+                    <TableCell
+                      className={`text-right font-bold ${
+                        d.revenue === 0
+                          ? "text-slate-400"
+                          : d.profit >= 0
+                            ? "text-emerald-600"
+                            : "text-red-600"
+                      }`}
+                    >
+                      {d.revenue === 0 && d.ads === 0 ? "—" : fmt(d.profit, "currency", currency)}
+                    </TableCell>
+                    <TableCell
+                      className={`text-right text-xs ${
+                        d.revenue === 0
+                          ? "text-slate-400"
+                          : d.profit >= 0
+                            ? "text-emerald-600"
+                            : "text-red-600"
+                      }`}
+                    >
+                      {d.revenue > 0
+                        ? `${((d.profit / d.revenue) * 100).toFixed(0)}%`
+                        : "—"}
+                    </TableCell>
+                    <TableCell className="text-right text-slate-600">
                       {d.visitors.toLocaleString("en-CA")}
-                    </TableCell>
-                    <TableCell className="text-right text-slate-600">
-                      {d.addToCart}
-                    </TableCell>
-                    <TableCell className="text-right text-slate-600">
-                      {d.checkout}
                     </TableCell>
                     <TableCell className="text-right text-slate-600">
                       {d.visitors > 0 ? fmt(d.conv, "percent") : "—"}
                     </TableCell>
                   </TableRow>
                 ))}
+                {/* Totals row */}
+                <TableRow className="bg-slate-50 font-semibold">
+                  <TableCell>Total 7 j</TableCell>
+                  <TableCell className="text-right">
+                    {fmt(last7Totals.revenue, "currency", currency)}
+                  </TableCell>
+                  <TableCell className="text-right">—</TableCell>
+                  <TableCell className="text-right">
+                    {fmt(last7Totals.cogs, "currency", currency)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {fmt(last7Totals.fees, "currency", currency)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {fmt(last7Totals.ads, "currency", currency)}
+                  </TableCell>
+                  <TableCell
+                    className={`text-right font-bold ${
+                      last7Totals.profit >= 0 ? "text-emerald-600" : "text-red-600"
+                    }`}
+                  >
+                    {fmt(last7Totals.profit, "currency", currency)}
+                  </TableCell>
+                  <TableCell
+                    className={`text-right ${
+                      last7Totals.profit >= 0 ? "text-emerald-600" : "text-red-600"
+                    }`}
+                  >
+                    {last7Totals.revenue > 0
+                      ? `${((last7Totals.profit / last7Totals.revenue) * 100).toFixed(0)}%`
+                      : "—"}
+                  </TableCell>
+                  <TableCell className="text-right">—</TableCell>
+                  <TableCell className="text-right">—</TableCell>
+                </TableRow>
               </TableBody>
             </Table>
             <p className="mt-3 text-xs text-slate-500">
