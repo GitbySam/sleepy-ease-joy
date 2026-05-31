@@ -730,7 +730,9 @@ export default function AdminAnalytics() {
                 <p className="text-xs text-slate-500 mt-1">
                   Source&nbsp;: <code>note_attributes</code> écrits sur la commande Shopify
                   au moment du checkout (<code>utm_source</code>, <code>utm_campaign</code>,{" "}
-                  <code>utm_content</code>, <code>fbclid</code>).
+                  <code>utm_content</code>, <code>fbclid</code>, <code>fbp</code>, <code>fbc</code>).
+                  Une vente avec <code>_fbc</code> mais sans <code>utm_*</code> est attribuée à
+                  Meta&nbsp;: le cookie <code>_fbc</code> n'est posé qu'après un clic publicitaire.
                 </p>
               </div>
               <div className="inline-flex rounded-md border bg-white p-0.5 text-xs">
