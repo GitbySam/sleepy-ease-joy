@@ -262,11 +262,25 @@ Deno.serve(async (req) => {
 
     // Orders by day
     const ordersByDay: Record<string, { orders: number; revenue: number }> = {};
+    // Per-day COGS + Shopify fees (CAD), only counted on paid, non-cancelled orders.
+    const cogsByDay: Record<string, number> = {};
+    const feesByDay: Record<string, number> = {};
     orders.forEach((o: any) => {
       const day = new Date(o.created_at).toISOString().split('T')[0];
       if (!ordersByDay[day]) ordersByDay[day] = { orders: 0, revenue: 0 };
       ordersByDay[day].orders++;
       ordersByDay[day].revenue += parseFloat(o.total_price || '0');
+
+      const isPaid = (o.financial_status === 'paid' || o.financial_status === 'partially_paid') && !o.cancelled_at;
+      if (!isPaid) return;
+      let cogs = 0;
+      (o.line_items || []).forEach((item: any) => {
+        const pack = detectPack(item);
+        cogs += (COGS_CAD[pack] ?? COGS_CAD.unknown) * (item.quantity || 0);
+      });
+      const fees = parseFloat(o.total_price || '0') * SHOPIFY_FEE_PCT + SHOPIFY_FEE_FIXED;
+      cogsByDay[day] = (cogsByDay[day] || 0) + cogs;
+      feesByDay[day] = (feesByDay[day] || 0) + fees;
     });
 
     // Top products
@@ -322,6 +336,13 @@ Deno.serve(async (req) => {
         abandonedScopeMissing,
       },
       ordersByDay,
+      cogsByDay,
+      feesByDay,
+      costsConfig: {
+        cogs_cad: COGS_CAD,
+        shopify_fee_pct: SHOPIFY_FEE_PCT,
+        shopify_fee_fixed: SHOPIFY_FEE_FIXED,
+      },
       topProducts,
       topCountries,
       abandonedCheckouts: abandonedCheckouts.slice(0, 25).map((c: any) => ({
