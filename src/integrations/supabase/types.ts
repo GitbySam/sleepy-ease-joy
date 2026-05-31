@@ -146,6 +146,30 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_ad_spend: {
+        Row: {
+          amount_cad: number
+          created_at: string
+          date: string
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_cad?: number
+          created_at?: string
+          date: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_cad?: number
+          created_at?: string
+          date?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       friction_events: {
         Row: {
           created_at: string
