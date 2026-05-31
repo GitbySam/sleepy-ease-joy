@@ -57,6 +57,17 @@ interface AttributedOrder {
   referring_site?: string | null;
 }
 
+// Resolve marketing source from all available signals.
+// fbc (Facebook Click ID cookie) is set by Meta Pixel only on an ad click,
+// so it's a reliable Meta attribution even when utm_* / fbclid didn't survive.
+// fbp alone (Facebook Browser ID) just means the user visited Meta — treat as soft signal.
+function resolveSource(o: AttributedOrder): string {
+  if (o.utm_source) return o.utm_source;
+  if (o.fbclid || o.fbc) return "facebook";
+  if (o.fbp) return "facebook (pixel)";
+  return "(direct)";
+}
+
 interface ShopifyResult {
   summary: { currency: string };
   // we re-derive everything from the raw orders below
