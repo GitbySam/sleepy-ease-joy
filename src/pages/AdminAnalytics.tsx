@@ -20,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 
 /* ────────────────────────────────────────────────────────── */
@@ -82,6 +83,8 @@ interface DayBucket {
   addToCart: number;
   checkout: number;
   purchases: number;
+  cogs: number; // CAD
+  fees: number; // CAD (Shopify payment fees)
 }
 
 interface KpiRow {
@@ -239,6 +242,8 @@ async function fetchAll(): Promise<{
       addToCart: 0,
       checkout: 0,
       purchases: 0,
+      cogs: 0,
+      fees: 0,
     });
   }
 
@@ -294,6 +299,17 @@ async function fetchAll(): Promise<{
             b.orders += 1;
             b.purchases += 1;
           }
+        }
+        // Per-day COGS + Shopify fees from the edge function (CAD).
+        const cogsByDay: Record<string, number> = json?.cogsByDay || {};
+        const feesByDay: Record<string, number> = json?.feesByDay || {};
+        for (const [day, cogs] of Object.entries(cogsByDay)) {
+          const b = buckets.get(day);
+          if (b) b.cogs += Number(cogs) || 0;
+        }
+        for (const [day, fees] of Object.entries(feesByDay)) {
+          const b = buckets.get(day);
+          if (b) b.fees += Number(fees) || 0;
         }
       } else {
         errors.push(`Shopify: HTTP ${resp.status}`);
@@ -370,6 +386,9 @@ export default function AdminAnalytics() {
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const [attributedOrders, setAttributedOrders] = useState<AttributedOrder[]>([]);
   const [attribWindow, setAttribWindow] = useState<7 | 30 | 90>(30);
+  // date (YYYY-MM-DD) -> ad spend CAD
+  const [adSpend, setAdSpend] = useState<Record<string, number>>({});
+  const [savingDate, setSavingDate] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setRefreshing(true);
@@ -380,9 +399,35 @@ export default function AdminAnalytics() {
       setErrors(res.errors);
       setAttributedOrders(res.attributedOrders);
       setLastRefresh(new Date());
+      // Load ad spend rows for the same 90-day window
+      const sinceDate = new Date();
+      sinceDate.setDate(sinceDate.getDate() - WINDOW_DAYS - 1);
+      const sinceKey = sinceDate.toISOString().slice(0, 10);
+      const { data: adRows, error: adErr } = await supabase
+        .from("daily_ad_spend")
+        .select("date, amount_cad")
+        .gte("date", sinceKey);
+      if (!adErr && adRows) {
+        const map: Record<string, number> = {};
+        for (const r of adRows) map[r.date as string] = Number(r.amount_cad) || 0;
+        setAdSpend(map);
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
+    }
+  }, []);
+
+  const saveAdSpend = useCallback(async (date: string, amount: number) => {
+    setSavingDate(date);
+    try {
+      const { error } = await supabase
+        .from("daily_ad_spend")
+        .upsert({ date, amount_cad: amount, updated_at: new Date().toISOString() }, { onConflict: "date" });
+      if (error) console.error("ad spend save error:", error);
+      else setAdSpend((prev) => ({ ...prev, [date]: amount }));
+    } finally {
+      setSavingDate(null);
     }
   }, []);
 
@@ -487,11 +532,16 @@ export default function AdminAnalytics() {
       const dateObj = new Date(y, m - 1, d);
       const conv = b && b.visitors > 0 ? (b.purchases / b.visitors) * 100 : 0;
       const aovDay = b && b.orders > 0 ? b.revenue / b.orders : 0;
+      const cogs = b?.cogs ?? 0;
+      const fees = b?.fees ?? 0;
+      const ads = adSpend[k] ?? 0;
+      const revenue = b?.revenue ?? 0;
+      const profit = revenue - cogs - fees - ads;
       return {
         key: k,
         weekday: weekdayFmt.format(dateObj).replace(".", ""),
         date: dateFmt.format(dateObj),
-        revenue: b?.revenue ?? 0,
+        revenue,
         orders: b?.orders ?? 0,
         visitors: b?.visitors ?? 0,
         addToCart: b?.addToCart ?? 0,
@@ -499,9 +549,25 @@ export default function AdminAnalytics() {
         purchases: b?.purchases ?? 0,
         aov: aovDay,
         conv,
+        cogs,
+        fees,
+        ads,
+        profit,
       };
     });
-  }, [buckets]);
+  }, [buckets, adSpend]);
+
+  const last7Totals = useMemo(() => {
+    const sum = (k: "revenue" | "cogs" | "fees" | "ads" | "profit") =>
+      last7Days.reduce((s, d) => s + d[k], 0);
+    return {
+      revenue: sum("revenue"),
+      cogs: sum("cogs"),
+      fees: sum("fees"),
+      ads: sum("ads"),
+      profit: sum("profit"),
+    };
+  }, [last7Days]);
 
   /* ── Meta attribution aggregations ── */
   const paidAttributedInWindow = useMemo(() => {
@@ -665,8 +731,14 @@ export default function AdminAnalytics() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">
-              Historique jour par jour — 7 derniers jours
+              Profitabilité jour par jour — 7 derniers jours
             </CardTitle>
+            <p className="text-xs text-slate-500 mt-1">
+              Profit = Revenu − COGS (produit + freight + packaging, CAD) − Frais Shopify (2.9 % + 0.30 $) − Dépense pub (saisie manuelle).
+              <br />
+              <strong>Coûts unitaires CAD :</strong> Single 15.55 · Duo 24.95 · Family 34.23 · Sleep Kit 2.00.
+              Édite la cellule "Pub" pour saisir ton budget pub du jour (sauvegarde auto).
+            </p>
           </CardHeader>
           <CardContent>
             <Table>
@@ -675,10 +747,12 @@ export default function AdminAnalytics() {
                   <TableHead>Jour</TableHead>
                   <TableHead className="text-right">Revenu</TableHead>
                   <TableHead className="text-right">Commandes</TableHead>
-                  <TableHead className="text-right">AOV</TableHead>
+                  <TableHead className="text-right">COGS</TableHead>
+                  <TableHead className="text-right">Frais</TableHead>
+                  <TableHead className="text-right">Pub ($ CAD)</TableHead>
+                  <TableHead className="text-right">Profit</TableHead>
+                  <TableHead className="text-right">Marge</TableHead>
                   <TableHead className="text-right">Visiteurs</TableHead>
-                  <TableHead className="text-right">Add to cart</TableHead>
-                  <TableHead className="text-right">Checkout</TableHead>
                   <TableHead className="text-right">Conv.</TableHead>
                 </TableRow>
               </TableHeader>
@@ -694,22 +768,97 @@ export default function AdminAnalytics() {
                     </TableCell>
                     <TableCell className="text-right">{d.orders}</TableCell>
                     <TableCell className="text-right text-slate-600">
-                      {d.orders > 0 ? fmt(d.aov, "currency", currency) : "—"}
+                      {d.cogs > 0 ? fmt(d.cogs, "currency", currency) : "—"}
+                    </TableCell>
+                    <TableCell className="text-right text-slate-600">
+                      {d.fees > 0 ? fmt(d.fees, "currency", currency) : "—"}
                     </TableCell>
                     <TableCell className="text-right">
+                      <Input
+                        type="number"
+                        inputMode="decimal"
+                        step="0.01"
+                        min="0"
+                        defaultValue={d.ads || ""}
+                        placeholder="0"
+                        disabled={savingDate === d.key}
+                        onBlur={(e) => {
+                          const v = parseFloat(e.target.value) || 0;
+                          if (v !== d.ads) saveAdSpend(d.key, v);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                        }}
+                        className="h-8 w-24 ml-auto text-right text-sm"
+                      />
+                    </TableCell>
+                    <TableCell
+                      className={`text-right font-bold ${
+                        d.revenue === 0
+                          ? "text-slate-400"
+                          : d.profit >= 0
+                            ? "text-emerald-600"
+                            : "text-red-600"
+                      }`}
+                    >
+                      {d.revenue === 0 && d.ads === 0 ? "—" : fmt(d.profit, "currency", currency)}
+                    </TableCell>
+                    <TableCell
+                      className={`text-right text-xs ${
+                        d.revenue === 0
+                          ? "text-slate-400"
+                          : d.profit >= 0
+                            ? "text-emerald-600"
+                            : "text-red-600"
+                      }`}
+                    >
+                      {d.revenue > 0
+                        ? `${((d.profit / d.revenue) * 100).toFixed(0)}%`
+                        : "—"}
+                    </TableCell>
+                    <TableCell className="text-right text-slate-600">
                       {d.visitors.toLocaleString("en-CA")}
-                    </TableCell>
-                    <TableCell className="text-right text-slate-600">
-                      {d.addToCart}
-                    </TableCell>
-                    <TableCell className="text-right text-slate-600">
-                      {d.checkout}
                     </TableCell>
                     <TableCell className="text-right text-slate-600">
                       {d.visitors > 0 ? fmt(d.conv, "percent") : "—"}
                     </TableCell>
                   </TableRow>
                 ))}
+                {/* Totals row */}
+                <TableRow className="bg-slate-50 font-semibold">
+                  <TableCell>Total 7 j</TableCell>
+                  <TableCell className="text-right">
+                    {fmt(last7Totals.revenue, "currency", currency)}
+                  </TableCell>
+                  <TableCell className="text-right">—</TableCell>
+                  <TableCell className="text-right">
+                    {fmt(last7Totals.cogs, "currency", currency)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {fmt(last7Totals.fees, "currency", currency)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {fmt(last7Totals.ads, "currency", currency)}
+                  </TableCell>
+                  <TableCell
+                    className={`text-right font-bold ${
+                      last7Totals.profit >= 0 ? "text-emerald-600" : "text-red-600"
+                    }`}
+                  >
+                    {fmt(last7Totals.profit, "currency", currency)}
+                  </TableCell>
+                  <TableCell
+                    className={`text-right ${
+                      last7Totals.profit >= 0 ? "text-emerald-600" : "text-red-600"
+                    }`}
+                  >
+                    {last7Totals.revenue > 0
+                      ? `${((last7Totals.profit / last7Totals.revenue) * 100).toFixed(0)}%`
+                      : "—"}
+                  </TableCell>
+                  <TableCell className="text-right">—</TableCell>
+                  <TableCell className="text-right">—</TableCell>
+                </TableRow>
               </TableBody>
             </Table>
             <p className="mt-3 text-xs text-slate-500">

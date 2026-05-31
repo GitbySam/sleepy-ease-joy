@@ -8,6 +8,35 @@ const SHOPIFY_API_VERSION = '2025-07';
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
+// ── Profitability config ─────────────────────────────────────
+// COGS in CAD (cost + freight + packaging), all-in landed.
+// Source: supplier CANWANGDA, Canada column (USD), converted with USD/CAD = 1.40.
+const COGS_CAD = {
+  single: 15.55, // 1pc landed = 11.11 USD * 1.40
+  duo:    24.95, // 2pcs landed = 17.82 USD * 1.40
+  family: 34.23, // 3pcs landed = 24.45 USD * 1.40
+  kit:     2.00, // Sleep Kit add-on (estimate, low cost digital/eyemask)
+  unknown: 15.55, // fallback to single
+};
+// Shopify payment fees (Shopify Basic, CAD): 2.9% + 0.30 CAD per order.
+const SHOPIFY_FEE_PCT = 0.029;
+const SHOPIFY_FEE_FIXED = 0.30;
+
+function detectPack(item: any): keyof typeof COGS_CAD {
+  const blob = `${item?.variant_title || ''} ${item?.title || ''} ${item?.name || ''} ${item?.sku || ''}`.toLowerCase();
+  if (/(sleep\s*kit|kit\b|eye\s*mask|earplug)/.test(blob)) return 'kit';
+  if (/(family|3\s*pack|3pcs|trio|x\s*3|×\s*3)/.test(blob)) return 'family';
+  if (/(duo|2\s*pack|2pcs|couple|x\s*2|×\s*2)/.test(blob)) return 'duo';
+  if (/(single|1\s*pack|1pcs|solo|x\s*1|×\s*1)/.test(blob)) return 'single';
+  // Fallback by unit price (CAD) — Single 29.95 / Duo 59.95 / Family 64.95
+  const price = parseFloat(item?.price || '0');
+  if (price >= 60) return 'family';
+  if (price >= 40) return 'duo';
+  if (price >= 15) return 'single';
+  if (price > 0) return 'kit';
+  return 'unknown';
+}
+
 function jsonResponse(body: Record<string, unknown>, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -233,11 +262,25 @@ Deno.serve(async (req) => {
 
     // Orders by day
     const ordersByDay: Record<string, { orders: number; revenue: number }> = {};
+    // Per-day COGS + Shopify fees (CAD), only counted on paid, non-cancelled orders.
+    const cogsByDay: Record<string, number> = {};
+    const feesByDay: Record<string, number> = {};
     orders.forEach((o: any) => {
       const day = new Date(o.created_at).toISOString().split('T')[0];
       if (!ordersByDay[day]) ordersByDay[day] = { orders: 0, revenue: 0 };
       ordersByDay[day].orders++;
       ordersByDay[day].revenue += parseFloat(o.total_price || '0');
+
+      const isPaid = (o.financial_status === 'paid' || o.financial_status === 'partially_paid') && !o.cancelled_at;
+      if (!isPaid) return;
+      let cogs = 0;
+      (o.line_items || []).forEach((item: any) => {
+        const pack = detectPack(item);
+        cogs += (COGS_CAD[pack] ?? COGS_CAD.unknown) * (item.quantity || 0);
+      });
+      const fees = parseFloat(o.total_price || '0') * SHOPIFY_FEE_PCT + SHOPIFY_FEE_FIXED;
+      cogsByDay[day] = (cogsByDay[day] || 0) + cogs;
+      feesByDay[day] = (feesByDay[day] || 0) + fees;
     });
 
     // Top products
@@ -293,6 +336,13 @@ Deno.serve(async (req) => {
         abandonedScopeMissing,
       },
       ordersByDay,
+      cogsByDay,
+      feesByDay,
+      costsConfig: {
+        cogs_cad: COGS_CAD,
+        shopify_fee_pct: SHOPIFY_FEE_PCT,
+        shopify_fee_fixed: SHOPIFY_FEE_FIXED,
+      },
       topProducts,
       topCountries,
       abandonedCheckouts: abandonedCheckouts.slice(0, 25).map((c: any) => ({
