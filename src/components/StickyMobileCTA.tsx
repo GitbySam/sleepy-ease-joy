@@ -1,20 +1,24 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { ShoppingBag, Loader2 } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useMarket } from "@/i18n/MarketContext";
+import { useCartStore } from "@/stores/cartStore";
+import { fetchProducts } from "@/lib/shopify";
+import { trackAddToCart } from "@/lib/metaPixel";
+import { trackFunnelStep, trackFriction } from "@/lib/funnelTracking";
+import { toast } from "sonner";
 
 const StickyMobileCTA = () => {
   const [visible, setVisible] = useState(false);
+  const [busy, setBusy] = useState(false);
   const { t } = useLanguage();
-  const { prices, formatPrice } = useMarket();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { country, currency, prices, formatPrice } = useMarket();
+  const addItem = useCartStore((s) => s.addItem);
+  const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
 
   useEffect(() => {
     const handleScroll = () => {
-      // Visible dès qu'on a quitté le hero. Reste affiché tant qu'on n'y revient pas.
       setVisible(window.scrollY > 400);
     };
 
@@ -25,15 +29,105 @@ const StickyMobileCTA = () => {
     };
   }, []);
 
-  const handleClick = () => {
-    const target =
-      document.getElementById("offer") || document.getElementById("products");
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth" });
-      return;
-    }
-    if (location.pathname !== "/product") {
-      navigate("/product");
+  const handleClick = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      // 1. Fetch the pillow product + the Sleep Kit product in parallel
+      const [pillowList, kitList] = await Promise.all([
+        fetchProducts(1, undefined, country),
+        fetchProducts(1, 'product_type:"Sleep Kit"', country),
+      ]);
+      const pillow = pillowList[0];
+      const kit = kitList[0];
+      if (!pillow) {
+        toast.error(t("product.addedToCart") ? "Product unavailable" : "Product unavailable");
+        return;
+      }
+
+      // 2. Find the Single + Grey variant
+      const greyVariant = pillow.node.variants.edges.find((v) => {
+        const opts = v.node.selectedOptions || [];
+        const isSingle = opts.some((o) => o.value === "Single");
+        const isGrey = opts.some(
+          (o) => o.name === "Color" && (o.value === "Grey" || o.value === "Gray"),
+        );
+        return isSingle && isGrey;
+      })?.node;
+
+      if (!greyVariant) {
+        trackFriction("checkout_error", {
+          severity: "error",
+          message: "Sticky CTA: Single Grey variant not found",
+        });
+        toast.error("Variant unavailable");
+        return;
+      }
+
+      // 3. Add Single Grey pillow
+      await addItem(
+        {
+          product: pillow,
+          variantId: greyVariant.id,
+          variantTitle: greyVariant.title,
+          price: greyVariant.price,
+          quantity: 1,
+          selectedOptions: greyVariant.selectedOptions || [],
+          bundleLabel: "SOLO TRAVELERS",
+          bundlePrice: prices.single,
+          bundleUnitSize: 1,
+        },
+        country,
+      );
+
+      // 4. Add Sleep Kit (best-effort — don't block if missing)
+      if (kit) {
+        const kitVariant = kit.node.variants.edges[0]?.node;
+        if (kitVariant) {
+          await addItem(
+            {
+              product: kit,
+              variantId: kitVariant.id,
+              variantTitle: kitVariant.title,
+              price: kitVariant.price,
+              quantity: 1,
+              selectedOptions: kitVariant.selectedOptions || [],
+              bundleLabel: "Sleep Kit",
+            },
+            country,
+          );
+        }
+      }
+
+      // 5. Tracking
+      trackAddToCart({
+        contentName: "1 Sleep&zy (Grey) + Sleep Kit",
+        contentId: greyVariant.id,
+        value: prices.single + prices.sleepKit,
+        currency,
+        quantity: 1,
+      });
+      trackFunnelStep("add_to_cart", {
+        step_value: "sticky_cta_single_grey_kit",
+        value: prices.single + prices.sleepKit,
+        currency,
+      });
+
+      toast.success(t("product.addedToCart") || "Added to cart", {
+        position: "top-center",
+      });
+
+      // 6. Open drawer
+      setDrawerOpen(true);
+    } catch (e) {
+      console.error("Sticky CTA ATC failed", e);
+      trackFriction("shopify_error", {
+        severity: "error",
+        message: e instanceof Error ? e.message : "Sticky ATC failed",
+        element: "StickyMobileCTA",
+      });
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -51,10 +145,11 @@ const StickyMobileCTA = () => {
             <motion.div
               whileTap={{ scale: 0.97 }}
               onClick={handleClick}
+              aria-busy={busy}
               className="w-full bg-black text-primary-foreground text-center py-2.5 rounded-full font-bold shadow-[0_4px_20px_rgba(0,0,0,0.3)] flex flex-col items-center justify-center gap-0.5 cursor-pointer leading-tight"
             >
               <span className="flex items-center justify-center gap-2">
-                <ShoppingBag size={16} />
+                {busy ? <Loader2 size={16} className="animate-spin" /> : <ShoppingBag size={16} />}
                 <span className="text-[13px] uppercase tracking-wide">{t("sticky.cta")}</span>
               </span>
               <span className="text-[11px] font-normal whitespace-nowrap">
