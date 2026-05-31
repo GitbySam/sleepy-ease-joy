@@ -856,7 +856,7 @@ export default function AdminAnalytics() {
                   </TableHeader>
                   <TableBody>
                     {recentAttributedOrders.map((o) => {
-                      const source = o.utm_source || (o.fbclid ? "facebook" : "(direct)");
+                      const source = resolveSource(o);
                       return (
                         <TableRow key={String(o.id)}>
                           <TableCell className="text-xs text-slate-600 whitespace-nowrap">
