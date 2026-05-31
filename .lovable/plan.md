@@ -1,37 +1,25 @@
-## Problèmes
+## Objectif
 
-Dans `src/components/StickyMobileCTA.tsx` :
+Le sticky "Shop Now" mobile ajoute actuellement automatiquement le **Sleep Kit ($19.95)** en plus de l'oreiller Single Grey ($34.95), gonflant le panier à $54.90 sans consentement. On retire cet ajout automatique. Le Sleep Kit reste disponible **en opt-in** via la carte d'upsell déjà présente dans le drawer ("Complete your sleep experience").
 
-1. **Le bouton est inactif sur la home** — il fait `document.getElementById("offer").scrollIntoView()`. Or l'id `offer` n'existe que dans `BundleOffer.tsx`, qui n'est **pas** monté sur `/` (la home utilise `ShopifyProducts` avec `id="products"`). Résultat : `getElementById` renvoie `null` et rien ne se passe au clic.
+## Changements
 
-2. **Disparaît trop vite après le scroll** — la logique actuelle :
-   - À chaque évènement scroll, on appelle `hideSticky()` puis on programme un timer de 3 s qui le ré-affiche.
-   - Donc dès qu'on arrête de scroller, la barre est cachée et ne réapparaît que 3 s plus tard — pile pendant la fenêtre où l'utilisateur voudrait cliquer.
-   - Le `isOfferCtaVisible()` cherche aussi `#offer` (absent sur la home) → renvoie toujours `false`, OK ici mais incohérent.
+### `src/components/StickyMobileCTA.tsx`
 
-## Correctifs (uniquement `src/components/StickyMobileCTA.tsx`)
+1. **Supprimer le fetch parallèle du Sleep Kit** — ne fetcher que le produit oreiller.
+2. **Supprimer le bloc "Add Sleep Kit"** qui appelle `addItem({ bundleLabel: "Sleep Kit", ... })`.
+3. **Tracking** — remettre `value` et `contentName` à la valeur de l'oreiller seul :
+   - `contentName: "1 Sleep&zy (Grey)"`
+   - `value: prices.single` (au lieu de `prices.single + prices.sleepKit`)
+4. **Garder** : la sélection du variant Single + Grey, l'ajout de l'oreiller, l'ouverture du drawer, le spinner `busy`, et la gestion d'erreurs.
 
-### A. Rendre le clic fonctionnel
-- Utiliser `useNavigate` + `useLocation` de `react-router-dom`.
-- Au clic :
-  - Essayer d'abord `document.getElementById("offer") || document.getElementById("products")` et `scrollIntoView` si trouvé sur la page courante.
-  - Sinon (cas home sans section offer visée), naviguer vers `/product` (ou `/product#offer`).
-- Cela règle aussi le cas où l'utilisateur est sur une page sans section produit.
+### Aucun autre fichier touché
 
-### B. Garder la barre visible assez longtemps pour cliquer
-- Ne plus cacher la barre à chaque évènement scroll. Nouvelle logique :
-  - Afficher dès qu'on est `pastHero` (scrollY > 100) **et** qu'on n'est pas sur la section offer/products visible.
-  - Cacher uniquement quand : on remonte au-dessus du Hero, ou la section cible (`#offer` ou `#products`) entre dans le viewport (l'utilisateur est déjà sur le CTA principal).
-  - Conserver l'apparition immédiate sur "scroll rapide vers le haut" (intention de quitter).
-  - Supprimer le timer d'inactivité qui re-cache puis re-montre — il crée la disparition gênante.
-- Mettre à jour `isOfferCtaVisible()` pour viser `#offer` **ou** `#products`.
+- `ShopifyCartDrawer.tsx` — déjà OK : la carte d'upsell Sleep Kit s'affiche dès qu'un pack Sleep&zy est dans le panier (`showSleepKit = hasSleepzyPack && !hasSleepBundle`), avec boutons +/− pour l'ajouter volontairement.
+- Pas de changement de copy ni de pricing.
 
-### C. Empêcher la disparition involontaire pendant un tap
-- Augmenter la zone cliquable (déjà OK) et s'assurer que `pointer-events` reste actif pendant l'animation `exit` (la durée 0.3 s de Framer est correcte, on garde).
+## Résultat attendu
 
-## Hors scope
-- Pas de changement de style, copy, ni de la logique d'apparition du Hero.
-- Pas de modifications backend/analytics.
-
-## Fichiers touchés
-- `src/components/StickyMobileCTA.tsx`
+- Clic sur le sticky "Shop Now" → panier contient **1× Sleep&zy Single Grey à $34.95**, total **$34.95 CAD**.
+- Le client voit la carte "✨ Complete your sleep experience" avec le Sleep Kit à $19.95 et peut l'ajouter d'un clic sur le `+` s'il le souhaite.
+- Aucune régression pour les autres CTA (BundleOffer, page produit) qui n'ajoutaient déjà pas le Sleep Kit automatiquement.
