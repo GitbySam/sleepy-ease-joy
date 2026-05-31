@@ -51,8 +51,21 @@ interface AttributedOrder {
   utm_content?: string | null;
   utm_term?: string | null;
   fbclid?: string | null;
+  fbp?: string | null;
+  fbc?: string | null;
   landing_site?: string | null;
   referring_site?: string | null;
+}
+
+// Resolve marketing source from all available signals.
+// fbc (Facebook Click ID cookie) is set by Meta Pixel only on an ad click,
+// so it's a reliable Meta attribution even when utm_* / fbclid didn't survive.
+// fbp alone (Facebook Browser ID) just means the user visited Meta — treat as soft signal.
+function resolveSource(o: AttributedOrder): string {
+  if (o.utm_source) return o.utm_source;
+  if (o.fbclid || o.fbc) return "facebook";
+  if (o.fbp) return "facebook (pixel)";
+  return "(direct)";
 }
 
 interface ShopifyResult {
@@ -512,7 +525,7 @@ export default function AdminAnalytics() {
     };
     const map = new Map<string, Row>();
     for (const o of paidAttributedInWindow) {
-      const source = o.utm_source || (o.fbclid ? "facebook" : "(direct)");
+      const source = resolveSource(o);
       const campaign = o.utm_campaign || "(sans campagne)";
       const ad = o.utm_content || "(sans ad)";
       const key = `${source}||${campaign}||${ad}`;
@@ -530,11 +543,13 @@ export default function AdminAnalytics() {
       (s, o) => s + parseFloat(o.total_price || "0"),
       0,
     );
-    const metaOrders = paidAttributedInWindow.filter(
-      (o) => (o.utm_source || "").toLowerCase() === "facebook" || !!o.fbclid,
-    ).length;
+    const isMeta = (o: AttributedOrder) =>
+      (o.utm_source || "").toLowerCase() === "facebook" ||
+      !!o.fbclid ||
+      !!o.fbc;
+    const metaOrders = paidAttributedInWindow.filter(isMeta).length;
     const metaRevenue = paidAttributedInWindow
-      .filter((o) => (o.utm_source || "").toLowerCase() === "facebook" || !!o.fbclid)
+      .filter(isMeta)
       .reduce((s, o) => s + parseFloat(o.total_price || "0"), 0);
     return { totalOrders, totalRevenue, metaOrders, metaRevenue };
   }, [paidAttributedInWindow]);
@@ -715,7 +730,9 @@ export default function AdminAnalytics() {
                 <p className="text-xs text-slate-500 mt-1">
                   Source&nbsp;: <code>note_attributes</code> écrits sur la commande Shopify
                   au moment du checkout (<code>utm_source</code>, <code>utm_campaign</code>,{" "}
-                  <code>utm_content</code>, <code>fbclid</code>).
+                  <code>utm_content</code>, <code>fbclid</code>, <code>fbp</code>, <code>fbc</code>).
+                  Une vente avec <code>_fbc</code> mais sans <code>utm_*</code> est attribuée à
+                  Meta&nbsp;: le cookie <code>_fbc</code> n'est posé qu'après un clic publicitaire.
                 </p>
               </div>
               <div className="inline-flex rounded-md border bg-white p-0.5 text-xs">
@@ -841,7 +858,7 @@ export default function AdminAnalytics() {
                   </TableHeader>
                   <TableBody>
                     {recentAttributedOrders.map((o) => {
-                      const source = o.utm_source || (o.fbclid ? "facebook" : "(direct)");
+                      const source = resolveSource(o);
                       return (
                         <TableRow key={String(o.id)}>
                           <TableCell className="text-xs text-slate-600 whitespace-nowrap">

@@ -310,6 +310,13 @@ Deno.serve(async (req) => {
         const attrs: Array<{ name: string; value: string }> = o.note_attributes || [];
         const get = (k: string) =>
           attrs.find((a) => a.name === `_sleepzy_${k}`)?.value || null;
+        const fbc = get('fbc');
+        let fbclid = get('fbclid');
+        // Fallback: extract fbclid from fbc cookie format "fb.1.<timestamp>.<fbclid>"
+        if (!fbclid && fbc) {
+          const parts = fbc.split('.');
+          if (parts.length >= 4) fbclid = parts.slice(3).join('.');
+        }
         return {
           id: o.id,
           name: o.name,
@@ -324,7 +331,9 @@ Deno.serve(async (req) => {
           utm_campaign: get('utm_campaign'),
           utm_content: get('utm_content'),
           utm_term: get('utm_term'),
-          fbclid: get('fbclid'),
+          fbclid,
+          fbp: get('fbp'),
+          fbc,
           landing_site: o.landing_site || null,
           referring_site: o.referring_site || null,
         };
