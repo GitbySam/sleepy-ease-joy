@@ -13,42 +13,9 @@ const StickyMobileCTA = () => {
   const location = useLocation();
 
   useEffect(() => {
-    let lastScrollY = window.scrollY;
-    let lastScrollTime = Date.now();
-
-    const showSticky = () => setVisible(true);
-    const hideSticky = () => setVisible(false);
-
-    const isOfferCtaVisible = () => {
-      const section =
-        document.getElementById("offer") || document.getElementById("products");
-      if (!section) return false;
-      const rect = section.getBoundingClientRect();
-      return rect.top < window.innerHeight - 150 && rect.bottom > 150;
-    };
-
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const currentTime = Date.now();
-      const scrollSpeed = Math.abs(currentScrollY - lastScrollY) / (currentTime - lastScrollTime);
-
-      const pastHero = currentScrollY > 100;
-      if (!pastHero) {
-        hideSticky();
-      } else if (isOfferCtaVisible()) {
-        // L'utilisateur voit déjà la section produit/offer → masquer
-        hideSticky();
-      } else {
-        // Sinon visible en permanence dès qu'on a quitté le hero
-        showSticky();
-      }
-
-      // Intention de quitter : scroll rapide vers le haut → forcer l'affichage
-      const scrollingUpFast = currentScrollY < lastScrollY && scrollSpeed > 1.5;
-      if (pastHero && scrollingUpFast) showSticky();
-
-      lastScrollY = currentScrollY;
-      lastScrollTime = currentTime;
+      // Visible dès qu'on a quitté le hero. Reste affiché tant qu'on n'y revient pas.
+      setVisible(window.scrollY > 400);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
