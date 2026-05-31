@@ -20,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 
 /* ────────────────────────────────────────────────────────── */
@@ -385,6 +386,9 @@ export default function AdminAnalytics() {
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const [attributedOrders, setAttributedOrders] = useState<AttributedOrder[]>([]);
   const [attribWindow, setAttribWindow] = useState<7 | 30 | 90>(30);
+  // date (YYYY-MM-DD) -> ad spend CAD
+  const [adSpend, setAdSpend] = useState<Record<string, number>>({});
+  const [savingDate, setSavingDate] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setRefreshing(true);
@@ -395,9 +399,35 @@ export default function AdminAnalytics() {
       setErrors(res.errors);
       setAttributedOrders(res.attributedOrders);
       setLastRefresh(new Date());
+      // Load ad spend rows for the same 90-day window
+      const sinceDate = new Date();
+      sinceDate.setDate(sinceDate.getDate() - WINDOW_DAYS - 1);
+      const sinceKey = sinceDate.toISOString().slice(0, 10);
+      const { data: adRows, error: adErr } = await supabase
+        .from("daily_ad_spend")
+        .select("date, amount_cad")
+        .gte("date", sinceKey);
+      if (!adErr && adRows) {
+        const map: Record<string, number> = {};
+        for (const r of adRows) map[r.date as string] = Number(r.amount_cad) || 0;
+        setAdSpend(map);
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
+    }
+  }, []);
+
+  const saveAdSpend = useCallback(async (date: string, amount: number) => {
+    setSavingDate(date);
+    try {
+      const { error } = await supabase
+        .from("daily_ad_spend")
+        .upsert({ date, amount_cad: amount, updated_at: new Date().toISOString() }, { onConflict: "date" });
+      if (error) console.error("ad spend save error:", error);
+      else setAdSpend((prev) => ({ ...prev, [date]: amount }));
+    } finally {
+      setSavingDate(null);
     }
   }, []);
 
