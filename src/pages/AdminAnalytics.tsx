@@ -82,6 +82,8 @@ interface DayBucket {
   addToCart: number;
   checkout: number;
   purchases: number;
+  cogs: number; // CAD
+  fees: number; // CAD (Shopify payment fees)
 }
 
 interface KpiRow {
@@ -239,6 +241,8 @@ async function fetchAll(): Promise<{
       addToCart: 0,
       checkout: 0,
       purchases: 0,
+      cogs: 0,
+      fees: 0,
     });
   }
 
@@ -294,6 +298,17 @@ async function fetchAll(): Promise<{
             b.orders += 1;
             b.purchases += 1;
           }
+        }
+        // Per-day COGS + Shopify fees from the edge function (CAD).
+        const cogsByDay: Record<string, number> = json?.cogsByDay || {};
+        const feesByDay: Record<string, number> = json?.feesByDay || {};
+        for (const [day, cogs] of Object.entries(cogsByDay)) {
+          const b = buckets.get(day);
+          if (b) b.cogs += Number(cogs) || 0;
+        }
+        for (const [day, fees] of Object.entries(feesByDay)) {
+          const b = buckets.get(day);
+          if (b) b.fees += Number(fees) || 0;
         }
       } else {
         errors.push(`Shopify: HTTP ${resp.status}`);
