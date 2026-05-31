@@ -532,11 +532,16 @@ export default function AdminAnalytics() {
       const dateObj = new Date(y, m - 1, d);
       const conv = b && b.visitors > 0 ? (b.purchases / b.visitors) * 100 : 0;
       const aovDay = b && b.orders > 0 ? b.revenue / b.orders : 0;
+      const cogs = b?.cogs ?? 0;
+      const fees = b?.fees ?? 0;
+      const ads = adSpend[k] ?? 0;
+      const revenue = b?.revenue ?? 0;
+      const profit = revenue - cogs - fees - ads;
       return {
         key: k,
         weekday: weekdayFmt.format(dateObj).replace(".", ""),
         date: dateFmt.format(dateObj),
-        revenue: b?.revenue ?? 0,
+        revenue,
         orders: b?.orders ?? 0,
         visitors: b?.visitors ?? 0,
         addToCart: b?.addToCart ?? 0,
@@ -544,9 +549,25 @@ export default function AdminAnalytics() {
         purchases: b?.purchases ?? 0,
         aov: aovDay,
         conv,
+        cogs,
+        fees,
+        ads,
+        profit,
       };
     });
-  }, [buckets]);
+  }, [buckets, adSpend]);
+
+  const last7Totals = useMemo(() => {
+    const sum = (k: "revenue" | "cogs" | "fees" | "ads" | "profit") =>
+      last7Days.reduce((s, d) => s + d[k], 0);
+    return {
+      revenue: sum("revenue"),
+      cogs: sum("cogs"),
+      fees: sum("fees"),
+      ads: sum("ads"),
+      profit: sum("profit"),
+    };
+  }, [last7Days]);
 
   /* ── Meta attribution aggregations ── */
   const paidAttributedInWindow = useMemo(() => {
