@@ -51,6 +51,8 @@ interface AttributedOrder {
   utm_content?: string | null;
   utm_term?: string | null;
   fbclid?: string | null;
+  fbp?: string | null;
+  fbc?: string | null;
   landing_site?: string | null;
   referring_site?: string | null;
 }
