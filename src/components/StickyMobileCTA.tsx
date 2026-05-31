@@ -33,13 +33,9 @@ const StickyMobileCTA = () => {
     if (busy) return;
     setBusy(true);
     try {
-      // 1. Fetch the pillow product + the Sleep Kit product in parallel
-      const [pillowList, kitList] = await Promise.all([
-        fetchProducts(1, undefined, country),
-        fetchProducts(1, 'product_type:"Sleep Kit"', country),
-      ]);
+      // 1. Fetch the pillow product
+      const pillowList = await fetchProducts(1, undefined, country);
       const pillow = pillowList[0];
-      const kit = kitList[0];
       if (!pillow) {
         toast.error(t("product.addedToCart") ? "Product unavailable" : "Product unavailable");
         return;
@@ -80,36 +76,17 @@ const StickyMobileCTA = () => {
         country,
       );
 
-      // 4. Add Sleep Kit (best-effort — don't block if missing)
-      if (kit) {
-        const kitVariant = kit.node.variants.edges[0]?.node;
-        if (kitVariant) {
-          await addItem(
-            {
-              product: kit,
-              variantId: kitVariant.id,
-              variantTitle: kitVariant.title,
-              price: kitVariant.price,
-              quantity: 1,
-              selectedOptions: kitVariant.selectedOptions || [],
-              bundleLabel: "Sleep Kit",
-            },
-            country,
-          );
-        }
-      }
-
-      // 5. Tracking
+      // 4. Tracking
       trackAddToCart({
-        contentName: "1 Sleep&zy (Grey) + Sleep Kit",
+        contentName: "1 Sleep&zy (Grey)",
         contentId: greyVariant.id,
-        value: prices.single + prices.sleepKit,
+        value: prices.single,
         currency,
         quantity: 1,
       });
       trackFunnelStep("add_to_cart", {
-        step_value: "sticky_cta_single_grey_kit",
-        value: prices.single + prices.sleepKit,
+        step_value: "sticky_cta_single_grey",
+        value: prices.single,
         currency,
       });
 
@@ -117,7 +94,7 @@ const StickyMobileCTA = () => {
         position: "top-center",
       });
 
-      // 6. Open drawer
+      // 5. Open drawer
       setDrawerOpen(true);
     } catch (e) {
       console.error("Sticky CTA ATC failed", e);
