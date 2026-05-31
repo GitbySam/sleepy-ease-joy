@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useMarket } from "@/i18n/MarketContext";
 
@@ -8,9 +9,10 @@ const StickyMobileCTA = () => {
   const [visible, setVisible] = useState(false);
   const { t } = useLanguage();
   const { prices, formatPrice } = useMarket();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    let inactivityTimer: ReturnType<typeof setTimeout> | null = null;
     let lastScrollY = window.scrollY;
     let lastScrollTime = Date.now();
 
@@ -18,10 +20,11 @@ const StickyMobileCTA = () => {
     const hideSticky = () => setVisible(false);
 
     const isOfferCtaVisible = () => {
-      const offerSection = document.getElementById("offer");
-      if (!offerSection) return false;
-      const rect = offerSection.getBoundingClientRect();
-      return rect.bottom - 200 < window.innerHeight && rect.bottom > 0;
+      const section =
+        document.getElementById("offer") || document.getElementById("products");
+      if (!section) return false;
+      const rect = section.getBoundingClientRect();
+      return rect.top < window.innerHeight - 150 && rect.bottom > 150;
     };
 
     const handleScroll = () => {
@@ -29,43 +32,43 @@ const StickyMobileCTA = () => {
       const currentTime = Date.now();
       const scrollSpeed = Math.abs(currentScrollY - lastScrollY) / (currentTime - lastScrollTime);
 
-      // Ne jamais montrer si on est encore dans le Hero ou si le CTA bundle est visible
       const pastHero = currentScrollY > 100;
-      if (!pastHero || isOfferCtaVisible()) {
+      if (!pastHero) {
         hideSticky();
-        if (inactivityTimer) clearTimeout(inactivityTimer);
-        lastScrollY = currentScrollY;
-        lastScrollTime = currentTime;
-        return;
-      }
-
-      // Intention de quitter : scroll rapide vers le haut
-      const scrollingUpFast = currentScrollY < lastScrollY && scrollSpeed > 1.5;
-      if (scrollingUpFast) {
+      } else if (isOfferCtaVisible()) {
+        // L'utilisateur voit déjà la section produit/offer → masquer
+        hideSticky();
+      } else {
+        // Sinon visible en permanence dès qu'on a quitté le hero
         showSticky();
-        if (inactivityTimer) clearTimeout(inactivityTimer);
-        lastScrollY = currentScrollY;
-        lastScrollTime = currentTime;
-        return;
       }
 
-      // Inactivité : reset le timer à chaque scroll
-      hideSticky();
-      if (inactivityTimer) clearTimeout(inactivityTimer);
-      inactivityTimer = setTimeout(() => {
-        if (!isOfferCtaVisible()) showSticky();
-      }, 3000);
+      // Intention de quitter : scroll rapide vers le haut → forcer l'affichage
+      const scrollingUpFast = currentScrollY < lastScrollY && scrollSpeed > 1.5;
+      if (pastHero && scrollingUpFast) showSticky();
 
       lastScrollY = currentScrollY;
       lastScrollTime = currentTime;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      if (inactivityTimer) clearTimeout(inactivityTimer);
     };
   }, []);
+
+  const handleClick = () => {
+    const target =
+      document.getElementById("offer") || document.getElementById("products");
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    if (location.pathname !== "/product") {
+      navigate("/product");
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -80,10 +83,7 @@ const StickyMobileCTA = () => {
           <div className="bg-card/95 backdrop-blur-md border-t border-border px-4 pt-2 pb-4 shadow-[0_-4px_20px_rgba(0,0,0,0.15)]">
             <motion.div
               whileTap={{ scale: 0.97 }}
-              onClick={() => {
-                const offer = document.getElementById("offer");
-                if (offer) offer.scrollIntoView({ behavior: "smooth" });
-              }}
+              onClick={handleClick}
               className="w-full bg-black text-primary-foreground text-center py-2.5 rounded-full font-bold shadow-[0_4px_20px_rgba(0,0,0,0.3)] flex flex-col items-center justify-center gap-0.5 cursor-pointer leading-tight"
             >
               <span className="flex items-center justify-center gap-2">
