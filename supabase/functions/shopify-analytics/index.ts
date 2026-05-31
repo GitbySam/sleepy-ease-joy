@@ -8,6 +8,35 @@ const SHOPIFY_API_VERSION = '2025-07';
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
+// ── Profitability config ─────────────────────────────────────
+// COGS in CAD (cost + freight + packaging), all-in landed.
+// Source: supplier CANWANGDA, Canada column (USD), converted with USD/CAD = 1.40.
+const COGS_CAD = {
+  single: 15.55, // 1pc landed = 11.11 USD * 1.40
+  duo:    24.95, // 2pcs landed = 17.82 USD * 1.40
+  family: 34.23, // 3pcs landed = 24.45 USD * 1.40
+  kit:     2.00, // Sleep Kit add-on (estimate, low cost digital/eyemask)
+  unknown: 15.55, // fallback to single
+};
+// Shopify payment fees (Shopify Basic, CAD): 2.9% + 0.30 CAD per order.
+const SHOPIFY_FEE_PCT = 0.029;
+const SHOPIFY_FEE_FIXED = 0.30;
+
+function detectPack(item: any): keyof typeof COGS_CAD {
+  const blob = `${item?.variant_title || ''} ${item?.title || ''} ${item?.name || ''} ${item?.sku || ''}`.toLowerCase();
+  if (/(sleep\s*kit|kit\b|eye\s*mask|earplug)/.test(blob)) return 'kit';
+  if (/(family|3\s*pack|3pcs|trio|x\s*3|×\s*3)/.test(blob)) return 'family';
+  if (/(duo|2\s*pack|2pcs|couple|x\s*2|×\s*2)/.test(blob)) return 'duo';
+  if (/(single|1\s*pack|1pcs|solo|x\s*1|×\s*1)/.test(blob)) return 'single';
+  // Fallback by unit price (CAD) — Single 29.95 / Duo 59.95 / Family 64.95
+  const price = parseFloat(item?.price || '0');
+  if (price >= 60) return 'family';
+  if (price >= 40) return 'duo';
+  if (price >= 15) return 'single';
+  if (price > 0) return 'kit';
+  return 'unknown';
+}
+
 function jsonResponse(body: Record<string, unknown>, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
